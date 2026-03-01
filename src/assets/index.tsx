@@ -19,6 +19,11 @@ import IconPOAktif from "./Icon-POAktif.png";
 import IconPenawaranPengadaan from "./Icon-PenawaranPengadaan.png";
 import IconKonfirmasiSelesai from "./Icon-KonfirmasiSelesai.png";
 import IconJadwalUlang from "./Icon-JadwalUlang.png";
+import IconLocation from "./Icon-Location.png";
+import IconPhone from "./Icon-Phone.png";
+import IconCart from "./Icon-Cart.png";
+import IconMaintenance2 from "./Icon-Maintenance2.png";
+import IconLastActivity from "./Icon-LastActivity.png";
 
 export const Icons = {
   Mantra: IconMantra,
@@ -42,4 +47,9 @@ export const Icons = {
   PenawaranPengadaan: IconPenawaranPengadaan,
   KonfirmasiSelesai: IconKonfirmasiSelesai,
   JadwalUlang: IconJadwalUlang,
+  Location: IconLocation,
+  Phone: IconPhone,
+  Cart: IconCart,
+  Maintenance2: IconMaintenance2,
+  LastActivity: IconLastActivity,
 };
