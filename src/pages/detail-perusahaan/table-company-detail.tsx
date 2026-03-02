@@ -190,55 +190,77 @@ export default function DaftarPoPengadaan() {
             </TableRow>
           </TableHeader>
           
-          <TableBody>
-            {poData.map((row, index) => (
-              <TableRow 
-                key={index} 
-                // Logika Highlight Baris: Jika isHighlighted true, ubah background menjadi kuning muda
-                className={`border-b-slate-100 ${row.isHighlighted ? "bg-amber-50/50 hover:bg-amber-50/80" : "hover:bg-slate-50"}`}
-              >
+<TableBody>
+            {poData.map((row, index) => {
+              
+// 1. Inisialisasi variabel bawaan (default)
+              let rowBgClass = "hover:bg-slate-50"; // Background putih/abu-abu
+              let shadowClass = ""; // Tidak ada shadow/garis kiri
+
+              // 2. Logika Kondisional (If/Else) untuk Background & Shadow
+              if (row.status === "Konfirmasi Proyek") {
+                // Latar belakang kuning sangat muda
+                rowBgClass = "bg-[#FEFCE8] hover:bg-[#f7f5d9]"; 
+                // Shadow kiri warna FEF3C7, hover menjadi FDE68A
+                shadowClass = "shadow-[inset_2px_0_0_0_#FACC15]";
                 
-                <TableCell className="font-bold text-slate-800 text-xs py-3.5 pl-4">
-                  {row.nomor}
-                </TableCell>
-                
-                <TableCell className="text-slate-600 text-xs py-3.5">
-                  {row.pengadaan}
-                </TableCell>
-                
-                <TableCell className="text-slate-500 text-xs py-3.5">
-                  {row.tanggal}
-                </TableCell>
-                
-                <TableCell className="py-3.5">
-                  <Badge className={`text-[10px] px-2.5 py-0.5 rounded-full ${getTopBadgeColor(row.topType)}`}>
-                    {row.top}
-                  </Badge>
-                </TableCell>
-                
-                <TableCell className="py-3.5">
-                  {/* Memanggil fungsi renderStatusBadge yang sudah dibuat di atas */}
-                  {renderStatusBadge(row.status, row.statusType, row.statusIcon)}
-                </TableCell>
-                
-                <TableCell className="py-3.5">
-                  <div className={`flex items-center gap-1.5 text-xs ${row.garansiAktif ? "text-slate-700 font-medium" : "text-slate-400"}`}>
-                    {row.garansi !== "Belum Tersedia" && row.garansi !== "Sudah Habis" && (
-                      <Clock className="w-3.5 h-3.5" />
-                    )}
-                    <span>{row.garansi}</span>
-                  </div>
-                </TableCell>
-                
-                <TableCell className="text-right py-3.5">
-                  <button className="flex items-center justify-end gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline ml-auto w-full">
-                    Lihat Detail
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </TableCell>
-                
-              </TableRow>
-            ))}
+              } else if (row.status === "Menunggu Persetujuan") {
+                // Latar belakang kuning/oranye pekat
+                rowBgClass = "bg-[#FEF3C7] hover:bg-[#f0e4b7]"; 
+                // Shadow kiri warna FDE68A, hover menjadi kuning yang sedikit lebih gelap (FCD34D)
+                shadowClass = "shadow-[inset_2px_0_0_0_#D1AB17]";
+              }
+
+              return (
+                <TableRow 
+                  key={index} 
+                  className={`group border-b-slate-100 transition-colors ${rowBgClass}`}
+                >
+                  
+                  <TableCell 
+                    // Cukup panggil variabel shadowClass di sini
+                    className={`font-bold text-slate-800 text-xs py-3.5 pl-4 ${shadowClass}`}
+                  >
+                    {row.nomor}
+                  </TableCell>
+                  
+                  <TableCell className="text-slate-600 text-xs py-3.5">
+                    {row.pengadaan}
+                  </TableCell>
+                  
+                  <TableCell className="text-slate-500 text-xs py-3.5">
+                    {row.tanggal}
+                  </TableCell>
+                  
+                  <TableCell className="py-3.5">
+                    <Badge className={`text-[10px] px-2.5 py-0.5 rounded-full ${getTopBadgeColor(row.topType)}`}>
+                      {row.top}
+                    </Badge>
+                  </TableCell>
+                  
+                  <TableCell className="py-3.5">
+                    {renderStatusBadge(row.status, row.statusType, row.statusIcon)}
+                  </TableCell>
+                  
+                  <TableCell className="py-3.5">
+                    <div className={`flex items-center gap-1.5 text-xs ${row.garansiAktif ? "text-slate-700 font-medium" : "text-slate-400"}`}>
+                      {row.garansi !== "Belum Tersedia" && row.garansi !== "Sudah Habis" && (
+                        <Clock className="w-3.5 h-3.5" />
+                      )}
+                      <span>{row.garansi}</span>
+                    </div>
+                  </TableCell>
+                  
+                  <TableCell className="text-right py-3.5">
+                    <button className="flex items-center justify-end gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline ml-auto w-full">
+                      Lihat Detail
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </TableCell>
+                  
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </CardContent>
