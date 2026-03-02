@@ -3,7 +3,7 @@ import { Icons } from "@/assets";
 
 export default function CardCompanyProfileDetail() {
   return (
-    <Card className="p-6 rounded-xl border-slate-200 shadow-sm mt-6">
+    <Card className="p-6 rounded-xl border-slate-200 shadow-sm">
       
       {/* --- BAGIAN ATAS: Info Perusahaan --- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

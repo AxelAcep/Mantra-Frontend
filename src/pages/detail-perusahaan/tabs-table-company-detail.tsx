@@ -5,7 +5,9 @@ import {
   TabsTrigger,
 } from "@/components/common/tabs-company-detail";
 import { Icons } from "@/assets";
-import DaftarPoPengadaan from "./table-company-detail";
+import DaftarPoPengadaan from "./table-daftar-po-pengadaan";
+import DaftarPoMaintenance from "./table-daftar-po-maintenance";
+import DaftarRiwayat from "./table-daftar-riwayat";
 
 export default function TabsTableCompanyDetail() {
     return (
@@ -55,10 +57,10 @@ export default function TabsTableCompanyDetail() {
                 <DaftarPoPengadaan />
             </TabsContent>
             <TabsContent value="maintenance" className="pt-4">
-                <DaftarPoPengadaan />
+                <DaftarPoMaintenance />
             </TabsContent>
             <TabsContent value="riwayat" className="pt-4">
-                <DaftarPoPengadaan />
+                <DaftarRiwayat />
             </TabsContent>
         </Tabs>
     )
