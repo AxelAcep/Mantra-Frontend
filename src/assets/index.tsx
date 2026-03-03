@@ -25,6 +25,7 @@ import IconCart from "./Icon-Cart.png";
 import IconMaintenance2 from "./Icon-Maintenance2.png";
 import IconLastActivity from "./Icon-LastActivity.png";
 import IconMaintenance3 from "./Icon-Maintenance3.png";
+import IconMantraBig from "./Icon-MantraBig.png";
 
 export const Icons = {
   Mantra: IconMantra,
@@ -54,4 +55,5 @@ export const Icons = {
   Maintenance2: IconMaintenance2,
   LastActivity: IconLastActivity,
   Maintenance3: IconMaintenance3,
+  MantraBig: IconMantraBig,
 };
