@@ -11,13 +11,13 @@ export default function CardPenawaranPengadaan() {
     return (
         <Card className="rounded-xl border-slate-200 shadow-sm p-0 gap-0">
             {/* Bagian Header: Judul, Ikon, dan Tombol */}
-            <CardHeader className="p-4 pb-0 gap-2">
+            <CardHeader className="p-4 pb-0 gap-2 h-[35%]">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-[12px] font-bold uppercase text-slate-400">
                         PENAWARAN PENGADAAN
                     </CardTitle>
                     <button className="text-[12px] text-cyan-600 font-medium hover:underline">
-                        Lihat →
+                        Lihat
                     </button>
                 </div>
             </CardHeader>
