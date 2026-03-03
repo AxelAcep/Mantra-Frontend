@@ -26,6 +26,9 @@ import IconMaintenance2 from "./Icon-Maintenance2.png";
 import IconLastActivity from "./Icon-LastActivity.png";
 import IconMaintenance3 from "./Icon-Maintenance3.png";
 import IconMantraBig from "./Icon-MantraBig.png";
+import IconPOD from "./Icon-PO-D.png";
+import IconMaintenanceD from "./Icon-Maintenance-D.png";
+import IconCalendar from "./Icon-Calendar.png";
 
 export const Icons = {
   Mantra: IconMantra,
@@ -56,4 +59,7 @@ export const Icons = {
   LastActivity: IconLastActivity,
   Maintenance3: IconMaintenance3,
   MantraBig: IconMantraBig,
+  POD: IconPOD,
+  MaintenanceD: IconMaintenanceD,
+  Calendar: IconCalendar,
 };

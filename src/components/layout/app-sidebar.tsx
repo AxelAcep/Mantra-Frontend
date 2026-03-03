@@ -25,11 +25,11 @@ const menuOperasional = [
   { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "#", badge: 3 },
   { title: "Tracking Barang", icon: Icons.Tracking, url: "#" },
   { title: "Maintenance", icon: Icons.Maintenance, url: "#", badge: 1 },
-  { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "#" },
+  { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" },
 ];
 
 const menuManajemen = [
-  { title: "Logbook", icon: Icons.Logbook, url: "#" },
+  { title: "Logbook", icon: Icons.Logbook, url: "/logbook" },
   { title: "Aktivitas Harian", icon: Icons.AktivitasHarian, url: "#" },
   { title: "Akun Karyawan", icon: Icons.AkunKaryawan, url: "#" },
 ];

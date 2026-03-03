@@ -30,11 +30,11 @@ export default function CardJadwalUlang() {
             <CardContent className="flex justify-between items-center w-full p-0">
                 <button className="flex-1 flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 transition-colors">
                     {/* Lingkaran Background Ikon (Cyan) */}
-                    <div className="w-6 h-6 rounded-full bg-cyan-50 flex items-center justify-center mb-3 mt-1">
+                    <div className="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center mb-3 mt-1">
                         <img 
-                        src={Icons.JadwalUlang} 
+                        src={Icons.Calendar} 
                         alt="Jadwal Ulang" 
-                        className="w-6 h-6 object-contain" 
+                        className="w-10 h-10 object-contain" 
                         />
                     </div>
                     

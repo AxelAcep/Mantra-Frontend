@@ -5,7 +5,7 @@ export default function LoginPage() {
     const { email, setEmail, password, setPassword, error, loading, handleSubmit } = useLogin();
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
             
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8 mb-4">
                 <img src={Icons.MantraBig} alt="Logo Mantra" className="mx-auto mb-2 w-12 h-12" />
