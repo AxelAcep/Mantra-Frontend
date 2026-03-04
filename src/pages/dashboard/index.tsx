@@ -3,8 +3,15 @@ import DailyActivityReport from "./card-daily-activity-report";
 import LogbookMonitoring from "./card-logbook-monitoring";
 import KpiKaryawan from "./card-kpi-karyawan";
 import CardPenawaranDouble from "./card-penawaran-Double";
+import { useEffect } from "react";
+import { useHeaderTitle } from "../../components/layout/layout"; // sesuaikan path
 
 export default function DashboardPage() {
+    const { setTitle } = useHeaderTitle();
+    useEffect(() => {
+        setTitle("Dashboard Operasional");
+    }, [setTitle]);
+
     return (
         <div className="p-3">
             <h1 className="text-md font-bold tracking-tight text-slate-500">

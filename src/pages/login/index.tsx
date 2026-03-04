@@ -4,6 +4,10 @@ import { useLogin } from "../../hooks/use-login";
 export default function LoginPage() {
     const { email, setEmail, password, setPassword, error, loading, handleSubmit } = useLogin();
 
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isPasswordValid = password.trim().length > 0;
+    const isFormValid = isEmailValid && isPasswordValid;
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
             
@@ -54,8 +58,12 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="w-full bg-[#06B6D4] text-white py-2 px-4 rounded-md hover:bg-[#0596B2] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!isFormValid || loading}
+                        className={`w-full text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200
+                            ${isFormValid && !loading
+                                ? "bg-[#06B6D4] hover:bg-[#0596B2] focus:ring-blue-500 cursor-pointer"
+                                : "bg-gray-300 cursor-not-allowed"
+                            }`}
                     >
                         {loading ? "Memuat..." : "Masuk"}
                     </button>

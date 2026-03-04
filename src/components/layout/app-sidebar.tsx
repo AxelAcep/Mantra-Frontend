@@ -22,7 +22,7 @@ import { Icons } from "@/assets";
 const menuOperasional = [
   { title: "Beranda", icon: Icons.Beranda, url: "/dashboard", active: true },
   { title: "Notifikasi", icon: Icons.Notifikasi, url: "#", badge: 5 },
-  { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "#", badge: 3 },
+  { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 },
   { title: "Tracking Barang", icon: Icons.Tracking, url: "#" },
   { title: "Maintenance", icon: Icons.Maintenance, url: "#", badge: 1 },
   { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" },

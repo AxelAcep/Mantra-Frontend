@@ -2,12 +2,12 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Icons } from "@/assets"
 
-export function SiteHeader() {
+export function SiteHeader({ title }: { title: string }) {
     return (
-        <header className="sticky top-0 z-10 flex h-12 w-full items-center border-b bg-white px-6">
+        <header className="sticky top-0 z-10 flex h-16 w-full items-center border-b bg-white px-6">
             <div className="flex items-center gap-4">
                 <h1 className="text-xl font-bold tracking-tight text-slate-600">
-                    Dashboard Operasional
+                    {title}
                 </h1>
                 
                 <Separator orientation="vertical" className="h-8! w-px! bg-slate-300" />
@@ -30,7 +30,7 @@ export function SiteHeader() {
                     </div>
                     <Input 
                         placeholder="Cari proyek, customer..." 
-                        className="pl-10 border-none focus-visible:ring-1 focus-visible:ring-slate-200 bg-cyan-50 text-cyan-900 placeholder:text-cyan-900"
+                        className="pl-10 border-none focus-visible:ring-1 focus-visible:ring-slate-200 bg-cyan-50 text-cyan-900 font-medium placeholder:text-cyan-500"
                     />
                 </div>
             </div>

@@ -1,5 +1,6 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Search, Phone, Clock, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useHeaderTitle } from '@/components/layout/layout';
 
 const companies = [
   { name: "PT. ABC Maju Jaya", address: "Jl. Sudirman No. 45, Jakarta Sela...", phone: "(021) 555-0123", activity: "2 jam lalu", pengadaan: 3, maintenance: 1, total: 12, id : 1 },
@@ -12,6 +13,10 @@ const companies = [
 ];
 
 export default function PerusahaanPage() {
+  const { setTitle } = useHeaderTitle();
+  useEffect(() => {
+      setTitle("Daftar Perusahaan");
+  }, [setTitle]);
   return (
       <div className="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         
@@ -47,7 +52,7 @@ export default function PerusahaanPage() {
             <tbody className="divide-y divide-gray-50">
               {companies.concat(companies.slice(0, 5)).map((item, idx) => (
                 <tr key={idx} className="hover:bg-gray-50/80 transition-colors text-sm text-gray-700">
-                  <td className="px-6 py-4 font-bold text-slate-800">{item.name}</td>
+                  <td className="px-6 py-4 font-md text-slate-800">{item.name}</td>
                   <td className="px-6 py-4 text-gray-500 max-w-[200px] truncate">{item.address}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
