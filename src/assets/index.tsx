@@ -29,6 +29,8 @@ import IconMantraBig from "./Icon-MantraBig.png";
 import IconPOD from "./Icon-PO-D.png";
 import IconMaintenanceD from "./Icon-Maintenance-D.png";
 import IconCalendar from "./Icon-Calendar.png";
+import IconLeftArrow from "./Icon-Left-Arrow.png";
+import IconUpDown from "./Icon-UpDown.png";
 
 export const Icons = {
   Mantra: IconMantra,
@@ -62,4 +64,6 @@ export const Icons = {
   POD: IconPOD,
   MaintenanceD: IconMaintenanceD,
   Calendar: IconCalendar,
+  LeftArrow: IconLeftArrow,
+  UpDown: IconUpDown,
 };

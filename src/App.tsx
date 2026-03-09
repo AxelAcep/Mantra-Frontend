@@ -9,6 +9,13 @@ import LoginPage from "./pages/login";
 import LogBookPage from "./pages/logbook";
 import ListPengadaan from "./pages/pengadaan-barang";
 import Penawaran from "./pages/penawaran";
+import RequestPenawaranPage from "./pages/dashboard-detail/request-penawaran";
+import PenawaranApprovalPage from "./pages/dashboard-detail/penawaran-approval";
+import KonfirmasiSelesaiPage from "./pages/dashboard-detail/konfirmasi-selesai";
+import PenawaranFinalPage from "./pages/dashboard-detail/penawaran-final";
+import POAktifPage from "./pages/dashboard-detail/po-aktif";
+import PengadaanBarangPage from "./pages/dashboard-detail/pengadaan-barang";
+import JadwalUlangPage from "./pages/dashboard-detail/jadwal-ulang";
 
 function App() {
   return (
@@ -22,6 +29,13 @@ function App() {
             <Route path="perusahaan" element={<PerusahaanPage />} />
             <Route path="perusahaan/:id" element={<DetailPerusahaanPage />} />
             <Route path="penawaran/:id" element={<Penawaran />} />
+            <Route path="dashboard/request-penawaran" element={<RequestPenawaranPage />} />
+            <Route path="dashboard/konfirmasi-selesai" element={<KonfirmasiSelesaiPage />} />
+            <Route path="dashboard/penawaran-approval" element={<PenawaranApprovalPage />} />
+            <Route path="dashboard/penawaran-final" element={<PenawaranFinalPage />} />
+            <Route path="dashboard/po-aktif" element={<POAktifPage />} />
+            <Route path="dashboard/pengadaan-barang" element={<PengadaanBarangPage />} />
+            <Route path="dashboard/jadwal-ulang" element={<JadwalUlangPage />} />
           </Route>
       </Routes>
     </BrowserRouter>
