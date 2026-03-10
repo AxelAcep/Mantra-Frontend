@@ -20,7 +20,7 @@ export default function JadwalUlangPage() {
 
                 <div className="flex flex-col">
                     <h1 className="text-2xl font-bold text-[#111827] tracking-tight">
-                        Daftar Pengajuan Jadwal Ulang
+                        Daftar Pengajuan Reschedule
                     </h1>
                     <p className="text-[14px] text-slate-500 mt-0.5 font-medium">
                         Tinjau permintaan perubahan jadwal aktivitas karyawan.

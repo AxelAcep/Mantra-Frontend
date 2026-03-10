@@ -16,6 +16,9 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import { AlertDialogMassal } from "./alert-dialog-massal";
+import { AlertDialogSetuju } from "./alert-dialog-setuju";
+import { AlertDialogTolakReschedule } from "./alert-dialog-tolak-reschedule";
 
 // Data Dummy disesuaikan dengan gambar (semua berstatus Menunggu)
 const pengajuanData = [
@@ -87,16 +90,24 @@ const pengajuanData = [
 ];
 
 export default function DaftarPengajuanJadwalUlang() {
+  const handleKonfirmasiSemua = () => {
+  };
+
+  const handleSetujui = () => {
+  };
+
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
       
       {/* --- HEADER / TOOLBAR --- */}
       {/* Menggunakan justify-end agar tombol terdorong ke paling kanan */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-end">
-        <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
-          <CheckCheck className="w-4 h-4 mr-1.5" />
-          Terima Semua Pengajuan
-        </Button>
+        <AlertDialogMassal onConfirm={handleKonfirmasiSemua}>
+          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
+            <CheckCheck className="w-4 h-4 mr-1.5" />
+            Terima Semua Pengajuan
+          </Button>
+        </AlertDialogMassal>
       </div>
 
       {/* --- TABEL --- */}
@@ -206,12 +217,20 @@ export default function DaftarPengajuanJadwalUlang() {
                     
                     {/* Tombol Ceklis dan Silang */}
                     <div className="flex items-center gap-1.5">
-                      <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-50 transition-colors">
-                        <Check className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
-                      <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-50 transition-colors">
-                        <X className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
+                      <AlertDialogSetuju onConfirm={handleSetujui}>
+                        <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-100 transition-colors">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
+                        </button>
+                      </AlertDialogSetuju>
+                      <AlertDialogTolakReschedule onConfirm={(alasan) => {
+                          console.log("Ditolak dengan alasan:", alasan);
+                          // Panggil API tolak di sini
+                        }}
+                      >
+                        <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors">
+                          <X className="h-3.5 w-3.5 stroke-[3]" />
+                        </button>
+                      </AlertDialogTolakReschedule>
                     </div>
                     
                     {/* Link Teks */}

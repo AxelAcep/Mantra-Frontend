@@ -19,6 +19,9 @@ import {
   X,
   CheckCheck,
 } from "lucide-react";
+import { AlertDialogMassalMaintenance } from "./alert-dialog-massal-maintenance";
+import { AlertDialogSetuju } from "./alert-dialog-setuju";
+import { AlertDialogTolak } from "./alert-dialog-tolak";
 
 // Data Dummy sesuai dengan gambar terbaru
 const permintaanData = [
@@ -79,6 +82,12 @@ const permintaanData = [
 ];
 
 export default function DaftarPenawaranApprovalMaintenance() {
+  const handleConfirmMassal = () => {
+  };
+
+  const handleConfirmSetuju = () => {
+  };
+
     return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
       
@@ -92,10 +101,12 @@ export default function DaftarPenawaranApprovalMaintenance() {
             className="pl-9 h-9 text-xs bg-slate-50/50 border-slate-200 shadow-none focus-visible:ring-cyan-500 rounded-lg"
           />
         </div>
-        <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
-          <CheckCheck className="w-4 h-4 mr-1.5" />
-          Terima Semua Penawaran
-        </Button>
+        <AlertDialogMassalMaintenance onConfirm={handleConfirmMassal}>
+          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
+            <CheckCheck className="w-4 h-4 mr-1.5" />
+            Terima Semua Penawaran
+          </Button>
+        </AlertDialogMassalMaintenance>
       </div>
 
       {/* --- TABEL --- */}
@@ -203,12 +214,16 @@ export default function DaftarPenawaranApprovalMaintenance() {
                   <div className="flex items-center justify-end gap-3">
                     {/* Tombol Aksi (Ceklis dan Silang) */}
                     <div className="flex items-center gap-1.5">
-                      <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-100 transition-colors">
-                        <Check className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
-                      <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors">
-                        <X className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
+                      <AlertDialogSetuju onConfirm={handleConfirmSetuju}>
+                        <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-100 transition-colors">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
+                        </button>
+                      </AlertDialogSetuju>
+                      <AlertDialogTolak onConfirm={(alasan) => console.log("Alasan Tolak:", alasan)}>
+                        <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors">
+                          <X className="h-3.5 w-3.5 stroke-[3]" />
+                        </button>
+                      </AlertDialogTolak>
                     </div>
                     
                     {/* Link Teks */}
