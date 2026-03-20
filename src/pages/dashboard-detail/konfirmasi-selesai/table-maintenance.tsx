@@ -9,14 +9,16 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
+import {
+  Search,
   CheckCheck,
   Check,
   X,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import { AlertDialogMassalMaintenance } from "./alert-dialog-massal-maintenance";
+import { AlertDialogSetuju } from "./alert-dialog-setuju";
 
 // Data Dummy sesuai dengan gambar terbaru
 const konfirmasiMaintenanceData = [
@@ -58,9 +60,15 @@ const konfirmasiMaintenanceData = [
 ];
 
 export default function DaftarKonfirmasiSelesaiMaintenance() {
+  const handleConfirmMassal = () => {
+  };
+
+  const handleConfirm = () => {
+  };
+
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
-      
+
       {/* --- HEADER / TOOLBAR (Sesuai Konfigurasi Anda) --- */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-4">
         <div className="relative w-full max-w-sm">
@@ -71,10 +79,12 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
             className="pl-9 h-9 text-xs bg-slate-50/50 border-slate-200 shadow-none focus-visible:ring-cyan-500 rounded-lg"
           />
         </div>
-        <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
-          <CheckCheck className="w-4 h-4 mr-1.5" />
-          Terima Semua Penawaran
-        </Button>
+        <AlertDialogMassalMaintenance onConfirm={handleConfirmMassal}>
+          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
+            <CheckCheck className="w-4 h-4 mr-1.5" />
+            Konfirmasi Seluruh Maintenance
+          </Button>
+        </AlertDialogMassalMaintenance>
       </div>
 
       {/* --- TABEL --- */}
@@ -82,19 +92,19 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50/30 hover:bg-slate-50/30">
-              
+
               <TableHead className="h-11 w-[18%] pl-4">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
                   NOMOR PO
                 </div>
               </TableHead>
-              
+
               <TableHead className="h-11 w-[20%]">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
                   PERUSAHAAN
                 </div>
               </TableHead>
-              
+
               <TableHead className="h-11 w-[20%]">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
                   JENIS MAINTENANCE
@@ -112,21 +122,21 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
                   TANGGAL SERAH TERIMA
                 </div>
               </TableHead>
-              
+
               <TableHead className="text-[10px] font-bold text-slate-500 uppercase h-11 text-right pr-4 w-[12%]">
                 AKSI
               </TableHead>
-              
+
             </TableRow>
           </TableHeader>
-          
+
           <TableBody>
             {konfirmasiMaintenanceData.map((row, index) => (
-              <TableRow 
-                key={index} 
+              <TableRow
+                key={index}
                 className="border-b-slate-100 hover:bg-slate-50 transition-colors"
               >
-                
+
                 {/* Kolom Nomor PO (Bold) */}
                 <TableCell className="font-bold text-slate-800 text-xs py-4 pl-4">
                   {row.nomorPo}
@@ -145,31 +155,30 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
                 <TableCell className="text-slate-500 text-xs py-4">
                   {row.tanggalPesan}
                 </TableCell>
-                
+
                 <TableCell className="text-slate-500 text-xs py-4">
                   {row.tanggalSerah}
                 </TableCell>
-                
+
                 {/* Kolom Aksi */}
                 <TableCell className="text-right py-4 pr-4">
                   <div className="flex items-center justify-end gap-3">
                     {/* Tombol Aksi (Ceklis dan Silang) */}
                     <div className="flex items-center gap-1.5">
-                      <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-50 transition-colors">
-                        <Check className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
-                      <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-50 transition-colors">
-                        <X className="h-3.5 w-3.5 stroke-[3]" />
-                      </button>
+                      <AlertDialogSetuju onConfirm={handleConfirm}>
+                        <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-50 transition-colors">
+                          <Check className="h-3.5 w-3.5 stroke-[3]" />
+                        </button>
+                      </AlertDialogSetuju>
                     </div>
-                    
+
                     {/* Link Teks */}
                     <button className="text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline shrink-0">
                       Lihat Detail
                     </button>
                   </div>
                 </TableCell>
-                
+
               </TableRow>
             ))}
           </TableBody>
@@ -181,12 +190,12 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
         <p className="text-xs text-slate-500">
           Menampilkan <strong className="text-slate-700">5</strong> dari <strong className="text-slate-700">50</strong> hasil
         </p>
-        
+
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-400 hover:text-slate-600" disabled>
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          
+
           <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
             1
           </Button>
@@ -200,13 +209,13 @@ export default function DaftarKonfirmasiSelesaiMaintenance() {
           <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
             8
           </Button>
-          
+
           <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100">
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       </div>
-      
+
     </Card>
   );
 }

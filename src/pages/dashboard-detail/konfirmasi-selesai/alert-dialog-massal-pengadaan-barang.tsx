@@ -32,7 +32,7 @@ export function AlertDialogMassalPengadaanBarang({ children, onConfirm }: AlertD
             Konfirmasi Persetujuan Massal
           </AlertDialogTitle>
           <AlertDialogDescription className="text-slate-500 mt-2 text-sm leading-relaxed">
-            Apakah Anda yakin ingin mengonfirmasi bahwa seluruh <strong>Penawaran Pengadaan Barang</strong> dalam daftar ini telah selesai?
+            Apakah Anda yakin ingin mengonfirmasi bahwa seluruh proyek <strong>Pengadaan Barang</strong> dalam daftar ini telah selesai? Tindakan ini akan memperbarui status proyek menjadi selesai secara otomatis.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

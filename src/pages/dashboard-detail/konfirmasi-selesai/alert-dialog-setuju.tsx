@@ -12,12 +12,12 @@ import {
 import React from "react";
 
 // Definisikan tipe props yang akan diterima komponen ini
-interface AlertDialogMassalProps {
+interface AlertDialogSetujuProps {
   children: React.ReactNode;
   onConfirm: () => void;
 }
 
-export function AlertDialogMassalPengadaanBarang({ children, onConfirm }: AlertDialogMassalProps) {
+export function AlertDialogSetuju({ children, onConfirm }: AlertDialogSetujuProps) {
   return (
     <AlertDialog>
 
@@ -29,10 +29,10 @@ export function AlertDialogMassalPengadaanBarang({ children, onConfirm }: AlertD
       <AlertDialogContent className="rounded-xl sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-slate-800 text-lg">
-            Konfirmasi Persetujuan Massal
+            Konfirmasi Proyek
           </AlertDialogTitle>
           <AlertDialogDescription className="text-slate-500 mt-2 text-sm leading-relaxed">
-            Apakah Anda yakin ingin mengonfirmasi bahwa seluruh <strong>Penawaran Pengadaan Barang</strong> dalam daftar ini telah selesai?
+            Apakah Anda yakin ingin menyetujui proyek telah selesai?
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -45,7 +45,7 @@ export function AlertDialogMassalPengadaanBarang({ children, onConfirm }: AlertD
             className="rounded-full bg-cyan-500! hover:bg-cyan-600! text-white! text-xs font-medium shadow-sm"
             onClick={onConfirm}
           >
-            Ya, Konfirmasi Semua
+            Ya, Setujui
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
