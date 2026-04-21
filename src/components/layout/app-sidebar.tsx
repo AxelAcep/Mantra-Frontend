@@ -62,7 +62,7 @@ const getMenuManajemen = (): MenuItem[] => {
     menu.push({
       title: "Akun Karyawan",
       icon: Icons.AkunKaryawan,
-      url: "/manajemen-akun",
+      url: "/akunkaryawan",
     });
   }
 
@@ -260,7 +260,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarSeparator className="bg-slate-100" />
+      <SidebarSeparator className="bg-slate-100/50" />
 
       <SidebarFooter className="p-2">
         <SidebarMenu>

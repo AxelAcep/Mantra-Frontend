@@ -1,62 +1,80 @@
+import React from 'react';
+import { Check } from 'lucide-react';
+
 interface Step {
-  n: number
-  label: string
-  status: "done" | "active" | "inactive"
+  n: number;
+  label: string;
+  status: "done" | "active" | "inactive";
 }
 
 interface ProgressCardProps {
-  steps: Step[]
-  onStepClick?: (step: number) => void
+  steps: Step[];
+  onStepClick?: (step: number) => void;
 }
 
 export default function ProgressCard({ steps, onStepClick }: ProgressCardProps) {
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-8 shadow-sm">
-      <div className="flex justify-between relative">
+    <div className="bg-white border border-gray-100 rounded-3xl p-4 lg:p-10 shadow-sm overflow-x-auto">
+      <div className="flex items-start justify-between min-w-[800px]">
+        {steps.map((step, i) => {
+          const isLast = i === steps.length - 1;
+          const nextStep = steps[i + 1];
+          const isLineActive = nextStep && (nextStep.status === 'done' || nextStep.status === 'active');
 
-        {/* Line */}
-        <div className="flex-1 absolute top-4 left-0 w-full h-[2px] bg-gray-100 z-0" />
+          return (
+            <React.Fragment key={i}>
+              {/* Step Item */}
+              <div
+                className={`flex flex-col items-center group ${onStepClick ? 'cursor-pointer' : ''}`}
+                onClick={() => onStepClick && onStepClick(step.n)}
+              >
+                {/* Icon Container */}
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 relative z-10
+                  ${step.status === "active"
+                      ? "bg-white border-2 border-cyan-500 ring-4 ring-cyan-50"
+                      : step.status === "done"
+                        ? "bg-cyan-500 border-2 border-cyan-500 text-white shadow-lg shadow-cyan-100"
+                        : "bg-white border-2 border-gray-100 text-gray-300"
+                    }`}
+                >
+                  {step.status === "active" ? (
+                    <div className="w-2.5 h-2.5 bg-cyan-500 rounded-full animate-pulse" />
+                  ) : step.status === "done" ? (
+                    <Check className="w-5 h-5 stroke-[3px]" />
+                  ) : (
+                    <span className="font-sans">{step.n}</span>
+                  )}
+                </div>
 
-        {steps.map((step, i) => (
-          <div
-            key={i}
-            className={`flex flex-col items-center gap-3 relative z-[1] bg-white px-2 ${onStepClick ? 'cursor-pointer' : ''}`}
-            onClick={() => onStepClick && onStepClick(step.n)}
-          >
+                {/* Label */}
+                <span
+                  className={`mt-4 text-[11px] font-bold text-center w-24 leading-tight transition-colors duration-300
+                  ${step.status === "active" || step.status === "done"
+                      ? "text-cyan-700"
+                      : "text-gray-400 group-hover:text-gray-500"
+                    }`}
+                >
+                  {step.label}
+                </span>
+              </div>
 
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-4
-              ${step.status === "active"
-                  ? "bg-white border-cyan-500 text-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-                  : step.status === "done"
-                    ? "bg-cyan-500 border-cyan-500 text-white"
-                    : "bg-white border-gray-200 text-gray-300"
-                }`}
-            >
-              {step.status === "active" ? (
-                <div className="w-2 h-2 bg-cyan-500 rounded-full" />
-              ) : step.status === "done" ? (
-                "✓"
-              ) : (
-                step.n
+              {/* Connecting Line */}
+              {!isLast && (
+                <div className="flex-1 mt-5 px-2">
+                  <div
+                    className={`h-[2px] w-full transition-all duration-500
+                    ${isLineActive
+                        ? "bg-cyan-500"
+                        : "border-t-2 border-dashed border-gray-100"
+                      }`}
+                  />
+                </div>
               )}
-            </div>
-
-            <span
-              className={`text-[10px] font-bold text-center max-w-[80px]
-              ${step.status === "active"
-                  ? "text-cyan-600"
-                  : step.status === "done"
-                    ? "text-cyan-500"
-                    : "text-gray-300"
-                }`}
-            >
-              {step.label}
-            </span>
-
-          </div>
-        ))}
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
-  )
+  );
 }

@@ -99,20 +99,31 @@ export function LogSection({ title, items }: { title: string, items: LogEntry[] 
   if (items.length === 0) return null;
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-bold text-gray-300 tracking-[2px]">{title}</p>
-      <div className="relative space-y-6 pl-4 border-l border-gray-100">
+      <div className="flex">
+        <p className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+          {title}
+        </p>
+      </div>
+      <div className="relative space-y-6 pl-5 ml-2.5 border-l-2 border-slate-50">
         {items.map((log) => (
           <div key={log.id} className="relative">
-            <div className={`absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center ${log.type === 'success' ? "bg-green-400" : log.type === 'system' ? "bg-slate-400" : "bg-blue-400"
-              }`}>
-              {log.type === 'success' && <CheckCircle2 size={8} className="text-white" />}
+            {/* The Dot */}
+            <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden text-[#94a3b8]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
             </div>
-            <div className="flex justify-between items-start gap-2">
+            
+            <div className="flex justify-between items-start gap-4">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-800">{log.user} <span className="text-red-500">{log.type === 'comment' ? '●' : ''}</span></p>
-                <p className="text-[10px] text-gray-500 leading-relaxed">{log.action}</p>
+                <p className="text-xs font-bold text-slate-800 leading-tight">
+                  {log.user}
+                </p>
+                <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+                  {log.action}
+                </p>
               </div>
-              <span className="text-[9px] text-gray-300 font-medium shrink-0">{log.time}</span>
+              <span className="text-[10px] text-slate-400 font-semibold shrink-0">
+                {log.time}
+              </span>
             </div>
           </div>
         ))}

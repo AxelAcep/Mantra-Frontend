@@ -11,6 +11,15 @@ import {
 } from 'lucide-react';
 import { DocumentItem, type LogEntry, LogSection } from './components';
 
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-4">
+      <h1 className="font-bold text-xl text-slate-800">{title}</h1>
+      <div className="h-px bg-slate-200 flex-1" />
+    </div>
+  );
+}
+
 function InfoCard({
   title,
   name,
@@ -26,17 +35,17 @@ function InfoCard({
 }) {
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-      <div className="flex items-center gap-2 text-slate-800 font-bold text-sm mb-5">
+      <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
         <span className="text-cyan-500">{icon}</span>
         <span>{title}</span>
       </div>
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
+        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
           {initials}
         </div>
         <div>
-          <p className="text-xl font-bold text-slate-800 leading-tight">{name}</p>
-          <p className="text-sm text-gray-400 font-medium mt-1">{sub}</p>
+          <p className="text-lg font-bold text-slate-800 leading-tight">{name}</p>
+          <p className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-tight">{sub}</p>
         </div>
       </div>
     </div>
@@ -46,7 +55,7 @@ function InfoCard({
 function AssignCard({ icon }: { icon: React.ReactNode }) {
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-      <div className="flex items-center gap-2 text-slate-800 font-bold text-sm mb-5">
+      <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
         <span className="text-cyan-500">{icon}</span>
         <span>Pembuat Penawaran</span>
       </div>
@@ -56,7 +65,7 @@ function AssignCard({ icon }: { icon: React.ReactNode }) {
           <option>Andi Pratama</option>
           <option>Dian Permata</option>
         </select>
-        <button className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl px-8 py-3 shadow-sm transition-colors">
+        <button className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl px-8 py-3 text-sm shadow-sm transition-colors">
           Simpan
         </button>
       </div>
@@ -68,19 +77,19 @@ function WorkTimeCard() {
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
       <div className="flex justify-between items-center mb-5">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight">
           <Clock3 size={16} className="text-cyan-500" />
           <span>Waktu Pengerjaan</span>
         </div>
-        <span className="text-[11px] bg-amber-50 text-amber-500 px-3 py-1 rounded-full font-bold">
+        <span className="text-[11px] bg-amber-50 text-amber-500 px-3 py-1 rounded-full font-bold uppercase tracking-tight">
           Proses
         </span>
       </div>
 
       <div className="space-y-2">
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500 font-medium">Sisa waktu: 6 jam</span>
-          <span className="text-slate-800 font-bold">38%</span>
+        <div className="flex justify-between items-center text-sm font-bold text-slate-800">
+          <span className="text-gray-400 font-medium text-xs">Sisa waktu: 6 jam</span>
+          <span className="text-lg">38%</span>
         </div>
         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
           <div className="h-full bg-amber-400 rounded-full w-[38%]" />
@@ -104,20 +113,20 @@ function DetailField({
 }) {
   return (
     <div className="bg-slate-50/70 rounded-xl border border-gray-100 p-4 min-h-[88px]">
-      <p className="text-sm text-gray-400 font-medium mb-2">{label}</p>
+      <p className="text-[11px] text-gray-400 font-bold mb-2 uppercase tracking-tight">{label}</p>
       {badges ? (
         <div className="flex flex-wrap gap-2">
           {badges.map((badge) => (
             <span
               key={badge}
-              className="px-3 py-1 bg-cyan-50 text-cyan-600 text-xs font-semibold rounded-full border border-cyan-100"
+              className="px-3 py-1 bg-cyan-50 text-cyan-600 text-[10px] font-bold rounded-full border border-cyan-100"
             >
               {badge}
             </span>
           ))}
         </div>
       ) : (
-        <p className={`${strong ? "text-2xl md:text-xl" : "text-base"} font-bold text-slate-800 leading-snug`}>
+        <p className="text-lg font-bold text-slate-800 leading-snug">
           {value}
         </p>
       )}
@@ -160,9 +169,7 @@ export default function Step1({ mode }: { mode: string }) {
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
-        <div className="flex items-center gap-2">
-          <h1 className="font-bold text-xl">Detail</h1>
-        </div>
+        <SectionHeading title="Detail" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5">
           <InfoCard
@@ -189,7 +196,7 @@ export default function Step1({ mode }: { mode: string }) {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-50 flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <div className="p-4 border-b border-gray-100/80 flex items-center gap-2 font-bold text-slate-800 text-sm">
             <FileText size={16} className="text-cyan-500" />
             Detail Permintaan Masuk
           </div>
@@ -203,7 +210,7 @@ export default function Step1({ mode }: { mode: string }) {
             <DetailField label="Jenis Penawaran" badges={["PAC Montair", "Conventional Sys"]} strong={false} />
           </div>
 
-          <div className="px-6 py-5 border-t border-gray-50">
+          <div className="px-6 py-5 border-t border-gray-100/80">
             <button className="px-4 py-2 bg-amber-50 text-amber-500 text-sm font-semibold rounded-xl border border-amber-100 hover:bg-amber-100 transition-colors">
               Revisi
             </button>
@@ -211,10 +218,11 @@ export default function Step1({ mode }: { mode: string }) {
         </div>
 
         <div className="pt-2">
-          <h1 className="font-bold text-xl mb-4">Dokumen</h1>
+          <SectionHeading title="Dokumen" />
+          <div className="mb-4" />
 
           <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden mb-6">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FileText size={16} className="text-cyan-500" /> Logbook Operasional
               </div>
@@ -228,7 +236,7 @@ export default function Step1({ mode }: { mode: string }) {
               </div>
             </div>
 
-            <div className="p-4">
+            <div className="p-6">
               <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
@@ -247,7 +255,7 @@ export default function Step1({ mode }: { mode: string }) {
           </div>
 
           <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FileText size={16} className="text-cyan-500" /> Dokumen Pendukung
               </div>
@@ -256,7 +264,7 @@ export default function Step1({ mode }: { mode: string }) {
               </button>
             </div>
 
-            <div className="p-2 space-y-1">
+            <div className="p-4 space-y-1">
               {documentItems.map((item) => (
                 <DocumentItem
                   key={item.name}
@@ -272,34 +280,19 @@ export default function Step1({ mode }: { mode: string }) {
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col">
-          <div className="p-4 border-b border-gray-50 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">Log Aktivitas</h3>
-            <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-colors shadow-sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
+            <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-all shadow-sm active:scale-95">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               Chat
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_0_2px_#fff]">2</span>
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm font-bold">2</span>
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
+          <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">
             <LogSection title="23 Okt 2025" items={logs.filter((l) => l.date === "HARI INI")} />
             <LogSection title="Kemarin" items={logs.filter((l) => l.date === "KEMARIN")} />
-          </div>
-
-          <div className="p-4 border-t border-gray-50 space-y-3">
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Tulis catatan cepat..."
-              className="w-full p-3 text-xs bg-gray-50 border border-gray-100 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 resize-none h-20"
-            />
-            <button
-              onClick={handleSendLog}
-              className="w-full py-2 bg-white border border-gray-200 text-slate-600 text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <Send size={14} /> Kirim Catatan
-            </button>
           </div>
         </div>
       </div>

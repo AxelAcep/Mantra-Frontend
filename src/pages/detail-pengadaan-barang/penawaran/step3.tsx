@@ -56,31 +56,35 @@ function SectionHeading({ title }: { title: string }) {
 function ActivitySidebar() {
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
-      <div className="p-4 border-b border-gray-50 flex justify-between items-center">
-        <h3 className="font-bold text-slate-800 text-sm">Log Aktivitas</h3>
-        <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-colors shadow-sm">
-          <MessageSquareText size={14} />
+      <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
+        <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
+        <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-all shadow-sm active:scale-95">
+          <MessageSquareText size={16} />
           Chat
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_0_2px_#fff]">2</span>
+          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm font-bold">2</span>
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">
         {logsByDate.map((section) => (
           <div key={section.title} className="space-y-4">
-            <p className="text-[10px] font-bold text-gray-300 tracking-[2px] bg-gray-100 px-2 py-1 rounded inline-block text-gray-500">
-              {section.title}
-            </p>
-            <div className="relative space-y-6 pl-4 border-l border-gray-100">
+            <div className="flex">
+              <p className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                {section.title}
+              </p>
+            </div>
+            <div className="relative space-y-6 pl-5 ml-2.5 border-l-2 border-slate-50">
               {section.items.map((item) => (
                 <div key={item.id} className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300" />
-                  <div className="flex justify-between items-start gap-2">
+                  <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden text-[#94a3b8]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
+                  </div>
+                  <div className="flex justify-between items-start gap-4">
                     <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">{item.title}</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">{item.description}</p>
+                      <p className="text-xs font-bold text-slate-800 leading-tight">{item.title}</p>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{item.description}</p>
                     </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">{item.time}</span>
+                    <span className="text-[10px] text-slate-400 font-semibold shrink-0">{item.time}</span>
                   </div>
                 </div>
               ))}
@@ -152,7 +156,7 @@ export default function Step3() {
         <SectionHeading title="Detail" />
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-50 flex justify-between items-center">
+          <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
             <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
               <ShieldCheck size={18} className="text-cyan-500" />
               Persetujuan Review Internal
@@ -212,7 +216,7 @@ export default function Step3() {
           <SectionHeading title="Dokumen" />
 
           <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FolderOpen size={16} className="text-cyan-500" /> Dokumen Pendukung
               </div>
@@ -221,7 +225,7 @@ export default function Step3() {
               </button>
             </div>
 
-            <div className="p-2 space-y-1">
+            <div className="p-4 space-y-1">
               <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">

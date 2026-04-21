@@ -2,17 +2,24 @@ import React from 'react';
 import { FileText, CheckCircle2, Upload, Clock, ShieldCheck, Download, ChevronDown } from 'lucide-react';
 import { DocumentItem } from './components';
 
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-4">
+      <h1 className="font-bold text-xl text-slate-800">{title}</h1>
+      <div className="h-px bg-slate-200 flex-1" />
+    </div>
+  );
+}
+
 export default function Step4() {
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
-        <div className="flex items-center gap-2">
-          <h1 className="font-bold text-xl">Detail</h1>
-        </div>
+        <SectionHeading title="Detail" />
 
         {/* Persetujuan Manajemen */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-50 flex justify-between items-center">
+          <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
             <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
               <ShieldCheck size={18} className="text-cyan-500" />
               Persetujuan Manajemen
@@ -78,10 +85,11 @@ export default function Step4() {
         </div>
 
         <div className="pt-2">
-          <h1 className="font-bold text-xl mb-4">Dokumen</h1>
+          <SectionHeading title="Dokumen" />
+          <div className="mb-4" />
           
-          <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+          <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FileText size={16} className="text-cyan-500" /> Dokumen Pendukung
               </div>
@@ -89,7 +97,7 @@ export default function Step4() {
                 <Upload size={14} /> Upload File
               </button>
             </div>
-            <div className="p-2 space-y-1">
+            <div className="p-4 space-y-1">
               <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
@@ -116,114 +124,64 @@ export default function Step4() {
 
       {/* Activity Log (Right) */}
       <div className="col-span-12 lg:col-span-3">
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col">
-          <div className="p-4 border-b border-gray-50 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-sm">Log Aktivitas</h3>
-            <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-colors shadow-sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
+            <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-all shadow-sm active:scale-95">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               Chat
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_0_2px_#fff]">2</span>
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm font-bold">2</span>
             </button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
-            <div className="space-y-4">
-              <p className="text-[10px] font-bold text-gray-300 tracking-[2px] bg-gray-100 px-2 py-1 rounded inline-block text-gray-500">23 Okt 2025</p>
-              <div className="relative space-y-6 pl-4 border-l border-gray-100">
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Upload Dokumen</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Rudi H. mengunggah file Material_List_Raw.xlsx.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">16:45</span>
-                  </div>
+          <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">
+            {[
+              { 
+                date: "23 Okt 2025", 
+                items: [
+                  { title: "Upload Dokumen", desc: "Rudi H. mengunggah file Material_List_Raw.xlsx.", time: "16:45" },
+                  { title: "Tugas Dimulai", desc: "Estimator mulai mengerjakan perhitungan.", time: "09:00" },
+                  { title: "Penugasan PIC", desc: "Rudi Hartono ditugaskan sebagai PIC Estimator.", time: "08:30" }
+                ]
+              },
+              { 
+                date: "Kemarin", 
+                items: [
+                  { title: "Upload Dokumen", desc: "Rudi H. mengunggah file Material_List_Raw.xlsx.", time: "16:45" },
+                  { title: "Tugas Dimulai", desc: "Estimator mulai mengerjakan perhitungan.", time: "09:00" },
+                  { title: "Penugasan PIC", desc: "Rudi Hartono ditugaskan sebagai PIC Estimator.", time: "08:30" }
+                ]
+              },
+              { 
+                date: "Hari Ini", 
+                items: [
+                  { title: "BoQ Selesai (Draft)", desc: "Rudi Hartono menyelesaikan perhitungan awal.", time: "10:30" },
+                  { title: "Masuk Review", desc: "Draft v2 dikirim untuk review internal tim engineering.", time: "11:00" }
+                ]
+              }
+            ].map((section) => (
+              <div key={section.date} className="space-y-4">
+                <div className="flex">
+                  <p className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">{section.date}</p>
                 </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Tugas Dimulai</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Estimator mulai mengerjakan perhitungan.</p>
+                <div className="relative space-y-6 pl-5 ml-2.5 border-l-2 border-slate-50">
+                  {section.items.map((item, idx) => (
+                    <div key={idx} className="relative">
+                      <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden text-[#94a3b8]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
+                      </div>
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-slate-800 leading-tight">{item.title}</p>
+                          <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{item.desc}</p>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-semibold shrink-0">{item.time}</span>
+                      </div>
                     </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">09:00</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Penugasan PIC</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Rudi Hartono ditugaskan sebagai PIC Estimator.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">08:30</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-[10px] font-bold text-gray-300 tracking-[2px] bg-gray-100 px-2 py-1 rounded inline-block text-gray-500">Kemarin</p>
-              <div className="relative space-y-6 pl-4 border-l border-gray-100">
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Upload Dokumen</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Rudi H. mengunggah file Material_List_Raw.xlsx.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">16:45</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Tugas Dimulai</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Estimator mulai mengerjakan perhitungan.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">09:00</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Penugasan PIC</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Rudi Hartono ditugaskan sebagai PIC Estimator.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">08:30</span>
-                  </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-[10px] font-bold text-gray-300 tracking-[2px] bg-gray-100 px-2 py-1 rounded inline-block text-gray-500">Hari Ini</p>
-              <div className="relative space-y-6 pl-4 border-l border-gray-100">
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">BoQ Selesai (Draft)</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Rudi Hartono menyelesaikan perhitungan awal.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">10:30</span>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300"></div>
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-800">Masuk Review</p>
-                      <p className="text-[10px] text-gray-500 leading-relaxed">Draft v2 dikirim untuk review internal tim engineering.</p>
-                    </div>
-                    <span className="text-[9px] text-gray-400 font-medium shrink-0">11:00</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

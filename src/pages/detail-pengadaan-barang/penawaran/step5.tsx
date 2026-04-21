@@ -12,6 +12,15 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-4">
+      <h1 className="font-bold text-xl text-slate-800">{title}</h1>
+      <div className="h-px bg-slate-200 flex-1" />
+    </div>
+  );
+}
+
 type FollowUpStage = {
   title: string;
   description: string;
@@ -75,9 +84,52 @@ const logsByDate: { title: string; items: ActivityLog[] }[] = [
 
 function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="p-4 border-b border-gray-50 flex items-center gap-2 font-bold text-slate-800 text-sm">
+    <div className="p-4 border-b border-gray-100/80 flex items-center gap-2 font-bold text-slate-800 text-sm">
       <span className="text-cyan-500">{icon}</span>
       {title}
+    </div>
+  );
+}
+
+function ActivitySidebar() {
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
+      <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
+        <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
+        <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-all shadow-sm active:scale-95">
+          <MessageSquareText size={16} />
+          Chat
+          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm font-bold">2</span>
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">
+        {logsByDate.map((section) => (
+          <div key={section.title} className="space-y-4">
+            <div className="flex">
+              <p className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                {section.title}
+              </p>
+            </div>
+            <div className="relative space-y-6 pl-5 ml-2.5 border-l-2 border-slate-50">
+              {section.items.map((item) => (
+                <div key={item.id} className="relative">
+                  <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden text-[#94a3b8]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
+                  </div>
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-slate-800 leading-tight">{item.title}</p>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{item.description}</p>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-semibold shrink-0">{item.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -86,9 +138,7 @@ export default function Step5() {
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
-        <div className="flex items-center gap-2">
-          <h1 className="font-bold text-xl">Detail</h1>
-        </div>
+        <SectionHeading title="Detail" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
@@ -138,13 +188,12 @@ export default function Step5() {
                       <div key={stage.title} className="flex gap-4">
                         <div className="flex flex-col items-center">
                           <div
-                            className={`w-8 h-8 rounded-full border flex items-center justify-center ${
-                              isActive
+                            className={`w-8 h-8 rounded-full border flex items-center justify-center ${isActive
                                 ? "bg-amber-50 border-amber-200 text-amber-500"
                                 : isDone
                                   ? "bg-green-50 border-green-200 text-green-500"
                                   : "bg-slate-100 border-slate-200 text-slate-300"
-                            }`}
+                              }`}
                           >
                             {isDone ? <CheckCircle2 size={14} /> : <Clock3 size={14} />}
                           </div>
@@ -174,10 +223,11 @@ export default function Step5() {
         </div>
 
         <div className="pt-2">
-          <h1 className="font-bold text-xl mb-4">Dokumen</h1>
+          <SectionHeading title="Dokumen" />
+          <div className="mb-4" />
 
           <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden mb-6">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FileText size={16} className="text-cyan-500" /> Logbook Operasional
               </div>
@@ -191,7 +241,7 @@ export default function Step5() {
               </div>
             </div>
 
-            <div className="p-4 pt-0">
+            <div className="p-6">
               <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
@@ -210,7 +260,7 @@ export default function Step5() {
           </div>
 
           <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 flex justify-between items-center border-b border-gray-50">
+            <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
               <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
                 <FileText size={16} className="text-cyan-500" /> Dokumen Pendukung
               </div>
@@ -219,7 +269,7 @@ export default function Step5() {
               </button>
             </div>
 
-            <div className="p-2 space-y-1">
+            <div className="p-4 space-y-1">
               <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
@@ -260,40 +310,7 @@ export default function Step5() {
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
-          <div className="p-4 border-b border-gray-50 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-sm">Log Aktivitas</h3>
-            <button className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-colors shadow-sm">
-              <MessageSquareText size={14} />
-              Chat
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_0_2px_#fff]">2</span>
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
-            {logsByDate.map((section) => (
-              <div key={section.title} className="space-y-4">
-                <p className="text-[10px] font-bold text-gray-300 tracking-[2px] bg-gray-100 px-2 py-1 rounded inline-block text-gray-500">
-                  {section.title}
-                </p>
-                <div className="relative space-y-6 pl-4 border-l border-gray-100">
-                  {section.items.map((item) => (
-                    <div key={item.id} className="relative">
-                      <div className="absolute -left-[21px] top-0 w-[14px] h-[14px] rounded-full border-2 border-white flex items-center justify-center bg-slate-300" />
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="space-y-1">
-                          <p className="text-xs font-bold text-slate-800">{item.title}</p>
-                          <p className="text-[10px] text-gray-500 leading-relaxed">{item.description}</p>
-                        </div>
-                        <span className="text-[9px] text-gray-400 font-medium shrink-0">{item.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ActivitySidebar />
       </div>
     </div>
   );
