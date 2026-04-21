@@ -18,7 +18,7 @@ export default function PerusahaanPage() {
       setTitle("Daftar Perusahaan");
   }, [setTitle]);
   return (
-      <div className="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="m-6 flex-1 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         
         {/* Search Bar */}
         <div className="p-4 border-b border-gray-100">

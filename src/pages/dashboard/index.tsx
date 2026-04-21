@@ -13,7 +13,7 @@ export default function DashboardPage() {
     }, [setTitle]);
 
     return (
-        <div className="p-3">
+        <div className="p-6">
             <h1 className="text-md font-bold tracking-tight text-slate-500">
                 RINGKASAN OPERASIONAL
             </h1>

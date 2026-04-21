@@ -1,80 +1,76 @@
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardAction,
-} from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { DialogTambahKaryawan } from "./dialog-tambah-karyawan";
-import { DialogEditKaryawan } from "./dialog-edit-karyawan";
+"use client"
 
-const dataKaryawan = [
-    {
-        inisial: "BJ",
-        nama: "Budi Johan",
-        divisi: "Sales",
-        username: "budi.santoso",
-        aktivitasTanggal: "24 Okt 2023",
-        aktivitasWaktu: "09:00 WIB",
-        warnaInisial: "bg-blue-100 text-blue-600",
-    },
-    {
-        inisial: "RA",
-        nama: "Rina Amalia",
-        divisi: "Sales",
-        username: "rina.amalia",
-        aktivitasTanggal: "24 Okt 2023",
-        aktivitasWaktu: "09:00 WIB",
-        warnaInisial: "bg-purple-100 text-purple-600",
-    },
-    {
-        inisial: "JS",
-        nama: "Joko Susilo",
-        divisi: "Sales",
-        username: "joko.susilo",
-        aktivitasTanggal: "24 Okt 2023",
-        aktivitasWaktu: "09:00 WIB",
-        warnaInisial: "bg-cyan-100 text-cyan-600",
-    },
-    {
-        inisial: "DK",
-        nama: "Deni Kurniawan",
-        divisi: "Pre-Sales",
-        username: "deni.kurniawan",
-        aktivitasTanggal: "24 Okt 2023",
-        aktivitasWaktu: "09:00 WIB",
-        warnaInisial: "bg-orange-100 text-orange-600",
-    },
-    {
-        inisial: "SS",
-        nama: "Sari Simorangkir",
-        divisi: "Pre-Sales",
-        username: "sari.simorangkir",
-        aktivitasTanggal: "24 Okt 2023",
-        aktivitasWaktu: "09:00 WIB",
-        warnaInisial: "bg-indigo-100 text-indigo-600",
-    },
-];
+import { useState } from "react"
+import { Plus, ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { DialogTambahKaryawan } from "./dialog-tambah-karyawan"
+import { UserTable } from "./user-table"
+import { useUsers } from "@/hooks/use-user"
+import { useDebounce } from "@/hooks/use-debounce"
+
+const LIMIT = 10
+type TokenPayload = {
+    role?: string
+}
 
 export default function ManajemenAkunPage() {
+    const [page, setPage] = useState(1)
+    const [search, setSearch] = useState("")
+    const debouncedSearch = useDebounce(search, 400)
+
+    const { data, isLoading, isError } = useUsers(page, LIMIT, debouncedSearch)
+
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    if (token) {
+        try {
+            const encodedPayload = token.split(".")[1]
+            const payload: TokenPayload = encodedPayload ? JSON.parse(atob(encodedPayload)) : {}
+            if (payload.role !== "MASTER") {
+                return (
+                    <div className="p-6 flex items-center justify-center h-[60vh]">
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-slate-700">Akses Ditolak</p>
+                            <p className="text-slate-500 mt-2 font-medium">Halaman ini hanya bisa diakses oleh role Master.</p>
+                        </div>
+                    </div>
+                )
+            }
+        } catch {
+            return null
+        }
+    }
+
+    const meta = data?.meta
+    const totalPages = meta?.totalPages ?? 1
+
+    function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+        setSearch(e.target.value)
+        setPage(1)
+    }
+
+    function renderPages() {
+        const pages: (number | "...")[] = []
+        if (totalPages <= 5) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i)
+        } else {
+            pages.push(1)
+            if (page > 3) pages.push("...")
+            for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+                pages.push(i)
+            }
+            if (page < totalPages - 2) pages.push("...")
+            pages.push(totalPages)
+        }
+        return pages
+    }
+
     return (
-        <div className="p-5">
+        <div className="p-6 bg-slate-50 min-h-screen">
             <Card className="shadow-none border rounded-xl overflow-hidden py-0! gap-0!">
                 <CardHeader className="border-b px-6 py-5 bg-white">
-                    <CardTitle className="text-xl font-bold text-slate-800">
-                        Daftar Akun Karyawan
-                    </CardTitle>
+                    <CardTitle className="text-xl font-bold text-slate-800">Daftar Akun Karyawan</CardTitle>
                     <CardDescription className="text-sm font-medium text-slate-500 mt-1">
                         Kelola data dan akses akun seluruh karyawan di perusahaan Anda.
                     </CardDescription>
@@ -87,96 +83,64 @@ export default function ManajemenAkunPage() {
                         </DialogTambahKaryawan>
                     </CardAction>
                 </CardHeader>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                                <TableHead className="font-semibold text-slate-500 h-12 px-6">
-                                    KARYAWAN
-                                </TableHead>
-                                <TableHead className="font-semibold text-slate-500 h-12">
-                                    DIVISI
-                                </TableHead>
-                                <TableHead className="font-semibold text-slate-500 h-12">
-                                    USERNAME
-                                </TableHead>
-                                <TableHead className="font-semibold text-slate-500 h-12">
-                                    AKTIVITAS TERAKHIR
-                                </TableHead>
-                                <TableHead className="font-semibold text-slate-500 h-12 text-right px-6">
-                                    AKSI
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {dataKaryawan.map((karyawan, index) => (
-                                <TableRow key={index} className="hover:bg-slate-50/50">
-                                    <TableCell className="px-6">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold ${karyawan.warnaInisial}`}
-                                            >
-                                                {karyawan.inisial}
-                                            </div>
-                                            <span className="font-medium text-slate-700">
-                                                {karyawan.nama}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-slate-500 font-medium">
-                                        {karyawan.divisi}
-                                    </TableCell>
-                                    <TableCell className="text-slate-500 font-medium">
-                                        {karyawan.username}
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-slate-700">
-                                                {karyawan.aktivitasTanggal}
-                                            </span>
-                                            <span className="text-sm text-slate-500 mt-0.5 font-medium">
-                                                {karyawan.aktivitasWaktu}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right px-6 ">
-                                        <DialogEditKaryawan>
-                                            <button className="text-cyan-500 font-semibold hover:text-cyan-600 text-sm">
-                                                Edit
-                                            </button>
-                                        </DialogEditKaryawan>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
 
-                    {/* Pagination */}
+                <div className="px-6 py-4 border-b border-slate-100 bg-white">
+                    <div className="relative max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <Input
+                            placeholder="Cari nama atau email..."
+                            value={search}
+                            onChange={handleSearch}
+                            className="pl-9 h-10 border-slate-200 text-slate-700 focus-visible:ring-4 focus-visible:ring-cyan-500/10 focus-visible:border-cyan-500 font-medium rounded-lg shadow-none"
+                        />
+                    </div>
+                </div>
+
+                <CardContent className="p-0">
+                    {isLoading && <div className="py-16 text-center text-slate-400 font-medium">Memuat data...</div>}
+                    {isError && <div className="py-16 text-center text-rose-400 font-medium">Gagal memuat data.</div>}
+                    {data && data.data.length === 0 && (
+                        <div className="py-16 text-center text-slate-400 font-medium">Tidak ada data ditemukan.</div>
+                    )}
+                    {data && data.data.length > 0 && <UserTable users={data.data} />}
+
                     <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
                         <div className="text-sm text-slate-500 font-medium">
-                            Menampilkan <span className="text-slate-700 font-semibold">5</span>{" "}
-                            dari <span className="text-slate-700 font-semibold">40</span> data
+                            Menampilkan <span className="text-slate-700 font-semibold">{data?.data.length ?? 0}</span>{" "}
+                            dari <span className="text-slate-700 font-semibold">{meta?.total ?? 0}</span> data
                         </div>
                         <div className="flex items-center gap-1">
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md">
+                            <button
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <button className="w-8 h-8 flex items-center justify-center bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-md text-sm">
-                                1
-                            </button>
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 font-medium rounded-md text-sm transition-colors">
-                                2
-                            </button>
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 font-medium rounded-md text-sm transition-colors">
-                                3
-                            </button>
-                            <span className="w-8 h-8 flex items-center justify-center text-slate-400 font-medium tracking-widest">
-                                ...
-                            </span>
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 font-medium rounded-md text-sm transition-colors">
-                                8
-                            </button>
-                            <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md">
+                            {renderPages().map((p, i) =>
+                                p === "..." ? (
+                                    <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-slate-400 tracking-widest">
+                                        ...
+                                    </span>
+                                ) : (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPage(p)}
+                                        className={`w-8 h-8 flex items-center justify-center font-medium rounded-md text-sm transition-colors ${
+                                            page === p
+                                                ? "bg-cyan-500 text-white"
+                                                : "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50"
+                                        }`}
+                                    >
+                                        {p}
+                                    </button>
+                                )
+                            )}
+                            <button
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
                                 <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
@@ -184,5 +148,5 @@ export default function ManajemenAkunPage() {
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 }

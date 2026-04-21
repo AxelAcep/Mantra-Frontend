@@ -1,15 +1,15 @@
-import IconMantra from "./Icon-Mantra.png";
+import IconMantra from "./Icon-Mantra.svg";
 import IconBeranda from "./Icon-Beranda.png";
-import IconNotifikasi from "./Icon-Notifikasi.png";
+import IconNotifikasi from "./Icon-Notifikasi.svg";
 import IconPengadaan from "./Icon-PB.png";
 import IconTracking from "./Icon-Tracking.png";
 import IconMaintenance from "./Icon-Maintenance.png";
 import IconDaftarPerusahaan from "./Icon-Perusahaan.png";
 import IconLogbook from "./Icon-Logbook.png";
-import IconAktivitasHarian from "./Icon-Activity.png";
-import IconAkunKaryawan from "./Icon-Akun.png";
-import IconPengaturan from "./Icon-Settings.png";
-import IconKeluar from "./Icon-Logout.png";
+import IconAktivitasHarian from "./Icon-Activity.svg";
+import IconAkunKaryawan from "./Icon-Akun.svg";
+import IconPengaturan from "./Icon-Settings.svg";
+import IconKeluar from "./Icon-Logout.svg";
 import IconSearch from "./Icon-Search.png";
 import IconContainer from "./Icon-Container.png";
 import IconRequestPenawaran from "./Icon-RequestPenawaran.png";
@@ -29,8 +29,14 @@ import IconMantraBig from "./Icon-MantraBig.png";
 import IconPOD from "./Icon-PO-D.png";
 import IconMaintenanceD from "./Icon-Maintenance-D.png";
 import IconCalendar from "./Icon-Calendar.png";
-import IconLeftArrow from "./Icon-Left-Arrow.png";
-import IconUpDown from "./Icon-UpDown.png";
+import IconAktifitas from "./Icon-Aktifias-Today.svg"
+import IconAKtifitasApproval from "./Icon-Aktifitas-Approval.svg"
+import IconAKtifitasDeadline from "./Icon-Aktifitas-Deadline.svg"
+import IconAKtifitasOverdue from "./Icon-Aktifitas-Overdue.svg"
+import IconLeftArrow from "./Icon_LeftArrow.svg"
+import IconFile from "./Icon-File.svg"
+import IconEdit from "./Icon-Edit-Pensil.svg"
+import IconCalendarX from "./Icon-Calendar-X.svg"
 
 export const Icons = {
   Mantra: IconMantra,
@@ -64,6 +70,12 @@ export const Icons = {
   POD: IconPOD,
   MaintenanceD: IconMaintenanceD,
   Calendar: IconCalendar,
+  Aktifitas: IconAktifitas,
+  AktifitasApproval: IconAKtifitasApproval,
+  AKtifitasDeadline: IconAKtifitasDeadline,
+  AKtifitasOverdue: IconAKtifitasOverdue,
   LeftArrow: IconLeftArrow,
-  UpDown: IconUpDown,
+  File: IconFile,
+  Edit: IconEdit,
+  CalendarX: IconCalendarX,
 };

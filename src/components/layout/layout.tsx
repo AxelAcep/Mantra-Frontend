@@ -17,7 +17,7 @@ export default function Layout() {
                 <div className="flex-1 flex flex-col">
                     {/* Kirim title yang sudah diupdate ke SiteHeader */}
                     <SiteHeader title={title} />
-                    <main className="flex-1 p-3">
+                    <main className="flex-1">
                         {/* Kirim fungsi setTitle ke semua halaman di dalam Outlet */}
                         <Outlet context={{ setTitle } satisfies ContextType} />
                     </main>

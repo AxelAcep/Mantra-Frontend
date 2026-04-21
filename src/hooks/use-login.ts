@@ -21,9 +21,10 @@ export const useLogin = () => {
 
             // Simpan token
             localStorage.setItem("token", res.token);
-            localStorage.setItem("user",  JSON.stringify(res.user));
+            localStorage.setItem("user", JSON.stringify(res.user));
+            localStorage.setItem("login_at", Date.now().toString());
 
-            navigate("/logbook");
+            navigate("/dailyactivity");
 
         } catch (err: any) {
             setError(err.message);

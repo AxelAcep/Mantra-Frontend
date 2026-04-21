@@ -38,7 +38,7 @@ export default function ListPengadaan() {
   };
 
   return (
-    <div className="bg-gray-50 p-8 font-sans">
+    <div className="bg-gray-50 p-6 font-sans">
       <div className="mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
