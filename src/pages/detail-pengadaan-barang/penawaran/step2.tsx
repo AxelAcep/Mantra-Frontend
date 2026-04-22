@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FileText,
   Clock3,
@@ -8,6 +8,7 @@ import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
+  ChevronUp,
   Wallet,
   FolderOpen,
 } from 'lucide-react';
@@ -98,6 +99,8 @@ function ActivitySidebar() {
 }
 
 export default function Step2() {
+  const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
+
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
@@ -110,12 +113,48 @@ export default function Step2() {
               <span>Ringkasan Finansial</span>
             </div>
 
-            <div className="bg-slate-50/70 rounded-xl border border-gray-100 p-5">
-              <p className="text-sm text-gray-400 font-medium mb-3">Sub Total I + II + III</p>
-              <div className="flex items-center gap-2">
-                <span className="text-[18px] md:text-[20px] font-bold text-slate-800">Rp 485.000.000</span>
-                <ChevronDown size={16} className="text-slate-400" />
-              </div>
+            <div className="space-y-4">
+              <button
+                onClick={() => setIsFinancialExpanded(!isFinancialExpanded)}
+                className={`w-full text-left transition-all rounded-xl border p-5 group ${isFinancialExpanded
+                  ? 'bg-cyan-50/50 border-cyan-100 shadow-sm'
+                  : 'bg-slate-50/50 border-gray-100 hover:bg-slate-50'
+                  }`}
+              >
+                <p className={`text-xs font-bold mb-2 uppercase tracking-tight transition-colors ${isFinancialExpanded ? 'text-cyan-600' : 'text-slate-400'
+                  }`}>
+                  Sub Total I + II + III
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className={`text-xl md:text-2xl font-bold transition-colors ${isFinancialExpanded ? 'text-cyan-700' : 'text-slate-800'
+                    }`}>
+                    Rp 485.000.000
+                  </span>
+                  <div className={`p-1 rounded-lg transition-all ${isFinancialExpanded
+                    ? 'bg-white/50 text-cyan-500 rotate-180'
+                    : 'text-slate-400'
+                    }`}>
+                    <ChevronDown size={20} />
+                  </div>
+                </div>
+              </button>
+
+              {isFinancialExpanded && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-4">
+                    <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">Sub Total I (Main Equipment)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 300.000.000</p>
+                  </div>
+                  <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-4">
+                    <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">Sub Total II (Material Instalasi)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 120.000.000</p>
+                  </div>
+                  <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-4">
+                    <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">Sub Total III (Jasa)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 65.000.000</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
