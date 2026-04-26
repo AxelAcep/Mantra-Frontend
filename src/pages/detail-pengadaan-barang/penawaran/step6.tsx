@@ -196,7 +196,7 @@ export default function Step6() {
         </div>
 
         <Tabs defaultValue="pembelian" className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-6 border-b border-gray-100">
+          <div className="px-6 border-b border-gray-100 bg-white">
             <TabsList className="flex gap-8 bg-transparent h-auto w-full justify-start rounded-none p-0 border-0">
               <TabsTrigger
                 value="pembelian"
@@ -219,196 +219,277 @@ export default function Step6() {
             </TabsList>
           </div>
 
-          <TabsContent value="pembelian" className="p-6 m-0 outline-none">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Item</p>
-                <p className="text-base font-bold text-slate-800">30 barang proyek</p>
-              </div>
-              <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Barang Ready</p>
-                <p className="text-base font-bold text-slate-800">26 barang</p>
-              </div>
-              <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Barang Perlu Beli</p>
-                <p className="text-base font-bold text-slate-800">4 barang</p>
-              </div>
-              <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Progres Pembelian Barang</p>
-                <div className="flex items-center gap-3 mt-1">
-                  <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-yellow-400 rounded-full" style={{ width: '86%' }} />
+          <TabsContent value="pembelian" className="m-0 bg-slate-50/50 p-6 space-y-6 outline-none">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Item</p>
+                  <p className="text-base font-bold text-slate-800">30 barang proyek</p>
+                </div>
+                <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Barang Ready</p>
+                  <p className="text-base font-bold text-slate-800">26 barang</p>
+                </div>
+                <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Barang Perlu Beli</p>
+                  <p className="text-base font-bold text-slate-800">4 barang</p>
+                </div>
+                <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Progres Pembelian Barang</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-yellow-400 rounded-full" style={{ width: '86%' }} />
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">26 dari 30 barang terbeli</span>
                   </div>
-                  <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">26 dari 30 barang terbeli</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText size={16} className="text-cyan-500" />
-                  <h3 className="font-bold text-slate-800 text-sm">Daftar Barang Pembelian</h3>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Cari nama barang..."
-                      className="bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 w-64"
-                    />
-                  </div>
-                  <button className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-2 shadow-sm">
-                    <CheckCircle2 size={14} /> Terima Semua
-                  </button>
-                </div>
-              </div>
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6">
 
-              <div className="rounded-md border border-gray-100 overflow-hidden">
-                <Table className="w-full">
-                  <TableHeader>
-                    <TableRow className="bg-slate-50 border-b border-gray-100 hover:bg-slate-50">
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto">Nama Barang</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Status</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Qty</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Harga Satuan</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Total</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto">Metode / Estimasi</TableHead>
-                      <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-right">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {itemsData.map((item) => (
-                      <TableRow key={item.id} className="bg-white border-b border-gray-50 last:border-0 hover:bg-slate-50/30 transition-all">
-                        <TableCell className="px-4 py-4">
-                          <p className="text-xs font-bold text-slate-800">{item.name}</p>
-                        </TableCell>
-                        <TableCell className="px-4 py-4 text-center">
-                          <Badge variant="outline" className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border-0 ${item.status === 'Ready' ? 'bg-green-50 text-green-500' : 'bg-amber-50 text-amber-500'
-                            }`}>
-                            {item.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-4 py-4 text-xs text-slate-600 font-medium text-center">{item.qty}</TableCell>
-                        <TableCell className="px-4 py-4 text-xs text-slate-600 font-medium text-center">{item.price}</TableCell>
-                        <TableCell className="px-4 py-4 text-xs font-bold text-slate-800 text-center">{item.total}</TableCell>
-                        <TableCell className="px-4 py-4">
-                          <p className="text-xs font-bold text-slate-700">{item.method}</p>
-                          {item.date && (
-                            item.date === 'Belum Tersedia' ? (
-                              <Badge variant="outline" className="bg-red-50 text-red-600 border-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold mt-1">
-                                {item.date}
-                              </Badge>
-                            ) : (
-                              <p className="text-[10px] font-medium text-gray-400">
-                                {item.date}
-                              </p>
-                            )
-                          )}
-                        </TableCell>
-                        <TableCell className="px-4 py-4 text-right">
-                          {item.date === 'Belum Tersedia' ? (
-                            <button
-                              onClick={() => setIsEstimasiModalOpen(true)}
-                              className="text-cyan-500 text-[10px] font-bold flex items-center gap-1 hover:underline ml-auto"
-                            >
-                              Masukan Estimasi <ArrowRight size={12} />
-                            </button>
-                          ) : item.hasAction ? (
-                            <div className="flex items-center justify-end gap-2">
-                              <button className="text-green-500 hover:text-green-600 transition-colors" title="Terima">
-                                <CheckCircle className="w-5 h-5" />
-                              </button>
-                              <button className="text-red-400 hover:text-red-500 transition-colors" title="Tolak">
-                                <XCircle className="w-5 h-5" />
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </TableCell>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText size={16} className="text-cyan-500" />
+                    <h3 className="font-bold text-slate-800 text-sm">Daftar Barang Pembelian</h3>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Cari nama barang..."
+                        className="bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 w-64"
+                      />
+                    </div>
+                    <button className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-2 shadow-sm">
+                      <CheckCircle2 size={14} /> Terima Semua
+                    </button>
+                  </div>
+                </div>
+
+                <div className="rounded-md border border-gray-100 overflow-hidden">
+                  <Table className="w-full">
+                    <TableHeader>
+                      <TableRow className="bg-slate-50 border-b border-gray-100 hover:bg-slate-50">
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto">Nama Barang</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Status</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Qty</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Harga Satuan</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-center">Total</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto">Metode / Estimasi</TableHead>
+                        <TableHead className="px-4 py-3 text-slate-600 text-[11px] font-bold uppercase tracking-wider h-auto text-right">Aksi</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {itemsData.map((item) => (
+                        <TableRow key={item.id} className="bg-white border-b border-gray-50 last:border-0 hover:bg-slate-50/30 transition-all">
+                          <TableCell className="px-4 py-4">
+                            <p className="text-xs font-bold text-slate-800">{item.name}</p>
+                          </TableCell>
+                          <TableCell className="px-4 py-4 text-center">
+                            <Badge variant="outline" className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border-0 ${item.status === 'Ready' ? 'bg-green-50 text-green-500' : 'bg-amber-50 text-amber-500'
+                              }`}>
+                              {item.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-4 py-4 text-xs text-slate-600 font-medium text-center">{item.qty}</TableCell>
+                          <TableCell className="px-4 py-4 text-xs text-slate-600 font-medium text-center">{item.price}</TableCell>
+                          <TableCell className="px-4 py-4 text-xs font-bold text-slate-800 text-center">{item.total}</TableCell>
+                          <TableCell className="px-4 py-4">
+                            <p className="text-xs font-bold text-slate-700">{item.method}</p>
+                            {item.date && (
+                              item.date === 'Belum Tersedia' ? (
+                                <Badge variant="outline" className="bg-red-50 text-red-600 border-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold mt-1">
+                                  {item.date}
+                                </Badge>
+                              ) : (
+                                <p className="text-[10px] font-medium text-gray-400">
+                                  {item.date}
+                                </p>
+                              )
+                            )}
+                          </TableCell>
+                          <TableCell className="px-4 py-4 text-right">
+                            {item.date === 'Belum Tersedia' ? (
+                              <button
+                                onClick={() => setIsEstimasiModalOpen(true)}
+                                className="text-cyan-500 text-[10px] font-bold flex items-center gap-1 hover:underline ml-auto"
+                              >
+                                Masukan Estimasi <ArrowRight size={12} />
+                              </button>
+                            ) : item.hasAction ? (
+                              <div className="flex items-center justify-end gap-2">
+                                <button className="text-green-500 hover:text-green-600 transition-colors" title="Terima">
+                                  <CheckCircle className="w-5 h-5" />
+                                </button>
+                                <button className="text-red-400 hover:text-red-500 transition-colors" title="Tolak">
+                                  <XCircle className="w-5 h-5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-gray-300">—</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-[11px] text-gray-400 font-medium">Menampilkan 5 dari 30 data</p>
+                  <div className="flex items-center gap-1">
+                    <button className="p-2 text-gray-300 hover:text-cyan-500 transition-colors">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button className="w-8 h-8 rounded-lg bg-cyan-500 text-white text-xs font-bold shadow-sm">1</button>
+                    <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">2</button>
+                    <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">3</button>
+                    <span className="px-2 text-gray-300">...</span>
+                    <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">6</button>
+                    <button className="p-2 text-gray-400 hover:text-cyan-500 transition-colors">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
+              <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
+                <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                  <FileText size={16} className="text-cyan-500" /> Logbook Operasional Pembelian Barang
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex items-center bg-gray-50 p-1 rounded-lg">
+                    <button className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold px-3 py-1.5 rounded-md hover:text-gray-600 transition-colors">
+                      <div className="w-2 h-2 rounded-full bg-slate-400" /> Bermasalah
+                    </button>
+                    <button className="flex items-center gap-1.5 bg-white text-cyan-600 text-[10px] font-bold px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
+                      <CheckCircle2 size={12} /> Semua
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-[11px] text-gray-400 font-medium">Menampilkan 5 dari 30 data</p>
-                <div className="flex items-center gap-1">
-                  <button className="p-2 text-gray-300 hover:text-cyan-500 transition-colors">
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button className="w-8 h-8 rounded-lg bg-cyan-500 text-white text-xs font-bold shadow-sm">1</button>
-                  <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">2</button>
-                  <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">3</button>
-                  <span className="px-2 text-gray-300">...</span>
-                  <button className="w-8 h-8 rounded-lg text-gray-400 text-xs font-bold hover:bg-gray-50 transition-colors">6</button>
-                  <button className="p-2 text-gray-400 hover:text-cyan-500 transition-colors">
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
+              <div className="p-6 space-y-3">
+                {[
+                  { title: 'Logbook Pembelian Barang Pipa PVC Drainase (Indent Lokal)', time: '12 Feb, 09:00', badge: 'Perlu Tindakan' },
+                  { title: 'Logbook Pembelian Barang Pipa PVC Drainase (Indent Lokal)', time: '11 Feb, 08:30' },
+                  { title: 'Logbook Pembelian Pipa Tembaga', time: '10 Feb, 08:00' },
+                ].map((log, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:border-cyan-100 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-bold text-slate-800">{log.title}</p>
+                          {log.badge && (
+                            <Badge variant="outline" className="bg-amber-50 text-amber-500 text-[9px] font-bold border-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                              <AlertCircle size={10} /> {log.badge}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Diunggah oleh Esti • {log.time}</p>
+                      </div>
+                    </div>
+                    <button className="text-cyan-500 font-bold text-[10px] flex items-center gap-1 hover:underline">
+                      Lihat Detail <ArrowRight size={12} />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="pengantaran" className="p-6 text-center text-gray-400 text-sm">
-            Konten Pengantaran belum tersedia.
+          <TabsContent value="pengantaran" className="m-0 bg-slate-50/50 p-6 space-y-6 outline-none">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
+              <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
+                <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                  <FileText size={16} className="text-cyan-500" /> Logbook Operasional Pengantaran
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex items-center bg-gray-50 p-1 rounded-lg">
+                    <button className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold px-3 py-1.5 rounded-md hover:text-gray-600 transition-colors">
+                      <div className="w-2 h-2 rounded-full bg-slate-400" /> Bermasalah
+                    </button>
+                    <button className="flex items-center gap-1.5 bg-white text-cyan-600 text-[10px] font-bold px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
+                      <CheckCircle2 size={12} /> Semua
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-3">
+                {[
+                  { title: 'Logbook Pengantaran Barang', user: 'Febri', time: '20 Feb, 09:00' },
+                ].map((log, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:border-cyan-100 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-800">{log.title}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Diunggah oleh {log.user} • {log.time}</p>
+                      </div>
+                    </div>
+                    <button className="text-cyan-500 font-bold text-[10px] flex items-center gap-1 hover:underline">
+                      Lihat Detail <ArrowRight size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="instalasi" className="p-6 text-center text-gray-400 text-sm">
-            Konten Instalasi belum tersedia.
+          <TabsContent value="instalasi" className="m-0 bg-slate-50/50 p-6 space-y-6 outline-none">
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
+              <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
+                <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                  <FileText size={16} className="text-cyan-500" /> Logbook Operasional Instalasi
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex items-center bg-gray-50 p-1 rounded-lg">
+                    <button className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold px-3 py-1.5 rounded-md hover:text-gray-600 transition-colors">
+                      <div className="w-2 h-2 rounded-full bg-slate-400" /> Bermasalah
+                    </button>
+                    <button className="flex items-center gap-1.5 bg-white text-cyan-600 text-[10px] font-bold px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
+                      <CheckCircle2 size={12} /> Semua
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-3">
+                {[
+                  { title: 'Logbook Instalasi Barang', user: 'Febri', time: '22 Feb, 10:00' },
+                ].map((log, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:border-cyan-100 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-800">{log.title}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Diunggah oleh {log.user} • {log.time}</p>
+                      </div>
+                    </div>
+                    <button className="text-cyan-500 font-bold text-[10px] flex items-center gap-1 hover:underline">
+                      Lihat Detail <ArrowRight size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
 
-        <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-            <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-              <FileText size={16} className="text-cyan-500" /> Logbook Operasional Pembelian Barang
-            </div>
-            <div className="flex gap-2">
-              <div className="flex items-center bg-gray-50 p-1 rounded-lg">
-                <button className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold px-3 py-1.5 rounded-md hover:text-gray-600 transition-colors">
-                  <div className="w-2 h-2 rounded-full bg-slate-400" /> Bermasalah
-                </button>
-                <button className="flex items-center gap-1.5 bg-white text-cyan-600 text-[10px] font-bold px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
-                  <CheckCircle2 size={12} /> Semua
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 space-y-3">
-            {[
-              { title: 'Logbook Pembelian Barang Pipa PVC Drainase (Indent Lokal)', time: '12 Feb, 09:00', badge: 'Perlu Tindakan' },
-              { title: 'Logbook Pembelian Barang Pipa PVC Drainase (Indent Lokal)', time: '11 Feb, 08:30' },
-              { title: 'Logbook Pembelian Pipa Tembaga', time: '10 Feb, 08:00' },
-            ].map((log, i) => (
-              <div key={i} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:border-cyan-100 transition-all group">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
-                    <FileText size={18} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-slate-800">{log.title}</p>
-                      {log.badge && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-500 text-[9px] font-bold border-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
-                          <AlertCircle size={10} /> {log.badge}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5 font-medium">Diunggah oleh Esti • {log.time}</p>
-                  </div>
-                </div>
-                <button className="text-cyan-500 font-bold text-[10px] flex items-center gap-1 hover:underline">
-                  Lihat Detail <ArrowRight size={12} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <div className="pt-2">
           <SectionHeading title="Dokumen" />
