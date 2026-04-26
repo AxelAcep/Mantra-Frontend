@@ -37,7 +37,7 @@ export default function Step4() {
             </div>
 
             {/* Direktur Utama */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-gray-100 flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
                   DR
@@ -47,8 +47,8 @@ export default function Step4() {
                   <p className="text-[11px] text-gray-400">Budi Santoso, S.E., M.M.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold">
-                <Clock size={12} /> Menunggu Persetujuan
+              <div className="flex items-center gap-2 text-amber-500 text-[11px] font-bold">
+                <Clock size={14} /> Menunggu Persetujuan
               </div>
             </div>
 

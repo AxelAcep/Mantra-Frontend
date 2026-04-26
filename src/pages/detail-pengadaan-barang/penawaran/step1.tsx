@@ -52,7 +52,46 @@ function InfoCard({
   );
 }
 
+const presalesOptions = [
+  { name: "Andi Pratama", initials: "AP" },
+  { name: "Dian Permata", initials: "DP" },
+  { name: "Petrus", initials: "PR" },
+];
+
 function AssignCard({ icon }: { icon: React.ReactNode }) {
+  const [selectedName, setSelectedName] = useState<string>("");
+  const [isSaved, setIsSaved] = useState(false);
+
+  const selectedData = presalesOptions.find(p => p.name === selectedName);
+
+  if (isSaved && selectedData) {
+    return (
+      <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
+          <span className="text-cyan-500">{icon}</span>
+          <span>Pembuat Penawaran</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+              {selectedData.initials}
+            </div>
+            <div>
+              <p className="text-lg font-bold text-slate-800 leading-tight">{selectedData.name}</p>
+              <p className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-tight">Pre-Sales</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsSaved(false)}
+            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-sm font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95"
+          >
+            Ubah
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
       <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
@@ -60,12 +99,21 @@ function AssignCard({ icon }: { icon: React.ReactNode }) {
         <span>Pembuat Penawaran</span>
       </div>
       <div className="flex items-center gap-3">
-        <select className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
-          <option>Pilih Pre-Sales</option>
-          <option>Andi Pratama</option>
-          <option>Dian Permata</option>
+        <select
+          value={selectedName}
+          onChange={(e) => setSelectedName(e.target.value)}
+          className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        >
+          <option value="">Pilih Pre-Sales</option>
+          {presalesOptions.map(p => (
+            <option key={p.name} value={p.name}>{p.name}</option>
+          ))}
         </select>
-        <button className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl px-8 py-3 text-sm shadow-sm transition-colors">
+        <button
+          onClick={() => selectedName && setIsSaved(true)}
+          className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl px-8 py-3 text-sm shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!selectedName}
+        >
           Simpan
         </button>
       </div>
@@ -134,6 +182,75 @@ function DetailField({
   );
 }
 
+function RevisionModal({
+  isOpen,
+  onClose,
+  onConfirm
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+      <div className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800">Revisi Permintaan Masuk</h2>
+            <p className="text-sm text-gray-400 font-medium">Konfirmasi revisi</p>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-sm text-gray-500 leading-relaxed font-medium">
+              Apakah Anda yakin ingin merevisi permintaan penawaran ini?
+              Tindakan ini akan mengembalikan status penawaran ke pembuat untuk direvisi.
+            </p>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-slate-800 uppercase tracking-tight">
+                Alasan Penolakan
+              </label>
+              <textarea
+                autoFocus
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Tuliskan alasan agar karyawan dapat memahami keputusan ini..."
+                className="w-full h-32 p-4 text-sm bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all resize-none placeholder:text-gray-300"
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-slate-600 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              disabled={!reason.trim()}
+              onClick={() => {
+                onConfirm(reason);
+                setReason("");
+              }}
+              className={`px-8 py-3 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95 ${reason.trim()
+                  ? "bg-cyan-500 text-white hover:bg-cyan-600 shadow-cyan-200"
+                  : "bg-gray-100 text-gray-300 cursor-not-allowed"
+                }`}
+            >
+              Konfirmasi Revisi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const documentItems = [
   { name: "BoQ_Draft_v2.pdf", size: "Dimas • 12 Feb, 10:30", path: "./BoQ_Draft_v2.pdf", allowDelete: true },
   { name: "List Barang.xlsx", size: "Rudi H. • 11 Feb, 16:45", path: "./List-Barang.xlsx" },
@@ -151,6 +268,7 @@ export default function Step1({ mode }: { mode: string }) {
     { id: 6, user: "Penugasan PIC", action: "Rudi Hartono ditugaskan sebagai PIC Estimator.", time: "08:30", date: "KEMARIN", type: 'system' },
   ]);
   const [note, setNote] = useState("");
+  const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
 
   const handleSendLog = () => {
     if (!note.trim()) return;
@@ -211,7 +329,10 @@ export default function Step1({ mode }: { mode: string }) {
           </div>
 
           <div className="px-6 py-5 border-t border-gray-100/80">
-            <button className="px-4 py-2 bg-amber-50 text-amber-500 text-sm font-semibold rounded-xl border border-amber-100 hover:bg-amber-100 transition-colors">
+            <button
+              onClick={() => setIsRevisionModalOpen(true)}
+              className="px-4 py-2 bg-amber-50 text-amber-500 text-sm font-semibold rounded-xl border border-amber-100 hover:bg-amber-100 transition-colors"
+            >
               Revisi
             </button>
           </div>
@@ -296,6 +417,14 @@ export default function Step1({ mode }: { mode: string }) {
           </div>
         </div>
       </div>
+
+      <RevisionModal
+        isOpen={isRevisionModalOpen}
+        onClose={() => setIsRevisionModalOpen(false)}
+        onConfirm={(reason) => {
+          setIsRevisionModalOpen(false);
+        }}
+      />
     </div>
   );
 }

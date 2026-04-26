@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ShieldCheck,
   ChevronDown,
@@ -149,7 +149,146 @@ function ApprovalCard({
   );
 }
 
+function RevisionModal({ 
+  isOpen, 
+  onClose, 
+  onConfirm 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+      <div className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800">Revisi Permintaan Masuk</h2>
+            <p className="text-sm text-gray-400 font-medium">Konfirmasi revisi</p>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-sm text-gray-500 leading-relaxed font-medium">
+              Apakah Anda yakin ingin merevisi permintaan penawaran ini? 
+              Tindakan ini akan mengembalikan status penawaran ke pembuat untuk direvisi.
+            </p>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-slate-800 uppercase tracking-tight">
+                Alasan Penolakan
+              </label>
+              <textarea
+                autoFocus
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Tuliskan alasan agar karyawan dapat memahami keputusan ini..."
+                className="w-full h-32 p-4 text-sm bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all resize-none placeholder:text-gray-300"
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-slate-600 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              disabled={!reason.trim()}
+              onClick={() => {
+                onConfirm(reason);
+                setReason("");
+              }}
+              className={`px-8 py-3 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95 ${
+                reason.trim() 
+                  ? "bg-cyan-500 text-white hover:bg-cyan-600 shadow-cyan-200" 
+                  : "bg-gray-100 text-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Konfirmasi Revisi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ApprovalModal({ 
+  isOpen, 
+  onClose, 
+  onConfirm 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: (comment: string) => void;
+}) {
+  const [comment, setComment] = useState("");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+      <div className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800">Setujui Pengajuan Penawaran</h2>
+            <p className="text-sm text-gray-400 font-medium">Konfirmasi pengajuan dokumen penawaran</p>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-sm text-gray-500 leading-relaxed font-medium">
+              Apakah Anda sudah memastikan semua detail dalam penawaran ini benar? 
+              Setelah disetujui, status akan berubah menjadi <span className="font-bold text-slate-800">"Disetujui"</span> dan dokumen akan diteruskan ke tahap berikutnya.
+            </p>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-slate-800">
+                Komentar <span className="text-gray-400 font-medium">(Optional)</span>
+              </label>
+              <textarea
+                autoFocus
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Tulis komentar di sini..."
+                className="w-full h-32 p-4 text-sm bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all resize-none placeholder:text-gray-300"
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-end items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-slate-600 transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              onClick={() => {
+                onConfirm(comment);
+                setComment("");
+              }}
+              className="px-8 py-3 rounded-xl text-sm font-bold bg-cyan-500 text-white hover:bg-cyan-600 shadow-sm shadow-cyan-200 transition-all active:scale-95"
+            >
+              Konfirmasi Setuju
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Step3() {
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
+  const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
+
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
@@ -167,22 +306,50 @@ export default function Step3() {
           </div>
 
           <div className="p-6 space-y-5">
-            <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
+            <div 
+              onClick={() => setIsFinancialExpanded(!isFinancialExpanded)}
+              className={`rounded-2xl border p-5 cursor-pointer transition-all ${
+                isFinancialExpanded 
+                  ? 'bg-cyan-50/50 border-cyan-100 shadow-sm' 
+                  : 'bg-slate-50/70 border-gray-100 hover:bg-slate-50'
+              }`}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-2">Nilai Penawaran yang Direview</p>
+                  <p className={`text-sm font-medium mb-2 transition-colors ${isFinancialExpanded ? 'text-cyan-600' : 'text-gray-500'}`}>
+                    Nilai Penawaran yang Direview
+                  </p>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-[20px] font-bold text-slate-800">Rp 485.000.000</span>
+                    <span className={`text-[20px] font-bold transition-colors ${isFinancialExpanded ? 'text-cyan-700' : 'text-slate-800'}`}>
+                      Rp 485.000.000
+                    </span>
                     <span className="px-3 py-1 bg-cyan-50 text-cyan-600 text-xs font-semibold rounded-full border border-cyan-100">
                       PAC Montair
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-2">PT ABC Indonesia — Gedung Pusat Lt. 5, Jakarta Selatan</p>
                 </div>
-                <button className="text-slate-400 hover:text-slate-500">
-                  <ChevronDown size={18} />
-                </button>
+                <div className={`p-1 rounded-lg transition-all ${isFinancialExpanded ? 'bg-white/50 text-cyan-500 rotate-180' : 'text-slate-400'}`}>
+                  <ChevronDown size={20} />
+                </div>
               </div>
+
+              {isFinancialExpanded && (
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="bg-white rounded-xl border border-cyan-100/50 p-4 shadow-sm">
+                    <p className="text-[10px] text-cyan-600/60 font-bold mb-1.5 uppercase tracking-wider">Sub Total I (Main Equipment)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 300.000.000</p>
+                  </div>
+                  <div className="bg-white rounded-xl border border-cyan-100/50 p-4 shadow-sm">
+                    <p className="text-[10px] text-cyan-600/60 font-bold mb-1.5 uppercase tracking-wider">Sub Total II (Material Instalasi)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 120.000.000</p>
+                  </div>
+                  <div className="bg-white rounded-xl border border-cyan-100/50 p-4 shadow-sm">
+                    <p className="text-[10px] text-cyan-600/60 font-bold mb-1.5 uppercase tracking-wider">Sub Total III (Jasa)</p>
+                    <p className="text-sm font-bold text-slate-700">Rp 65.000.000</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <ApprovalCard
@@ -200,10 +367,16 @@ export default function Step3() {
               status="waiting"
               action={
                 <div className="flex items-center gap-3">
-                  <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm">
+                  <button 
+                    onClick={() => setIsApprovalModalOpen(true)}
+                    className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                  >
                     Setujui & Lanjut
                   </button>
-                  <button className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors">
+                  <button 
+                    onClick={() => setIsRevisionModalOpen(true)}
+                    className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
+                  >
                     Revisi
                   </button>
                 </div>
@@ -253,6 +426,24 @@ export default function Step3() {
       <div className="col-span-12 lg:col-span-3">
         <ActivitySidebar />
       </div>
+
+      <ApprovalModal 
+        isOpen={isApprovalModalOpen} 
+        onClose={() => setIsApprovalModalOpen(false)} 
+        onConfirm={(comment) => {
+          console.log("Approval dikonfirmasi dengan komentar:", comment);
+          setIsApprovalModalOpen(false);
+        }}
+      />
+
+      <RevisionModal 
+        isOpen={isRevisionModalOpen} 
+        onClose={() => setIsRevisionModalOpen(false)} 
+        onConfirm={(reason) => {
+          console.log("Revisi dikonfirmasi dengan alasan:", reason);
+          setIsRevisionModalOpen(false);
+        }}
+      />
     </div>
   );
 }

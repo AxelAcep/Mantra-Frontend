@@ -6,6 +6,7 @@ import Step2 from './step2';
 import Step3 from './step3';
 import Step4 from './step4';
 import Step5 from './step5';
+import Step6 from './step6';
 import StepRestricted from './step-restricted';
 import { Button } from '@/components/ui/button';
 import {
@@ -99,7 +100,7 @@ export default function PenawaranPage() {
               {activeStep === 3 && <Step3 />}
               {activeStep === 4 && <Step4 />}
               {activeStep === 5 && <Step5 />}
-              {activeStep === 6 && <StepRestricted />}
+              {activeStep === 6 && <Step6 />}
             </>
           )}
         </div>
