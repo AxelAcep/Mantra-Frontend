@@ -297,6 +297,8 @@ export type KaryawanItem = {
     cukup: number
     buruk: number
     aktivitasBerjalan: number
+    overdueCount: number
+    completedCount: number
     totalAktivitas: number
 }
 

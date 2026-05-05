@@ -28,12 +28,21 @@ type MenuItem = {
   children?: { title: string; url: string }[];
 };
 
-const getMenuOperasional = (unreadChatCount: number): MenuItem[] => [
-  { title: "Beranda", icon: Icons.Beranda, url: "/dashboard" },
-  { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount },
-  { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 },
-  { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" },
-];
+const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] => {
+  const menu: MenuItem[] = [];
+  
+  if (role === "MASTER") {
+    menu.push({ title: "Beranda", icon: Icons.Beranda, url: "/dashboard" });
+  }
+  
+  menu.push(
+    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount },
+    { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 },
+    { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" }
+  );
+  
+  return menu;
+};
 
 const getMenuManajemen = (): MenuItem[] => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -217,11 +226,14 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
       );
     });
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isMaster = user?.role === "MASTER";
+
   return (
     <>
       <SidebarHeader className="p-4 h-16 flex flex-row items-center justify-between gap-3 border-b border-slate-200 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
         <NavLink
-          to="/dashboard"
+          to={isMaster ? "/dashboard" : "/dailyactivity"}
           className="flex items-center gap-3 overflow-hidden group-data-[collapsible=icon]:hidden"
           onClick={onNavigate}
         >
@@ -243,7 +255,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {renderMenu(getMenuOperasional(unreadChatCount))}
+              {renderMenu(getMenuOperasional(unreadChatCount, user?.role))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

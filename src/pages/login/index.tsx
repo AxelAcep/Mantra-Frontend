@@ -1,8 +1,24 @@
 import { Icons } from "@/assets"
 import { useLogin } from "../../hooks/use-login";
 
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function LoginPage() {
     const { email, setEmail, password, setPassword, error, loading, handleSubmit } = useLogin();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const userJson = localStorage.getItem("user");
+        if (userJson) {
+            const user = JSON.parse(userJson);
+            if (user.role === "MASTER") {
+                navigate("/dashboard");
+            } else if (user.role) {
+                navigate("/dailyactivity");
+            }
+        }
+    }, [navigate]);
 
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = password.trim().length > 0;
@@ -10,7 +26,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-            
+
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8 mb-4">
                 <img src={Icons.MantraBig} alt="Logo Mantra" className="mx-auto mb-2 w-12 h-12" />
                 <h1 className="text-2xl font-bold text-center mb-1">Selamat Datang</h1>

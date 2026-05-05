@@ -24,7 +24,11 @@ export const useLogin = () => {
             localStorage.setItem("user", JSON.stringify(res.user));
             localStorage.setItem("login_at", Date.now().toString());
 
-            navigate("/dailyactivity");
+            if (res.user.role === "MASTER") {
+                navigate("/dashboard");
+            } else {
+                navigate("/dailyactivity");
+            }
 
         } catch (err: any) {
             setError(err.message);

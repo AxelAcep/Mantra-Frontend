@@ -1,13 +1,16 @@
-import CardJadwalUlang from "./card-penawaran-Single";
 import DailyActivityReport from "./card-daily-activity-report";
 import LogbookMonitoring from "./card-logbook-monitoring";
 import KpiKaryawan from "./card-kpi-karyawan";
-import CardPenawaranDouble from "./card-penawaran-Double";
+import CardRingkasan from "./card-ringaksan";
 import { useEffect } from "react";
 import { useHeaderTitle } from "../../components/layout/layout"; // sesuaikan path
+import { Icons } from "@/assets";
+import { useMasterStats } from "@/hooks/use-kpi";
 
 export default function DashboardPage() {
     const { setTitle } = useHeaderTitle();
+    const { data: stats } = useMasterStats();
+
     useEffect(() => {
         setTitle("Dashboard Operasional");
     }, [setTitle]);
@@ -19,13 +22,62 @@ export default function DashboardPage() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mt-6">
-                <CardPenawaranDouble title="REQUEST PENAWARAN" value1={12} value2={5} link1="/request-penawaran" link2="/request-penawaran" />
-                <CardPenawaranDouble title="PENAWARAN APPROVAL" value1={45} value2={18} link1="/penawaran-approval" link2="/penawaran-approval" />
-                <CardPenawaranDouble title="PENAWARAN FINAL" value1={8} value2={0} link1="/penawaran-final" link2="/penawaran-final" />
-                <CardPenawaranDouble title="PO AKTIF" value1={24} value2={3} link1="/po-aktif" link2="/po-aktif" />
-                <CardJadwalUlang title="Pengadaan Barang" value1={12} desc="Pengadaan Barang" link="/pengadaan-barang" />
-                <CardPenawaranDouble title="KONFIRMASI SELESAI" value1={8} value2={2} link1="/konfirmasi-selesai" link2="/konfirmasi-selesai" />
-                <CardJadwalUlang title="Jadwal Ulang" value1={5} desc="Jadwal Ulang" link="/jadwal-ulang" />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={12}
+                    label="Request Penawaran"
+                    icon={Icons.RequestPenawaran}
+                    href="/dashboard/request-penawaran"
+                    linkText="Lihat →"
+                />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={45}
+                    label="Penawaran Approval"
+                    icon={Icons.PenawaranApproval}
+                    href="/dashboard/penawaran-approval"
+                    linkText="Tinjau →"
+                />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={8}
+                    label="Penawaran Final"
+                    icon={Icons.PenawaranFinal}
+                    href="/dashboard/penawaran-final"
+                    linkText="Tinjau →"
+                />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={12}
+                    label="PO Aktif"
+                    icon={Icons.POAktif}
+                    href="/dashboard/po-aktif"
+                    linkText="Lihat →"
+                />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={24}
+                    label="Penawaran Pengadaan"
+                    icon={Icons.PenawaranPengadaan}
+                    href="/dashboard/pengadaan-barang"
+                    linkText="Tinjau →"
+                />
+                <CardRingkasan
+                    title="PENGADAAN BARANG"
+                    count={3}
+                    label="Konfirmasi Selesai"
+                    icon={Icons.KonfirmasiSelesai}
+                    href="/dashboard/konfirmasi-selesai"
+                    linkText="Tinjau →"
+                />
+                <CardRingkasan
+                    title="DAILY ACTIVITY REPORT"
+                    count={stats?.pengajuanReschedule ?? 0}
+                    label="Reschedule"
+                    icon={Icons.JadwalUlang}
+                    href="/dailyactivity?tab=reschedule"
+                    linkText="Tinjau →"
+                />
             </div>
 
             <div className="mt-6">
