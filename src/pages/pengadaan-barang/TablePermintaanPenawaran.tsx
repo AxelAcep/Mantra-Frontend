@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
 
 interface UserSession {
-  role?: "MASTER" | "PEGAWAI" | "KARYAWAN" | "SUPERVISI";
+  role?: string;
 }
 
 const getAuthData = () => {
@@ -12,7 +12,7 @@ const getAuthData = () => {
   const user: UserSession = session ? JSON.parse(session) : {};
   return {
     isLoggedIn: !!user.role,
-    role: user.role,
+    role: user.role ?? "",
   };
 };
 
@@ -24,7 +24,7 @@ function formatTanggal(iso: string) {
   });
 }
 
-function formatRupiah(nilai: number | null) {
+function formatRupiah(nilai: number | null | undefined) {
   if (!nilai) return null;
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -33,19 +33,38 @@ function formatRupiah(nilai: number | null) {
   }).format(nilai);
 }
 
-function stepToStatus(step: string): PermintaanPenawaran["status"] {
-  const map: Record<string, PermintaanPenawaran["status"]> = {
-    PERMINTAAN_MASUK: "Perlu tindakan",
-    PENYUSUNAN_BOQ: "Draft",
-    REVIEW_INTERNAL: "Review",
-    PERSETUJUAN_MANAJEMEN: "Review",
-  };
-  return map[step] ?? "Draft";
-}
+type StatusType =
+  | "ON_PROGRESS"
+  | "PERLU_TINDAKAN"
+  | "KONFIRMASI_SELESAI"
+  | "SELESAI";
 
-type PermintaanPenawaran = {
-  status: "Perlu tindakan" | "Review" | "Revisi" | "Draft";
-};
+function StatusBadge({ status }: { status: StatusType }) {
+  const config: Record<StatusType, string> = {
+    ON_PROGRESS: "bg-[#f8fafc] text-[#64748b] border-[#f1f5f9]",
+    PERLU_TINDAKAN:
+      "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5] ring-1 ring-[#fed7aa]",
+    KONFIRMASI_SELESAI: "bg-[#fefce8] text-[#ca8a04] border-[#fef9c3]",
+    SELESAI: "bg-[#f0fdf4] text-[#16a34a] border-[#dcfce7]",
+  };
+
+  const label: Record<StatusType, string> = {
+    ON_PROGRESS: "On Progress",
+    PERLU_TINDAKAN: "⚠️ Perlu Tindakan",
+    KONFIRMASI_SELESAI: "Menunggu Konfirmasi",
+    SELESAI: "✓ Selesai",
+  };
+
+  const safeStatus: StatusType = config[status] ? status : "ON_PROGRESS";
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border shadow-sm ${config[safeStatus]}`}
+    >
+      {label[safeStatus]}
+    </span>
+  );
+}
 
 export default function TablePermintaanPenawaran() {
   const [page, setPage] = useState(1);
@@ -92,7 +111,7 @@ export default function TablePermintaanPenawaran() {
             {isLoading && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={isMaster ? 7 : 6}
                   className="px-6 py-10 text-center text-gray-400 text-sm"
                 >
                   Memuat data...
@@ -102,7 +121,7 @@ export default function TablePermintaanPenawaran() {
             {isError && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={isMaster ? 7 : 6}
                   className="px-6 py-10 text-center text-red-400 text-sm"
                 >
                   Gagal memuat data.
@@ -112,7 +131,7 @@ export default function TablePermintaanPenawaran() {
             {!isLoading && !isError && data?.data.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={isMaster ? 7 : 6}
                   className="px-6 py-10 text-center text-gray-300 text-sm"
                 >
                   Tidak ada data penawaran.
@@ -120,12 +139,15 @@ export default function TablePermintaanPenawaran() {
               </tr>
             )}
             {data?.data.map((item) => {
-              const status = stepToStatus(item.stepSaatIni);
-              const isAlert = false;
+              const status = (item.status ?? "ON_PROGRESS") as StatusType;
               return (
                 <tr
                   key={item.id}
-                  className={`transition-colors ${isAlert ? "bg-[#fffbeb]" : "hover:bg-gray-50/50"}`}
+                  className={`transition-colors ${
+                    status === "PERLU_TINDAKAN"
+                      ? "bg-[#fffbeb]"
+                      : "hover:bg-gray-50/50"
+                  }`}
                 >
                   <td className="px-6 py-5 text-gray-500">
                     {formatTanggal(item.tanggalMasuk)}
@@ -196,24 +218,5 @@ export default function TablePermintaanPenawaran() {
         </div>
       )}
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: PermintaanPenawaran["status"] }) {
-  const config = {
-    "Perlu tindakan":
-      "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5] ring-1 ring-[#fed7aa]",
-    Review: "bg-[#fefce8] text-[#ca8a04] border-[#fef9c3]",
-    Revisi: "bg-[#fef2f2] text-[#dc2626] border-[#fee2e2]",
-    Draft: "bg-[#f8fafc] text-[#64748b] border-[#f1f5f9]",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border shadow-sm ${config[status]}`}
-    >
-      {status === "Perlu tindakan" && <span>⚠️</span>}
-      {status}
-    </span>
   );
 }
