@@ -27,6 +27,7 @@ import ChatPage from "./pages/notifikasi/chat";
 import DetailKPIPage from "./pages/kpi";
 import PengaturanPegawaiPage from "./pages/pengaturan/pegawai";
 import PengaturanManagerPage from "./pages/pengaturan/manager";
+import BuatPenawaran from "./pages/detail-pengadaan-barang/create-penawaran/index";
 
 interface UserSession {
   role?: "MASTER" | "PEGAWAI" | "KARYAWAN" | "SUPERVISI";
@@ -48,12 +49,20 @@ const DailyActivityWrapper = (): JSX.Element => {
 
 const DetailActivityWrapper = (): JSX.Element => {
   const { role } = getAuthData();
-  return role === "MASTER" ? <DetailActivityPagePegawaiAdmin /> : <DetailActivityPagePegawai />;
+  return role === "MASTER" ? (
+    <DetailActivityPagePegawaiAdmin />
+  ) : (
+    <DetailActivityPagePegawai />
+  );
 };
 
 const PengaturanWrapper = (): JSX.Element => {
   const { role } = getAuthData();
-  return role === "MASTER" ? <PengaturanManagerPage /> : <PengaturanPegawaiPage />;
+  return role === "MASTER" ? (
+    <PengaturanManagerPage />
+  ) : (
+    <PengaturanPegawaiPage />
+  );
 };
 
 function App() {
@@ -68,19 +77,41 @@ function App() {
           <Route path="perusahaan" element={<PerusahaanPage />} />
           <Route path="perusahaan/:id" element={<DetailPerusahaanPage />} />
           <Route path="penawaran/:id" element={<Penawaran />} />
-          <Route path="dashboard/request-penawaran" element={<RequestPenawaranPage />} />
-          <Route path="dashboard/konfirmasi-selesai" element={<KonfirmasiSelesaiPage />} />
-          <Route path="dashboard/penawaran-approval" element={<PenawaranApprovalPage />} />
-          <Route path="dashboard/penawaran-final" element={<PenawaranFinalPage />} />
+          <Route path="penawaran/create" element={<BuatPenawaran />} />
+          <Route
+            path="dashboard/request-penawaran"
+            element={<RequestPenawaranPage />}
+          />
+          <Route
+            path="dashboard/konfirmasi-selesai"
+            element={<KonfirmasiSelesaiPage />}
+          />
+          <Route
+            path="dashboard/penawaran-approval"
+            element={<PenawaranApprovalPage />}
+          />
+          <Route
+            path="dashboard/penawaran-final"
+            element={<PenawaranFinalPage />}
+          />
           <Route path="dashboard/po-aktif" element={<POAktifPage />} />
-          <Route path="dashboard/pengadaan-barang" element={<PengadaanBarangPage />} />
+          <Route
+            path="dashboard/pengadaan-barang"
+            element={<PengadaanBarangPage />}
+          />
           <Route path="dashboard/jadwal-ulang" element={<JadwalUlangPage />} />
           <Route path="manajemen-akun" element={<ManajemenAkunPage />} />
           <Route path="akunkaryawan" element={<ManajemenAkunPage />} />
           <Route path="dailyactivity" element={<DailyActivityWrapper />} />
           <Route path="dailyactivity/:id" element={<DetailActivityWrapper />} />
-          <Route path="dailyactivity/supervisi" element={<ActivityPageSupervisi />} />
-          <Route path="dailyactivity/supervisi/:id" element={<DetailActivityPagePegawaiAdmin />} />
+          <Route
+            path="dailyactivity/supervisi"
+            element={<ActivityPageSupervisi />}
+          />
+          <Route
+            path="dailyactivity/supervisi/:id"
+            element={<DetailActivityPagePegawaiAdmin />}
+          />
           <Route path="notifikasi/chat" element={<ChatPage />} />
           <Route path="kpi/:pegawaiId" element={<DetailKPIPage />} />
           <Route path="pengaturan" element={<PengaturanWrapper />} />
