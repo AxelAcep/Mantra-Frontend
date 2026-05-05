@@ -56,13 +56,28 @@ const PengaturanWrapper = (): JSX.Element => {
   return role === "MASTER" ? <PengaturanManagerPage /> : <PengaturanPegawaiPage />;
 };
 
+const IndexWrapper = (): JSX.Element => {
+  const { isLoggedIn, role } = getAuthData();
+  if (isLoggedIn) {
+    return <Navigate to={role === "MASTER" ? "/dashboard" : "/dailyactivity"} replace />;
+  }
+  return <LoginPage />;
+};
+
+const DashboardWrapper = (): JSX.Element => {
+  const { isLoggedIn, role } = getAuthData();
+  if (!isLoggedIn) return <Navigate to="/" replace />;
+  if (role !== "MASTER") return <Navigate to="/dailyactivity" replace />;
+  return <DashboardPage />;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={<LoginPage />} />
+        <Route index element={<IndexWrapper />} />
         <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardWrapper />} />
           <Route path="logbook" element={<LogBookPage />} />
           <Route path="pengadaan-barang" element={<ListPengadaan />} />
           <Route path="perusahaan" element={<PerusahaanPage />} />

@@ -45,7 +45,7 @@ export type KPIItem = {
 export type KPIBulanResult = { bulan: number; tahun: number; data: KPIItem[] }
 export type KPIYearlyResult = { tahun: number; bulanAwal: number; bulanAkhir: number; data: KPIItem[] }
 export type KPIDistribusi = { bulan: number; tahun: number; data: { baik: number; cukup: number; buruk: number } }
-export type MasterStats = { totalAktivitas: number; perluKonfirmasiSelesai: number; pengajuanReschedule: number; overdue: number }
+export type MasterStats = { totalAktivitas: number; perluKonfirmasiSelesai: number; pengajuanReschedule: number; overdue: number; totalKaryawan: number; karyawanOverdue: number }
 
 export async function getKPIBulan(bulan: number, tahun: number): Promise<KPIBulanResult> {
     const params = new URLSearchParams({ bulan: String(bulan), tahun: String(tahun) })
@@ -75,7 +75,7 @@ export async function getMasterStats(): Promise<MasterStats> {
     const res = await fetchClient(`/activity/master/stats`, { headers: authHeaders() })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? "Gagal mengambil statistik.")
-    return json
+    return json.data
 }
 
 export type NilaiKPI = "BAIK" | "CUKUP" | "BURUK"

@@ -4,6 +4,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { Link } from "react-router"
 
 interface CardRingkasanProps {
     /** Judul kategori di atas, misal "Pengadaan Barang" */
@@ -18,6 +19,8 @@ interface CardRingkasanProps {
     count: number | string
     /** Label keterangan di bawah angka */
     label: string
+    /** Text untuk link (opsional, default: "Lihat →") */
+    linkText?: string
 }
 
 export default function CardRingkasan({
@@ -27,34 +30,34 @@ export default function CardRingkasan({
     iconAlt = "",
     count,
     label,
+    linkText = "Lihat →",
 }: CardRingkasanProps) {
     return (
         <Card className="rounded-xl border-slate-200 shadow-sm p-0 gap-0">
             {/* Bagian Header: Judul, Ikon, dan Tombol */}
             <CardHeader className="p-4 pb-2 gap-2">
-                <CardTitle className="text-[12px] font-bold uppercase text-slate-400">
+                <CardTitle className="text-[10px] font-bold uppercase text-slate-400 leading-tight">
                     {title}
                 </CardTitle>
                 <div className="flex justify-between items-center">
-                    {/* Catatan: Gunakan tag <img> jika menggunakan Vite, atau <Image> jika menggunakan Next.js */}
                     <img
                         src={icon}
                         alt={iconAlt}
-                        className="w-5 h-5 shrink-0 opacity-50 object-contain"
+                        className="w-5 h-5 shrink-0 object-contain"
                     />
-                    <a
-                        href={href}
-                        className="text-[12px] text-cyan-600 font-medium hover:underline"
+                    <Link
+                        to={href}
+                        className="text-[11px] text-cyan-600 font-medium hover:underline"
                     >
-                        Lihat →
-                    </a>
+                        {linkText}
+                    </Link>
                 </div>
             </CardHeader>
 
             {/* Bagian Content: Angka dan Keterangan */}
             <CardContent className="p-4 pt-0">
-                <div className="text-xl font-bold text-slate-800">{count}</div>
-                <p className="text-[12px] text-slate-500 mt-1">{label}</p>
+                <div className="text-2xl font-bold text-slate-800 leading-none mb-1">{count}</div>
+                <p className="text-[11px] text-slate-500 leading-tight">{label}</p>
             </CardContent>
         </Card>
     )
