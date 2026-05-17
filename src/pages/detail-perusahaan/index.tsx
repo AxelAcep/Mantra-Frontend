@@ -3,7 +3,7 @@ import TabsTableCompanyDetail from "./tabs-table-company-detail";
 
 export default function DetailPerusahaanPage() {
     return (
-        <div className="p-3">
+        <div className="m-6">
             <div>
                 <CardCompanyProfileDetail />
             </div>
