@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Icons } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { DialogEditPerusahaan } from "./dialog-edit-perusahaan";
+import { useParams } from "react-router-dom";
+import { getPerusahaanDetail, updatePerusahaan } from "@/services/perusahaan.services";
 
 export default function CardCompanyProfileDetail() {
+  const { id } = useParams<{ id: string }>();
   const [companyInfo, setCompanyInfo] = useState({
     name: "PT. ABC Maju Jaya",
     address: "Jl. Sudirman No. 45, Jakarta Selatan",
@@ -13,13 +16,41 @@ export default function CardCompanyProfileDetail() {
     lastActivity: "2 jam yang lalu"
   });
 
-  function handleEditCompany(updated: { name: string; address: string; phone: string }) {
-    setCompanyInfo(prev => ({
-      ...prev,
-      name: updated.name,
-      address: updated.address,
-      phone: updated.phone
-    }));
+  useEffect(() => {
+    async function loadCompanyDetail() {
+      if (!id) return;
+      try {
+        const data = await getPerusahaanDetail(id);
+        setCompanyInfo(prev => ({
+          ...prev,
+          name: data.nama,
+          address: data.alamat || "-",
+          phone: data.nomor_telepon || "-"
+        }));
+      } catch (err: any) {
+        console.error("Gagal memuat detail perusahaan:", err);
+      }
+    }
+    loadCompanyDetail();
+  }, [id]);
+
+  async function handleEditCompany(updated: { name: string; address: string; phone: string }) {
+    if (!id) return;
+    try {
+      const data = await updatePerusahaan(id, {
+        nama: updated.name,
+        alamat: updated.address,
+        telepon: updated.phone
+      });
+      setCompanyInfo(prev => ({
+        ...prev,
+        name: data.nama,
+        address: data.alamat || "-",
+        phone: data.nomor_telepon || "-"
+      }));
+    } catch (err: any) {
+      alert(err.message || "Gagal memperbarui perusahaan.");
+    }
   }
 
   function truncateText(text: string, maxLength: number = 100): string {

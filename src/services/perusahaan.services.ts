@@ -36,11 +36,42 @@ async function fetchClient(input: string, init?: RequestInit): Promise<Response>
 export type Perusahaan = {
     id: string
     nama: string
+    alamat?: string
+    nomor_telepon?: string
 }
 
 export async function getPerusahaanList(): Promise<Perusahaan[]> {
     const res = await fetchClient(`/perusahaan`, { headers: authHeaders() })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error ?? "Gagal mengambil data perusahaan.")
+    return data
+}
+
+export async function getPerusahaanDetail(id: string): Promise<Perusahaan> {
+    const res = await fetchClient(`/perusahaan/${id}`, { headers: authHeaders() })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error ?? "Gagal mengambil detail perusahaan.")
+    return data
+}
+
+export async function createPerusahaan(company: { nama: string; alamat: string; telepon: string }): Promise<Perusahaan> {
+    const res = await fetchClient(`/perusahaan`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(company),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error ?? "Gagal membuat perusahaan baru.")
+    return data
+}
+
+export async function updatePerusahaan(id: string, company: { nama: string; alamat: string; telepon: string }): Promise<Perusahaan> {
+    const res = await fetchClient(`/perusahaan/${id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify(company),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error ?? "Gagal memperbarui data perusahaan.")
     return data
 }

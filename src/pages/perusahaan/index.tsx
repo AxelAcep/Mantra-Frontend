@@ -3,25 +3,50 @@ import { Search, Phone, Clock, ArrowRight, ChevronLeft, ChevronRight, Plus } fro
 import { useHeaderTitle } from '@/components/layout/layout';
 import { Button } from '@/components/ui/button';
 import { DialogTambahPerusahaan } from './dialog-tambah-perusahaan';
-
-const companies = [
-  { name: "PT. ABC Maju Jaya", address: "Jl. Sudirman No. 45, Jakarta Sela...", phone: "(021) 555-0123", activity: "2 jam lalu", pengadaan: 3, maintenance: 1, total: 12, id: 1 },
-  { name: "PT. Sumber Makmur", address: "Kawasan Industri Pulogadung Bl...", phone: "(021) 460-5678", activity: "1 hari lalu", pengadaan: 0, maintenance: 0, total: 5, id: 2 },
-  { name: "Graha Pena Group", address: "Jl. Ahmad Yani No. 88, Surabaya", phone: "(031) 820-2000", activity: "30 hari lalu", pengadaan: 0, maintenance: 0, total: 8, id: 3 },
-  { name: "Tekno Logistik", address: "Pergudangan Bandara Soetta Blo...", phone: "(021) 559-1122", activity: "3 jam lalu", pengadaan: 1, maintenance: 0, total: 20, id: 4 },
-  { name: "Fire Safety Indo", address: "Gd. Cyber 2, Jl. Rasuna Said", phone: "(021) 290-2222", activity: "5 menit lalu", pengadaan: 5, maintenance: 2, total: 35, id: 5 },
-  { name: "Mitra Mandiri", address: "Ruko Business Park, Kebon Jeruk", phone: "(021) 530-9988", activity: "4 jam lalu", pengadaan: 1, maintenance: 0, total: 4, id: 6 },
-  // ... data duplikat lainnya sesuai gambar
-];
+import { getPerusahaanList, createPerusahaan } from '@/services/perusahaan.services';
 
 export default function PerusahaanPage() {
   const { setTitle } = useHeaderTitle();
-  const [companyList, setCompanyList] = useState(companies);
+  const [companyList, setCompanyList] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     setTitle("Daftar Perusahaan");
   }, [setTitle]);
+
+  useEffect(() => {
+    async function loadCompanies() {
+      try {
+        setLoading(true);
+        const data = await getPerusahaanList();
+        const mapped = data.map((item) => ({
+          id: item.id,
+          name: item.nama,
+          address: item.alamat || "-",
+          phone: item.nomor_telepon || "-",
+          activity: "Baru saja",
+          pengadaan: 0,
+          maintenance: 0,
+          total: 0
+        }));
+        setCompanyList(mapped);
+      } catch (err: any) {
+        setError(err.message || "Gagal mengambil data perusahaan.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCompanies();
+  }, []);
+
+  // Reset page to 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const filteredCompanies = companyList.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -29,21 +54,59 @@ export default function PerusahaanPage() {
     c.phone.toLowerCase().includes(search.toLowerCase())
   );
 
-  function handleAddCompany(newCompany: { name: string; address: string; phone: string }) {
-    const newId = companyList.length + 1;
-    setCompanyList(prev => [
-      ...prev,
-      {
-        id: newId,
-        name: newCompany.name,
-        address: newCompany.address || "-",
-        phone: newCompany.phone || "-",
-        activity: "Baru saja",
-        pengadaan: 0,
-        maintenance: 0,
-        total: 0
+  const totalPages = Math.ceil(filteredCompanies.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedCompanies = filteredCompanies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
       }
-    ]);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) {
+        pages.push("...");
+      }
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) {
+        if (!pages.includes(i)) pages.push(i);
+      }
+      if (currentPage < totalPages - 2) {
+        pages.push("...");
+      }
+      if (!pages.includes(totalPages)) {
+        pages.push(totalPages);
+      }
+    }
+    return pages;
+  };
+
+  async function handleAddCompany(newCompany: { name: string; address: string; phone: string }) {
+    try {
+      const created = await createPerusahaan({
+        nama: newCompany.name,
+        alamat: newCompany.address,
+        telepon: newCompany.phone
+      });
+      setCompanyList(prev => [
+        ...prev,
+        {
+          id: created.id,
+          name: created.nama,
+          address: created.alamat || "-",
+          phone: created.nomor_telepon || "-",
+          activity: "Baru saja",
+          pengadaan: 0,
+          maintenance: 0,
+          total: 0
+        }
+      ]);
+    } catch (err: any) {
+      alert(err.message || "Gagal membuat perusahaan.");
+    }
   }
 
   return (
@@ -87,7 +150,7 @@ export default function PerusahaanPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {filteredCompanies.map((item, idx) => (
+            {paginatedCompanies.map((item, idx) => (
               <tr key={idx} className="hover:bg-gray-50/80 transition-colors text-sm text-gray-700">
                 <td className="px-6 py-4 font-md text-slate-800">{item.name}</td>
                 <td className="px-6 py-4 text-gray-500 max-w-[200px] truncate">{item.address}</td>
@@ -136,18 +199,38 @@ export default function PerusahaanPage() {
       {/* Footer / Pagination */}
       <div className="p-4 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500">
         <div>
-          Menampilkan <span className="font-semibold text-gray-700">1</span> sampai <span className="font-semibold text-gray-700">{filteredCompanies.length}</span> dari <span className="font-semibold text-gray-700">{filteredCompanies.length}</span> perusahaan
+          Menampilkan <span className="font-semibold text-gray-700">{filteredCompanies.length === 0 ? 0 : startIndex + 1}</span> sampai <span className="font-semibold text-gray-700">{Math.min(startIndex + ITEMS_PER_PAGE, filteredCompanies.length)}</span> dari <span className="font-semibold text-gray-700">{filteredCompanies.length}</span> perusahaan
         </div>
         <div className="flex items-center gap-2">
-          <button className="p-1.5 rounded hover:bg-gray-100 text-gray-400">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          >
             <ChevronLeft size={16} />
           </button>
-          <button className="w-7 h-7 flex items-center justify-center rounded bg-cyan-500 text-white font-bold">1</button>
-          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100">2</button>
-          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100">3</button>
-          <span className="px-1 text-gray-300">...</span>
-          <button className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100">8</button>
-          <button className="p-1.5 rounded hover:bg-gray-100 text-gray-400">
+          {getPageNumbers().map((page, idx) => {
+            if (page === "...") {
+              return <span key={idx} className="px-1 text-gray-300">...</span>;
+            }
+            return (
+              <button
+                key={idx}
+                onClick={() => setCurrentPage(Number(page))}
+                className={`w-7 h-7 flex items-center justify-center rounded font-bold text-xs transition-all ${currentPage === page
+                    ? "bg-cyan-500 text-white shadow-sm"
+                    : "hover:bg-gray-100 text-gray-600"
+                  }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+          >
             <ChevronRight size={16} />
           </button>
         </div>
