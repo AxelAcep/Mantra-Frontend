@@ -199,10 +199,11 @@ function WorkTimeCard({
       100,
       Math.max(0, Math.round(((now - start) / (end - start)) * 100)),
     );
-  }, [activity]);
+  }, [activity, activity?.status]);
 
   const sisaWaktu = React.useMemo(() => {
     if (!activity) return "-";
+    if (activity.status == "DITERIMA") return "Selesai";
     // eslint-disable-next-line react-hooks/purity
     const diff = new Date(activity.targetSelesai).getTime() - Date.now();
     if (diff <= 0) return "Waktu habis";
@@ -226,11 +227,13 @@ function WorkTimeCard({
         : (activity?.status ?? "-");
 
   const progressColor =
-    progress >= 80
-      ? "bg-red-400"
-      : progress >= 50
-        ? "bg-amber-400"
-        : "bg-cyan-400";
+    activity?.status === "DITERIMA"
+      ? "bg-green-400"
+      : progress >= 80
+        ? "bg-red-400"
+        : progress >= 50
+          ? "bg-amber-400"
+          : "bg-cyan-400";
 
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">

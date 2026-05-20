@@ -130,6 +130,7 @@ export default function Step1({
         />
         <SectionHeading title="Dokumen" />
         <DocumentSection
+          status={data?.permintaanMasuk?.activity?.status ?? ""}
           trackingId={trackingId}
           permintaanMasukId={data?.permintaanMasuk?.id}
           dokumen={data?.permintaanMasuk?.dokumen ?? []}

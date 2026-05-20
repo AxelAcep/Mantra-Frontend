@@ -104,6 +104,7 @@ export default function TablePermintaanPenawaran() {
               <th className="px-6 py-4">Pembuat Penawaran</th>
               {isMaster && <th className="px-6 py-4">Estimasi Nilai</th>}
               <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-center">Tahapan</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
           </thead>
@@ -172,6 +173,9 @@ export default function TablePermintaanPenawaran() {
                     <div className="flex justify-center">
                       <StatusBadge status={status} />
                     </div>
+                  </td>
+                  <td className="px-6 py-5 text-gray-400 font-medium">
+                    {item.stepSaatIni ?? "—"}
                   </td>
                   <td className="px-6 py-5 text-right">
                     <Link

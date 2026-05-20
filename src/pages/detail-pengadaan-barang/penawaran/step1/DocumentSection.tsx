@@ -1,11 +1,5 @@
 import React, { useRef } from "react";
-import {
-  FileText,
-  Upload,
-  AlertCircle,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
+import { FileText, Upload, CheckCircle2, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import type { PenawaranDokumen } from "@/services/penawaran.services";
@@ -17,6 +11,7 @@ import {
 interface DocumentSectionProps {
   trackingId: string;
   permintaanMasukId?: string;
+  status?: string;
   dokumen: PenawaranDokumen[];
   activity?: {
     id: string;
@@ -30,6 +25,7 @@ export default function DocumentSection({
   permintaanMasukId,
   dokumen,
   activity,
+  status,
 }: DocumentSectionProps) {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,11 +52,8 @@ export default function DocumentSection({
             Logbook Operasional
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-1.5 bg-gray-100 text-gray-500 text-[11px] font-bold px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-              <AlertCircle size={13} /> Bermasalah
-            </button>
             <button className="flex items-center gap-1.5 bg-cyan-50 text-cyan-600 text-[11px] font-bold px-3 py-2 rounded-lg border border-cyan-100 hover:bg-cyan-100 transition-colors">
-              <CheckCircle2 size={13} /> Semua
+              <CheckCircle2 size={13} /> {status ?? "-"}
             </button>
           </div>
         </div>
