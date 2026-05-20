@@ -4,9 +4,10 @@ import RequestDetailSection from "./RequestDetailSection";
 import DocumentSection from "./DocumentSection";
 import ActivityLogSection from "./ActivityLogSection";
 import RevisionModal from "./RevisionModal";
+import { usePenawaranLogs } from "@/hooks/use-penawaran-log";
 import type { TrackingPenawaranDetail } from "@/services/penawaran.services";
 
-export type Mode = "master" | "admin" | "sales" | "readonly";
+export type Mode = "master" | "admin" | "sales" | "readonly" | "presales";
 
 export interface LogEntry {
   id: number;
@@ -42,73 +43,7 @@ export default function Step1({
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const isAdmin = mode === "master" || mode === "admin";
 
-  const logs: LogEntry[] = React.useMemo(() => {
-    const result: LogEntry[] = [];
-
-    // Activity dibuat
-    if (data?.permintaanMasuk?.activity) {
-      const act = data.permintaanMasuk.activity;
-      result.push({
-        id: 1,
-        user: "Sistem",
-        action: `Activity dibuat: ${act.judul}`,
-        time: new Date(act.waktuMulai).toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        date: new Date(act.waktuMulai).toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        type: "system",
-      });
-    }
-
-    // Upload dokumen
-    if (data?.permintaanMasuk?.dokumen) {
-      data.permintaanMasuk.dokumen.forEach((dok, i) => {
-        result.push({
-          id: i + 10,
-          user: "Upload Dokumen",
-          action: `Mengunggah file ${dok.namaFile}`,
-          time: new Date(dok.createdAt).toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          date: new Date(dok.createdAt).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-          type: "user",
-        });
-      });
-    }
-
-    // Log dari backend (assign, tolak, konfirmasi, dll)
-    if (data?.permintaanMasuk?.logs) {
-      data.permintaanMasuk.logs.forEach((log, i) => {
-        result.push({
-          id: i + 100,
-          user: log.namaPegawai,
-          action: `${log.aksi}${log.keterangan ? `: ${log.keterangan}` : ""}`,
-          time: new Date(log.createdAt).toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          date: new Date(log.createdAt).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
-          type: "system",
-        });
-      });
-    }
-
-    return result;
-  }, [data]);
+  const logs = usePenawaranLogs(data);
 
   return (
     <div className="grid grid-cols-12 gap-6">
