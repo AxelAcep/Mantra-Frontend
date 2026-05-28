@@ -5,7 +5,7 @@ import TrackingHeader from "../header-card";
 import Step1 from "./step1/index";
 import Step2 from "./step2/index";
 import Step3 from "./step3/index";
-import Step4 from "./step4";
+import Step4 from "./step4/index";
 import Step5 from "./step5";
 import Step6 from "./step6";
 import Step7 from "./step7";
@@ -68,9 +68,19 @@ export default function PenawaranPage() {
   const [activeStep, setActiveStep] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
-  const [revisionTarget, setRevisionTarget] = useState<"step1" | "step2">(
-    "step1",
-  );
+  const [revisionTarget, setRevisionTarget] = useState<
+    "step1" | "step2" | "step4"
+  >("step1");
+
+  const [step4Info, setStep4Info] = useState<{
+    status: string;
+    canAcc: boolean;
+    canKonfirmasiUlang: boolean;
+    isUpdating: boolean;
+    onAcc: () => void;
+    onPerluTindakan: (alasan: string) => void;
+    onKonfirmasiUlang: () => void;
+  } | null>(null);
 
   // ── Data & Mutations ───────────────────────────────────────────────────
   const { data: penawaran, isLoading } = useDetailPenawaran(trackingId);
@@ -121,12 +131,16 @@ export default function PenawaranPage() {
   const { data: reviewInternalData } = useDetailReviewInternal(trackingId);
   const isReviewInternalSelesai = reviewInternalData?.status === "SELESAI";
 
+  // Step 4
+  const isStep4Selesai = step4Info?.status === "SELESAI";
+
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
     (activeStep === 1 && !isPermintaanSelesai) ||
     (activeStep === 2 && !isBoQSelesai) ||
     (activeStep === 3 && !isReviewInternalSelesai) ||
-    activeStep >= 4;
+    (activeStep === 4 && !isStep4Selesai) || // ✅ tambah ini
+    activeStep >= 5; // ✅ ubah dari >= 4 ke >= 5
 
   // ── Handlers ───────────────────────────────────────────────────────────
   function handleKonfirmasiStep1() {
@@ -156,14 +170,15 @@ export default function PenawaranPage() {
     updateStatusBoQ({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan });
   }
 
-  function openRevisionModal(target: "step1" | "step2") {
+  function openRevisionModal(target: "step1" | "step2" | "step4") {
     setRevisionTarget(target);
     setIsRevisionModalOpen(true);
   }
 
   function handleRevisionConfirm(alasan: string) {
     if (revisionTarget === "step1") handleTolakStep1(alasan);
-    else handleTolakStep2(alasan);
+    else if (revisionTarget === "step2") handleTolakStep2(alasan);
+    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan); // ✅ bukan handleTolakStep4
     setIsRevisionModalOpen(false);
   }
 
@@ -187,7 +202,7 @@ export default function PenawaranPage() {
         <ProgressCard
           steps={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
             n,
-            label: `Tahap ${n}`,
+            label: n === 9 ? "Accounting" : `Tahap ${n}`,
             status:
               n === activeStep
                 ? "active"
@@ -222,12 +237,18 @@ export default function PenawaranPage() {
               onChatClick={() => setIsChatOpen(true)}
             />
           )}
-          {activeStep === 4 && <Step4 />}
+          {activeStep === 4 && (
+            <Step4
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+              onStatusChange={setStep4Info} // ✅
+            />
+          )}
           {activeStep === 5 && <Step5 />}
           {activeStep === 6 && <Step6 />}
           {activeStep === 7 && <Step7 />}
-          {activeStep === 8 && <Step8 />}
-          {activeStep === 9 && <Step9 />}
+          {activeStep === 8 && <Step9 />}
+          {activeStep === 9 && <Step8 />}
         </div>
 
         {/* Bottom Action Bar */}
@@ -302,6 +323,37 @@ export default function PenawaranPage() {
                 {isUpdatingBoQ ? "Memproses..." : "Terima"}
               </Button>
             </>
+          )}
+
+          {activeStep === 4 && step4Info?.canAcc && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step4")}
+                disabled={step4Info.isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Perlu Tindakan
+              </Button>
+              <Button
+                onClick={step4Info.onAcc}
+                disabled={step4Info.isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {step4Info.isUpdating ? "Memproses..." : "Approve"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 4: Sales/PreSales/Supervisi/Manajer — Konfirmasi Ulang */}
+          {activeStep === 4 && step4Info?.canKonfirmasiUlang && (
+            <Button
+              onClick={step4Info.onKonfirmasiUlang}
+              disabled={step4Info.isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {step4Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
+            </Button>
           )}
 
           <Button
