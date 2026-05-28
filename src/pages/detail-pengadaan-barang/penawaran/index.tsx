@@ -4,7 +4,7 @@ import ProgressCard from "../progress-card";
 import TrackingHeader from "../header-card";
 import Step1 from "./step1/index";
 import Step2 from "./step2/index";
-import Step3 from "./step3";
+import Step3 from "./step3/index";
 import Step4 from "./step4";
 import Step5 from "./step5";
 import Step6 from "./step6";
@@ -19,6 +19,7 @@ import {
   useUpdateStatusPermintaan,
 } from "@/hooks/use-penawaran";
 import { useUpdateStatusBoQ, usePreloadBoQ } from "@/hooks/use-boq";
+import { useDetailReviewInternal } from "@/hooks/use-review-internal";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function getUserInfo() {
@@ -48,11 +49,12 @@ function getNextButtonLabel(
   activeStep: number,
   isPermintaanSelesai: boolean,
   isBoQSelesai: boolean,
+  isReviewInternalSelesai: boolean,
 ): string {
   if (activeStep === 1 && !isPermintaanSelesai)
     return "Permintaan Belum Selesai";
   if (activeStep === 2 && !isBoQSelesai) return "BoQ Belum Selesai";
-  if (activeStep >= 3) return "Belum Tersedia";
+  if (activeStep >= 3 && !isReviewInternalSelesai) return "Belum Tersedia";
   return "Selanjutnya";
 }
 
@@ -115,11 +117,16 @@ export default function PenawaranPage() {
     (isBoQOnProgress || isBoQPerluTindakan);
   const canMasterAccStep2 = isMaster && isBoQKonfirmasi;
 
+  // Step 3
+  const { data: reviewInternalData } = useDetailReviewInternal(trackingId);
+  const isReviewInternalSelesai = reviewInternalData?.status === "SELESAI";
+
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
     (activeStep === 1 && !isPermintaanSelesai) ||
     (activeStep === 2 && !isBoQSelesai) ||
-    activeStep >= 3;
+    (activeStep === 3 && !isReviewInternalSelesai) ||
+    activeStep >= 4;
 
   // ── Handlers ───────────────────────────────────────────────────────────
   function handleKonfirmasiStep1() {
@@ -209,7 +216,12 @@ export default function PenawaranPage() {
               onChatClick={() => setIsChatOpen(true)}
             />
           )}
-          {activeStep === 3 && <Step3 />}
+          {activeStep === 3 && (
+            <Step3
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+            />
+          )}
           {activeStep === 4 && <Step4 />}
           {activeStep === 5 && <Step5 />}
           {activeStep === 6 && <Step6 />}
@@ -297,7 +309,12 @@ export default function PenawaranPage() {
             disabled={isNextBlocked}
             className="bg-cyan-500 hover:bg-cyan-600"
           >
-            {getNextButtonLabel(activeStep, isPermintaanSelesai, isBoQSelesai)}
+            {getNextButtonLabel(
+              activeStep,
+              isPermintaanSelesai,
+              isBoQSelesai,
+              isReviewInternalSelesai,
+            )}
           </Button>
         </div>
       </div>
