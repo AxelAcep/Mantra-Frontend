@@ -9,7 +9,7 @@ import Step4 from "./step4/index";
 import Step5 from "./step5";
 import Step6 from "./step6";
 import Step7 from "./step7";
-import Step8 from "./step8";
+import Step8 from "./accounting/index";
 import Step9 from "./step9";
 import { PenawaranChatPanel } from "@/components/penawaranChatPanel";
 import { Button } from "@/components/ui/button";
@@ -134,6 +134,15 @@ export default function PenawaranPage() {
   // Step 4
   const isStep4Selesai = step4Info?.status === "SELESAI";
 
+  //Accounting
+  const canAccessAccounting =
+    [
+      "KOMISARIS",
+      "DIREKTUR",
+      "MANAGER_OPERASIONAL",
+      "FINANCE_ACCOUNTING",
+    ].includes(userInfo.divisi) && isStep4Selesai;
+
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
     (activeStep === 1 && !isPermintaanSelesai) ||
@@ -200,17 +209,25 @@ export default function PenawaranPage() {
 
         {/* Progress */}
         <ProgressCard
-          steps={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
-            n,
-            label: n === 9 ? "Accounting" : `Tahap ${n}`,
-            status:
-              n === activeStep
-                ? "active"
-                : n < activeStep
-                  ? "done"
-                  : "inactive",
-          }))}
-          onStepClick={setActiveStep}
+          steps={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => {
+            const isAccounting = n === 8;
+
+            return {
+              n,
+              label: isAccounting ? "Accounting" : `Tahap ${n}`,
+              status:
+                n === activeStep
+                  ? "active"
+                  : n < activeStep
+                    ? "done"
+                    : "inactive",
+              disabled: isAccounting && !canAccessAccounting,
+            };
+          })}
+          onStepClick={(step) => {
+            if (step === 8 && !canAccessAccounting) return;
+            setActiveStep(step);
+          }}
         />
 
         {/* Step Content */}
@@ -248,7 +265,12 @@ export default function PenawaranPage() {
           {activeStep === 6 && <Step6 />}
           {activeStep === 7 && <Step7 />}
           {activeStep === 8 && <Step9 />}
-          {activeStep === 9 && <Step8 />}
+          {activeStep === 9 && (
+            <Step8
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+            />
+          )}
         </div>
 
         {/* Bottom Action Bar */}
