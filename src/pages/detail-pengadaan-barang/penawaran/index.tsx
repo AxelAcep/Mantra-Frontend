@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import ProgressCard from "../progress-card";
@@ -17,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import RevisionModal from "../penawaran/step1/RevisionModal";
 import {
   useDetailPenawaran,
-  useUnreadPenawaranCount,
   useUpdateStatusPermintaan,
 } from "@/hooks/use-penawaran";
 import { useUpdateStatusBoQ, usePreloadBoQ } from "@/hooks/use-boq";
@@ -37,12 +35,25 @@ function getUserInfo() {
 }
 
 type Mode = "master" | "admin" | "sales" | "readonly" | "presales";
+
 function detectMode(divisi: string, role: string): Mode {
   if (role === "MASTER") return "master";
   if (role === "SUPERVISI" && divisi === "SALES") return "admin";
   if (role === "PROJEK" && divisi === "SALES") return "sales";
   if (role === "PROJEK" && divisi === "PRESALES") return "presales";
   return "readonly";
+}
+
+function getNextButtonLabel(
+  activeStep: number,
+  isPermintaanSelesai: boolean,
+  isBoQSelesai: boolean,
+): string {
+  if (activeStep === 1 && !isPermintaanSelesai)
+    return "Permintaan Belum Selesai";
+  if (activeStep === 2 && !isBoQSelesai) return "BoQ Belum Selesai";
+  if (activeStep >= 3) return "Belum Tersedia";
+  return "Selanjutnya";
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────
@@ -55,53 +66,108 @@ export default function PenawaranPage() {
   const [activeStep, setActiveStep] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
+  const [revisionTarget, setRevisionTarget] = useState<"step1" | "step2">(
+    "step1",
+  );
 
+  // ── Data & Mutations ───────────────────────────────────────────────────
   const { data: penawaran, isLoading } = useDetailPenawaran(trackingId);
   const { mutate: updateStatusPermintaan, isPending: isUpdatingPermintaan } =
     useUpdateStatusPermintaan(trackingId);
   const { mutate: updateStatusBoQ, isPending: isUpdatingBoQ } =
     useUpdateStatusBoQ(trackingId);
-
   const { data: boqData } = usePreloadBoQ(trackingId);
+
+  // ── Derived Status ─────────────────────────────────────────────────────
+  const permintaanStatus = penawaran?.permintaanMasuk?.status as
+    | string
+    | undefined;
+  const isPermintaanSelesai = permintaanStatus === "SELESAI";
+  const isPermintaanKonfirmasi = permintaanStatus === "KONFIRMASI_SELESAI";
+  const isPermintaanPerluTindakan = permintaanStatus === "PERLU_TINDAKAN";
+  const isPermintaanOnProgress =
+    !permintaanStatus || permintaanStatus === "ON_PROGRESS";
+
   const boqStatus = boqData?.status as string | undefined;
   const isBoQSelesai = boqStatus === "SELESAI";
   const isBoQKonfirmasi = boqStatus === "KONFIRMASI_SELESAI";
   const isBoQPerluTindakan = boqStatus === "PERLU_TINDAKAN";
   const isBoQOnProgress = !boqStatus || boqStatus === "ON_PROGRESS";
 
-  // Siapa yang bisa apa
+  // ── Role Flags ─────────────────────────────────────────────────────────
   const isMaster = userInfo.role === "MASTER";
   const isSupervisiOrPresales =
     (userInfo.role === "SUPERVISI" && userInfo.divisi === "SALES") ||
     (userInfo.role === "PROJEK" && userInfo.divisi === "PRESALES");
 
-  // Bisa konfirmasi selesai: supervisi/presales saat ON_PROGRESS atau PERLU_TINDAKAN
-  const canKonfirmasi =
-    isSupervisiOrPresales && (isBoQOnProgress || isBoQPerluTindakan);
+  // ── Action Permissions per Step ────────────────────────────────────────
+  // Step 1
+  const canKonfirmasiStep1 =
+    isSupervisiOrPresales &&
+    (isPermintaanOnProgress || isPermintaanPerluTindakan);
+  const canMasterAccStep1 = isMaster && isPermintaanKonfirmasi;
 
-  // Bisa terima/tolak: master saat KONFIRMASI_SELESAI
-  const canMasterAcc = isMaster && isBoQKonfirmasi;
+  // Step 2
+  const canKonfirmasiStep2 =
+    ((userInfo.role === "SUPERVISI" && userInfo.divisi === "SALES") ||
+      (userInfo.role === "PROJEK" && userInfo.divisi === "SALES") ||
+      (userInfo.role === "PROJEK" && userInfo.divisi === "PRESALES")) &&
+    (isBoQOnProgress || isBoQPerluTindakan);
+  const canMasterAccStep2 = isMaster && isBoQKonfirmasi;
 
-  // Tombol next diblock sampai BoQ SELESAI
-  const isNextBlocked = activeStep === 2 && !isBoQSelesai;
+  // ── Next Button ────────────────────────────────────────────────────────
+  const isNextBlocked =
+    (activeStep === 1 && !isPermintaanSelesai) ||
+    (activeStep === 2 && !isBoQSelesai) ||
+    activeStep >= 3;
 
-  function handleKonfirmasiSelesai() {
+  // ── Handlers ───────────────────────────────────────────────────────────
+  function handleKonfirmasiStep1() {
+    updateStatusPermintaan({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTerimaStep1() {
+    updateStatusPermintaan({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTolakStep1(alasan: string) {
+    updateStatusPermintaan({
+      status: "PERLU_TINDAKAN",
+      alasanPenolakan: alasan,
+    });
+  }
+
+  function handleKonfirmasiStep2() {
     updateStatusBoQ({ status: "KONFIRMASI_SELESAI" });
   }
 
-  function handleTerima() {
-    updateStatusBoQ({ status: "KONFIRMASI_SELESAI" }); // master confirm → SELESAI di BE
+  function handleTerimaStep2() {
+    updateStatusBoQ({ status: "KONFIRMASI_SELESAI" });
   }
 
-  function handleTolak(alasan: string) {
+  function handleTolakStep2(alasan: string) {
     updateStatusBoQ({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan });
+  }
+
+  function openRevisionModal(target: "step1" | "step2") {
+    setRevisionTarget(target);
+    setIsRevisionModalOpen(true);
+  }
+
+  function handleRevisionConfirm(alasan: string) {
+    if (revisionTarget === "step1") handleTolakStep1(alasan);
+    else handleTolakStep2(alasan);
+    setIsRevisionModalOpen(false);
   }
 
   if (isLoading) return <div className="p-10 text-center">Memuat...</div>;
 
+  const isUpdating = isUpdatingPermintaan || isUpdatingBoQ;
+
   return (
     <div className="min-h-screen bg-[#f8fafc] p-6 flex flex-col">
       <div className="max-w-[1440px] mx-auto w-full flex-1 space-y-6">
+        {/* Header */}
         <TrackingHeader
           title="Tracking Penawaran"
           project={penawaran?.jenisPenawaran?.join(", ") ?? "-"}
@@ -110,6 +176,7 @@ export default function PenawaranPage() {
           status={penawaran?.stepSaatIni ?? "-"}
         />
 
+        {/* Progress */}
         <ProgressCard
           steps={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
             n,
@@ -124,6 +191,7 @@ export default function PenawaranPage() {
           onStepClick={setActiveStep}
         />
 
+        {/* Step Content */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           {activeStep === 1 && (
             <Step1
@@ -160,31 +228,63 @@ export default function PenawaranPage() {
             Sebelumnya
           </Button>
 
-          {/* Step 2: Supervisi/Presales konfirmasi selesai (ON_PROGRESS atau PERLU_TINDAKAN) */}
-          {activeStep === 2 && canKonfirmasi && (
+          {/* Step 1: Supervisi/Presales konfirmasi selesai */}
+          {activeStep === 1 && canKonfirmasiStep1 && (
             <Button
-              onClick={handleKonfirmasiSelesai}
-              disabled={isUpdatingBoQ}
+              onClick={handleKonfirmasiStep1}
+              disabled={isUpdating}
               className="bg-emerald-400 hover:bg-emerald-600"
             >
-              {isUpdatingBoQ ? "Memproses..." : "Konfirmasi Selesai"}
+              {isUpdatingPermintaan ? "Memproses..." : "Konfirmasi Selesai"}
             </Button>
           )}
 
-          {/* Step 2: Master terima atau tolak (KONFIRMASI_SELESAI) */}
-          {activeStep === 2 && canMasterAcc && (
+          {/* Step 1: Master terima atau tolak */}
+          {activeStep === 1 && canMasterAccStep1 && (
             <>
               <Button
-                onClick={() => setIsRevisionModalOpen(true)}
-                disabled={isUpdatingBoQ}
+                onClick={() => openRevisionModal("step1")}
+                disabled={isUpdating}
                 variant="outline"
                 className="border-red-300 text-red-600 hover:bg-red-50"
               >
                 Tolak
               </Button>
               <Button
-                onClick={handleTerima}
-                disabled={isUpdatingBoQ}
+                onClick={handleTerimaStep1}
+                disabled={isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {isUpdatingPermintaan ? "Memproses..." : "Terima"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 2: Supervisi/Presales konfirmasi selesai */}
+          {activeStep === 2 && canKonfirmasiStep2 && (
+            <Button
+              onClick={handleKonfirmasiStep2}
+              disabled={isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {isUpdatingBoQ ? "Memproses..." : "Konfirmasi Selesai"}
+            </Button>
+          )}
+
+          {/* Step 2: Master terima atau tolak */}
+          {activeStep === 2 && canMasterAccStep2 && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step2")}
+                disabled={isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Tolak
+              </Button>
+              <Button
+                onClick={handleTerimaStep2}
+                disabled={isUpdating}
                 className="bg-emerald-400 hover:bg-emerald-600"
               >
                 {isUpdatingBoQ ? "Memproses..." : "Terima"}
@@ -197,20 +297,19 @@ export default function PenawaranPage() {
             disabled={isNextBlocked}
             className="bg-cyan-500 hover:bg-cyan-600"
           >
-            {isNextBlocked ? "BoQ Belum Selesai" : "Selanjutnya"}
+            {getNextButtonLabel(activeStep, isPermintaanSelesai, isBoQSelesai)}
           </Button>
         </div>
       </div>
 
+      {/* Revision Modal — shared untuk step 1 & 2 */}
       <RevisionModal
         isOpen={isRevisionModalOpen}
         onClose={() => setIsRevisionModalOpen(false)}
-        onConfirm={(alasan) => {
-          handleTolak(alasan);
-          setIsRevisionModalOpen(false);
-        }}
+        onConfirm={handleRevisionConfirm}
       />
 
+      {/* Chat Panel */}
       <PenawaranChatPanel
         activityId={trackingId}
         activityJudul={`Chat · ${penawaran?.nomorPenawaran ?? ""}`}
