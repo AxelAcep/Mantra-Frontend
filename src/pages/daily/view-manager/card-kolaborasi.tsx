@@ -39,9 +39,9 @@ type Props = {
 
 function FieldBox({ label, value }: { label: string; value: string }) {
     return (
-        <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2">
+        <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
             <p className="text-xs text-gray-400 mb-1">{label}</p>
-            <p className="text-sm font-semibold text-gray-800">{value}</p>
+            <p className="text-sm font-semibold text-gray-800 truncate" title={value}>{value}</p>
         </div>
     )
 }

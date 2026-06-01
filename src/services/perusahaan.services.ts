@@ -38,6 +38,8 @@ export type Perusahaan = {
     nama: string
     alamat?: string
     nomor_telepon?: string
+    createdAt?: string
+    updatedAt?: string
 }
 
 export async function getPerusahaanList(): Promise<Perusahaan[]> {

@@ -113,21 +113,21 @@ export function KolaborasiCard({ activityId, kolaborator, activityStatus, onLiha
                                 </div>
 
                                 {/* Nama Karyawan */}
-                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2">
+                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
                                     <p className="text-xs text-gray-400 mb-1">Nama Karyawan</p>
-                                    <p className="text-sm font-semibold text-gray-800 truncate">{kol.pegawai.nama}</p>
+                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.nama}>{kol.pegawai.nama}</p>
                                 </div>
 
                                 {/* Divisi */}
-                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2">
+                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
                                     <p className="text-xs text-gray-400 mb-1">Divisi</p>
-                                    <p className="text-sm font-semibold text-gray-800 truncate">{kol.pegawai.divisi}</p>
+                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.divisi}>{kol.pegawai.divisi}</p>
                                 </div>
 
                                 {/* Judul */}
-                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2">
+                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
                                     <p className="text-xs text-gray-400 mb-1">Judul</p>
-                                    <p className="text-sm font-semibold text-gray-800 truncate">{kol.judul}</p>
+                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.judul}>{kol.judul}</p>
                                 </div>
 
                                 {/* Status */}
@@ -232,10 +232,11 @@ export function KolaborasiCard({ activityId, kolaborator, activityStatus, onLiha
                 open={konfirmasi}
                 onOpenChange={setKonfirmasi}
                 title="Tambah Kolaborator"
-                description={`Tambahkan kolaborator dengan tugas "${form.judul}"? Kolaborator akan mendapat notifikasi.`}
+                description={`Tambahkan kolaborator dengan tugas "${form.judul.length > 50 ? form.judul.substring(0, 50) + "..." : form.judul}"? Kolaborator akan mendapat notifikasi.`}
                 confirmLabel="Ya, tambahkan"
                 onConfirm={() => mutate(form)}
             />
+
         </>
     )
 }

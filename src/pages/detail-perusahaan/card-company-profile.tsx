@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import { DialogEditPerusahaan } from "./dialog-edit-perusahaan";
 import { useParams } from "react-router-dom";
 import { getPerusahaanDetail, updatePerusahaan } from "@/services/perusahaan.services";
+import { getTimeAgo } from "@/lib/utils";
 
 export default function CardCompanyProfileDetail() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ export default function CardCompanyProfileDetail() {
     name: "PT. ABC Maju Jaya",
     address: "Jl. Sudirman No. 45, Jakarta Selatan",
     phone: "(021) 555-0123",
-    lastActivity: "2 jam yang lalu"
+    lastActivity: "-"
   });
 
   useEffect(() => {
@@ -21,12 +22,13 @@ export default function CardCompanyProfileDetail() {
       if (!id) return;
       try {
         const data = await getPerusahaanDetail(id);
-        setCompanyInfo(prev => ({
-          ...prev,
+        const lastTime = data.updatedAt || data.createdAt || "";
+        setCompanyInfo({
           name: data.nama,
           address: data.alamat || "-",
-          phone: data.nomor_telepon || "-"
-        }));
+          phone: data.nomor_telepon || "-",
+          lastActivity: lastTime ? getTimeAgo(lastTime) : "-"
+        });
       } catch (err: any) {
         console.error("Gagal memuat detail perusahaan:", err);
       }
@@ -42,12 +44,13 @@ export default function CardCompanyProfileDetail() {
         alamat: updated.address,
         telepon: updated.phone
       });
-      setCompanyInfo(prev => ({
-        ...prev,
+      const lastTime = data.updatedAt || data.createdAt || "";
+      setCompanyInfo({
         name: data.nama,
         address: data.alamat || "-",
-        phone: data.nomor_telepon || "-"
-      }));
+        phone: data.nomor_telepon || "-",
+        lastActivity: lastTime ? getTimeAgo(lastTime) : "-"
+      });
     } catch (err: any) {
       alert(err.message || "Gagal memperbarui perusahaan.");
     }
@@ -115,31 +118,7 @@ export default function CardCompanyProfileDetail() {
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
               <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
-              <p className="text-lg font-bold text-emerald-500">3</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Menunggu Persetujuan</p>
-              <p className="text-lg font-bold text-slate-800">1</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Selesai</p>
-              <p className="text-lg font-bold text-slate-800">12</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Kolom Kanan: Proyek Maintenance */}
-        <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-          <div className="flex items-center gap-2 mb-4">
-            <img src={Icons.Maintenance} className="w-4 h-4 text-cyan-600" />
-            <h3 className="text-sm font-bold text-slate-700">Proyek Maintenance</h3>
-          </div>
-
-          {/* Sub-grid untuk 3 Status */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
-              <p className="text-lg font-bold text-emerald-500">1</p>
+              <p className="text-lg font-bold text-emerald-500">0</p>
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
               <p className="text-[10px] text-slate-500 mb-1">Menunggu Persetujuan</p>
@@ -147,11 +126,10 @@ export default function CardCompanyProfileDetail() {
             </div>
             <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
               <p className="text-[10px] text-slate-500 mb-1">Selesai</p>
-              <p className="text-lg font-bold text-slate-800">5</p>
+              <p className="text-lg font-bold text-slate-800">0</p>
             </div>
           </div>
         </div>
-
       </div>
     </Card>
   );

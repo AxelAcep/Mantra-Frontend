@@ -56,7 +56,7 @@ function FieldItem({ label, value }: { label: string; value: string }) {
     return (
         <div>
             <p className="text-xs text-gray-500 font-medium mb-1">{label}</p>
-            <p className="text-sm font-semibold text-gray-800">{value}</p>
+            <p className="text-sm font-semibold text-gray-800 break-words">{value}</p>
         </div>
     )
 }

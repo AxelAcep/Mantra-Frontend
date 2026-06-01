@@ -78,7 +78,7 @@ export function DetailAktivitasCard({ waktuMulai, waktuSubmit, targetSelesai, ka
                     </div>
                     <div>
                         <p className="text-xs text-gray-500 font-medium mb-1">Judul</p>
-                        <p className="text-sm font-semibold text-gray-800">{judul}</p>
+                        <p className="text-sm font-semibold text-gray-800 break-words">{judul}</p>
                     </div>
                     <div>
                         <p className="text-xs text-gray-500 font-medium mb-1">Deskripsi</p>
