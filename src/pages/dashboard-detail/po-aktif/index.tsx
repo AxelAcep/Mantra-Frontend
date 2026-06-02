@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/assets";
-import TabsTablePOAktif from "./tabs-table-po-aktif";
+import DaftarPOAktifPengadaanBarang from "./table-pengadaan-barang";
 
 export default function POAktifPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function POAktifPage() {
             </div>
 
             <div className="mt-6">
-                <TabsTablePOAktif />
+                <DaftarPOAktifPengadaanBarang />
             </div>
         </div>
     );

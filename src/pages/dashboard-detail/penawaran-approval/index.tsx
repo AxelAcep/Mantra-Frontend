@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/assets";
-import TabsTablePenawaranApproval from "./tabs-table-penawaran-approval";
+import DaftarPenawaranApprovalPengadaanBarang from "./table-pengadaan-barang";
 
 export default function PenawaranApprovalPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function PenawaranApprovalPage() {
             </div>
 
             <div className="mt-6">
-                <TabsTablePenawaranApproval />
+                <DaftarPenawaranApprovalPengadaanBarang />
             </div>
         </div>
     );

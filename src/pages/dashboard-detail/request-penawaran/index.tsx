@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/assets";
-import TabsTableRequestPenawaran from "./tabs-table-request-penawaran";
+import DaftarPermintaanPenawaranPengadaanBarang from "./table-pengadaan-barang";
 
 export default function RequestPenawaranPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function RequestPenawaranPage() {
             </div>
 
             <div className="mt-6">
-                <TabsTableRequestPenawaran />
+                <DaftarPermintaanPenawaranPengadaanBarang />
             </div>
         </div>
     );

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/assets";
-import TabsTableKonfirmasiSelesai from "./tabs-table-konfirmasi-selesai";
+import DaftarKonfirmasiSelesaiPengadaanBarang from "./table-pengadaan-barang";
 
 export default function KonfirmasiSelesaiPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function KonfirmasiSelesaiPage() {
             </div>
 
             <div className="mt-6">
-                <TabsTableKonfirmasiSelesai />
+                <DaftarKonfirmasiSelesaiPengadaanBarang />
             </div>
         </div>
     );

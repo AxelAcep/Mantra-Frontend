@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 // Data Dummy sesuai dengan gambar terbaru (Prefix M-)
-const riwayatPenawaranData = [
+const dummyRiwayatPenawaranData = [
   {
     noPenawaran: "M-2310-001",
     tanggal: "24 Okt 2023",
@@ -57,6 +57,8 @@ const riwayatPenawaranData = [
     jenisBarang: "PAC Montair",
   },
 ];
+
+const riwayatPenawaranData: typeof dummyRiwayatPenawaranData = [];
 
 export default function DaftarPenawaranFinalPengadaanBarang() {
   return (
@@ -116,41 +118,49 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
           </TableHeader>
           
           <TableBody>
-            {riwayatPenawaranData.map((row, index) => (
-              <TableRow 
-                key={index} 
-                className="border-b-slate-100 hover:bg-slate-50 transition-colors"
-              >
-                
-                {/* Kolom Nomor Penawaran ditebalkan */}
-                <TableCell className="font-bold text-slate-700 text-xs py-4 pl-4">
-                  {row.noPenawaran}
+            {riwayatPenawaranData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-10 text-slate-400 text-sm font-medium">
+                  Tidak ada data tersedia
                 </TableCell>
-
-                <TableCell className="text-slate-500 text-xs py-4">
-                  {row.tanggal}
-                </TableCell>
-                
-                {/* Kolom Nama Perusahaan ditebalkan */}
-                <TableCell className="font-bold text-slate-700 text-xs py-4">
-                  {row.perusahaan}
-                </TableCell>
-                
-                <TableCell className="py-4">
-                  <Badge className="bg-slate-100 hover:bg-slate-200 text-slate-600 border-none rounded-md px-2 py-1 text-[10px] font-medium shadow-none">
-                    {row.jenisBarang}
-                  </Badge>
-                </TableCell>
-                
-                <TableCell className="text-right py-4 pr-4">
-                  <button className="flex items-center justify-end gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline ml-auto w-full">
-                    Lihat Detail
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </TableCell>
-                
               </TableRow>
-            ))}
+            ) : (
+              riwayatPenawaranData.map((row, index) => (
+                <TableRow 
+                  key={index} 
+                  className="border-b-slate-100 hover:bg-slate-50 transition-colors"
+                >
+                  
+                  {/* Kolom Nomor Penawaran ditebalkan */}
+                  <TableCell className="font-bold text-slate-700 text-xs py-4 pl-4">
+                    {row.noPenawaran}
+                  </TableCell>
+
+                  <TableCell className="text-slate-500 text-xs py-4">
+                    {row.tanggal}
+                  </TableCell>
+                  
+                  {/* Kolom Nama Perusahaan ditebalkan */}
+                  <TableCell className="font-bold text-slate-700 text-xs py-4">
+                    {row.perusahaan}
+                  </TableCell>
+                  
+                  <TableCell className="py-4">
+                    <Badge className="bg-slate-100 hover:bg-slate-200 text-slate-600 border-none rounded-md px-2 py-1 text-[10px] font-medium shadow-none">
+                      {row.jenisBarang}
+                    </Badge>
+                  </TableCell>
+                  
+                  <TableCell className="text-right py-4 pr-4">
+                    <button className="flex items-center justify-end gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline ml-auto w-full">
+                      Lihat Detail
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </TableCell>
+                  
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -158,7 +168,7 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
       {/* --- FOOTER: Pagination --- */}
       <div className="flex justify-between items-center p-4 border-t border-slate-100 bg-white">
         <p className="text-xs text-slate-500">
-          Menampilkan <strong className="text-slate-700">6</strong> dari <strong className="text-slate-700">42</strong> data
+          Menampilkan <strong className="text-slate-700">{riwayatPenawaranData.length}</strong> dari <strong className="text-slate-700">{riwayatPenawaranData.length}</strong> data
         </p>
         
         <div className="flex items-center gap-1">
@@ -166,21 +176,29 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
             <ChevronLeft className="w-4 h-4" />
           </Button>
           
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
-            1
-          </Button>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            2
-          </Button>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            3
-          </Button>
-          <span className="text-slate-400 text-xs px-1">...</span>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            7
-          </Button>
+          {riwayatPenawaranData.length === 0 ? (
+            <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-slate-100 text-slate-400 p-0 text-xs font-medium shadow-none cursor-not-allowed" disabled>
+              1
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
+                1
+              </Button>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                2
+              </Button>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                3
+              </Button>
+              <span className="text-slate-400 text-xs px-1">...</span>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                7
+              </Button>
+            </>
+          )}
           
-          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100">
+          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100" disabled={riwayatPenawaranData.length === 0}>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

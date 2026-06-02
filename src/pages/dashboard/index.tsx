@@ -24,7 +24,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mt-6">
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={12}
+                    count={0}
                     label="Request Penawaran"
                     icon={Icons.RequestPenawaran}
                     href="/dashboard/request-penawaran"
@@ -32,7 +32,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={45}
+                    count={0}
                     label="Penawaran Approval"
                     icon={Icons.PenawaranApproval}
                     href="/dashboard/penawaran-approval"
@@ -40,7 +40,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={8}
+                    count={0}
                     label="Penawaran Final"
                     icon={Icons.PenawaranFinal}
                     href="/dashboard/penawaran-final"
@@ -48,7 +48,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={12}
+                    count={0}
                     label="PO Aktif"
                     icon={Icons.POAktif}
                     href="/dashboard/po-aktif"
@@ -56,7 +56,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={24}
+                    count={0}
                     label="Penawaran Pengadaan"
                     icon={Icons.PenawaranPengadaan}
                     href="/dashboard/pengadaan-barang"
@@ -64,7 +64,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={3}
+                    count={0}
                     label="Konfirmasi Selesai"
                     icon={Icons.KonfirmasiSelesai}
                     href="/dashboard/konfirmasi-selesai"

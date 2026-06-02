@@ -21,7 +21,7 @@ import { AlertDialogMassalPengadaanBarang } from "./alert-dialog-massal-pengadaa
 import { AlertDialogSetuju } from "./alert-dialog-setuju";
 
 // Data Dummy sesuai dengan gambar terbaru
-const konfirmasiMaintenanceData = [
+const dummyKonfirmasiMaintenanceData = [
   {
     nomorPo: "PO-2023-10-001",
     perusahaan: "PT Maju Sejahtera",
@@ -58,6 +58,8 @@ const konfirmasiMaintenanceData = [
     tanggalSerah: "24 Okt 2023",
   },
 ];
+
+const konfirmasiMaintenanceData: typeof dummyKonfirmasiMaintenanceData = [];
 
 export default function DaftarKonfirmasiSelesaiPengadaanBarang() {
   const handleConfirmMassal = () => {
@@ -131,56 +133,64 @@ export default function DaftarKonfirmasiSelesaiPengadaanBarang() {
           </TableHeader>
 
           <TableBody>
-            {konfirmasiMaintenanceData.map((row, index) => (
-              <TableRow
-                key={index}
-                className="border-b-slate-100 hover:bg-slate-50 transition-colors"
-              >
-
-                {/* Kolom Nomor PO (Bold) */}
-                <TableCell className="font-bold text-slate-800 text-xs py-4 pl-4">
-                  {row.nomorPo}
+            {konfirmasiMaintenanceData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-10 text-slate-400 text-sm font-medium">
+                  Tidak ada data tersedia
                 </TableCell>
-
-                {/* Kolom Perusahaan (Bold) */}
-                <TableCell className="font-bold text-slate-700 text-xs py-4">
-                  {row.perusahaan}
-                </TableCell>
-
-                {/* Kolom Jenis Maintenance (Teks biasa tanpa badge) */}
-                <TableCell className="text-slate-500 text-xs py-4">
-                  {row.jenis}
-                </TableCell>
-
-                <TableCell className="text-slate-500 text-xs py-4">
-                  {row.tanggalPesan}
-                </TableCell>
-
-                <TableCell className="text-slate-500 text-xs py-4">
-                  {row.tanggalSerah}
-                </TableCell>
-
-                {/* Kolom Aksi */}
-                <TableCell className="text-right py-4 pr-4">
-                  <div className="flex items-center justify-end gap-3">
-                    {/* Tombol Aksi (Ceklis dan Silang) */}
-                    <div className="flex items-center gap-1.5">
-                      <AlertDialogSetuju onConfirm={handleConfirm}>
-                        <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-50 transition-colors">
-                          <Check className="h-3.5 w-3.5 stroke-[3]" />
-                        </button>
-                      </AlertDialogSetuju>
-                    </div>
-
-                    {/* Link Teks */}
-                    <button className="text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline shrink-0">
-                      Lihat Detail
-                    </button>
-                  </div>
-                </TableCell>
-
               </TableRow>
-            ))}
+            ) : (
+              konfirmasiMaintenanceData.map((row, index) => (
+                <TableRow
+                  key={index}
+                  className="border-b-slate-100 hover:bg-slate-50 transition-colors"
+                >
+
+                  {/* Kolom Nomor PO (Bold) */}
+                  <TableCell className="font-bold text-slate-800 text-xs py-4 pl-4">
+                    {row.nomorPo}
+                  </TableCell>
+
+                  {/* Kolom Perusahaan (Bold) */}
+                  <TableCell className="font-bold text-slate-700 text-xs py-4">
+                    {row.perusahaan}
+                  </TableCell>
+
+                  {/* Kolom Jenis Maintenance (Teks biasa tanpa badge) */}
+                  <TableCell className="text-slate-500 text-xs py-4">
+                    {row.jenis}
+                  </TableCell>
+
+                  <TableCell className="text-slate-500 text-xs py-4">
+                    {row.tanggalPesan}
+                  </TableCell>
+
+                  <TableCell className="text-slate-500 text-xs py-4">
+                    {row.tanggalSerah}
+                  </TableCell>
+
+                  {/* Kolom Aksi */}
+                  <TableCell className="text-right py-4 pr-4">
+                    <div className="flex items-center justify-end gap-3">
+                      {/* Tombol Aksi (Ceklis dan Silang) */}
+                      <div className="flex items-center gap-1.5">
+                        <AlertDialogSetuju onConfirm={handleConfirm}>
+                          <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-50 transition-colors">
+                            <Check className="h-3.5 w-3.5 stroke-[3]" />
+                          </button>
+                        </AlertDialogSetuju>
+                      </div>
+
+                      {/* Link Teks */}
+                      <button className="text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline shrink-0">
+                        Lihat Detail
+                      </button>
+                    </div>
+                  </TableCell>
+
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -188,7 +198,7 @@ export default function DaftarKonfirmasiSelesaiPengadaanBarang() {
       {/* --- FOOTER: Pagination --- */}
       <div className="flex justify-between items-center p-4 border-t border-slate-100 bg-white">
         <p className="text-xs text-slate-500">
-          Menampilkan <strong className="text-slate-700">5</strong> dari <strong className="text-slate-700">50</strong> hasil
+          Menampilkan <strong className="text-slate-700">{konfirmasiMaintenanceData.length}</strong> dari <strong className="text-slate-700">{konfirmasiMaintenanceData.length}</strong> hasil
         </p>
 
         <div className="flex items-center gap-1">
@@ -196,21 +206,29 @@ export default function DaftarKonfirmasiSelesaiPengadaanBarang() {
             <ChevronLeft className="w-4 h-4" />
           </Button>
 
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
-            1
-          </Button>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            2
-          </Button>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            3
-          </Button>
-          <span className="text-slate-400 text-xs px-1">...</span>
-          <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-            8
-          </Button>
+          {konfirmasiMaintenanceData.length === 0 ? (
+            <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-slate-100 text-slate-400 p-0 text-xs font-medium shadow-none cursor-not-allowed" disabled>
+              1
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
+                1
+              </Button>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                2
+              </Button>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                3
+              </Button>
+              <span className="text-slate-400 text-xs px-1">...</span>
+              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
+                8
+              </Button>
+            </>
+          )}
 
-          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100">
+          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100" disabled={konfirmasiMaintenanceData.length === 0}>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/assets";
-import TabsTablePenawaranFinal from "./tabs-table-penawaran-final";
+import DaftarPenawaranFinalPengadaanBarang from "./table-pengadaan-barang";
 
 export default function PenawaranFinalPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function PenawaranFinalPage() {
             </div>
 
             <div className="mt-6">
-                <TabsTablePenawaranFinal />
+                <DaftarPenawaranFinalPengadaanBarang />
             </div>
         </div>
     );
