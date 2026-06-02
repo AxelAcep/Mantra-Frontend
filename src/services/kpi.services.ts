@@ -75,7 +75,7 @@ export async function getMasterStats(): Promise<MasterStats> {
     const res = await fetchClient(`/activity/master/stats`, { headers: authHeaders() })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? "Gagal mengambil statistik.")
-    return json.data
+    return json
 }
 
 export type NilaiKPI = "BAIK" | "CUKUP" | "BURUK"
