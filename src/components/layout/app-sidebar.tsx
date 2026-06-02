@@ -30,17 +30,20 @@ type MenuItem = {
 
 const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] => {
   const menu: MenuItem[] = [];
-  
+
   if (role === "MASTER") {
     menu.push({ title: "Beranda", icon: Icons.Beranda, url: "/dashboard" });
   }
-  
+
   menu.push(
-    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount },
-    { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 },
-    { title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" }
+    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount }
+    // { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
   );
-  
+
+  if (role === "MASTER") {
+    menu.push({ title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" });
+  }
+
   return menu;
 };
 
@@ -52,19 +55,19 @@ const getMenuManajemen = (): MenuItem[] => {
   const menu: MenuItem[] = [
     isSupervisi
       ? {
-          title: "Daily Activity",
-          icon: Icons.AktivitasHarian,
-          url: "/dailyactivity",
-          children: [
-            { title: "Aktivitas Saya", url: "/dailyactivity" },
-            { title: "Manajemen Staff", url: "/dailyactivity/supervisi" },
-          ],
-        }
+        title: "Daily Activity",
+        icon: Icons.AktivitasHarian,
+        url: "/dailyactivity",
+        children: [
+          { title: "Aktivitas Saya", url: "/dailyactivity" },
+          { title: "Manajemen Staff", url: "/dailyactivity/supervisi" },
+        ],
+      }
       : {
-          title: "Daily Activity",
-          icon: Icons.AktivitasHarian,
-          url: "/dailyactivity",
-        },
+        title: "Daily Activity",
+        icon: Icons.AktivitasHarian,
+        url: "/dailyactivity",
+      },
   ];
 
   if (isMaster) {
@@ -114,11 +117,10 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
             <SidebarMenuButton
               onClick={() => toggleMenu(item.title)}
               isActive={isActive}
-              className={`flex items-center justify-between px-4 py-6 transition-colors ${
-                isActive
-                  ? "bg-cyan-50! text-cyan-600! hover:bg-cyan-100! hover:text-cyan-700! font-semibold!"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
+              className={`flex items-center justify-between px-4 py-6 transition-colors ${isActive
+                ? "bg-cyan-50! text-cyan-600! hover:bg-cyan-100! hover:text-cyan-700! font-semibold!"
+                : "text-slate-500 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center gap-3 w-full justify-between">
                 <div className="flex items-center gap-3">
@@ -145,9 +147,8 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className={`transition-transform group-data-[collapsible=icon]:hidden ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform group-data-[collapsible=icon]:hidden ${isOpen ? "rotate-180" : ""
+                    }`}
                 >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
@@ -166,11 +167,10 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
                       key={child.title}
                       to={child.url}
                       onClick={onNavigate}
-                      className={`text-sm px-3 py-2 rounded-md transition-colors ${
-                        isChildActive
-                          ? "bg-cyan-50 text-cyan-600 font-semibold"
-                          : "text-slate-500 hover:bg-slate-50"
-                      }`}
+                      className={`text-sm px-3 py-2 rounded-md transition-colors ${isChildActive
+                        ? "bg-cyan-50 text-cyan-600 font-semibold"
+                        : "text-slate-500 hover:bg-slate-50"
+                        }`}
                     >
                       {child.title}
                     </NavLink>
@@ -187,11 +187,10 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            className={`flex items-center justify-between px-4 py-6 transition-colors ${
-              isActive
-                ? "bg-cyan-50! text-cyan-600! hover:bg-cyan-100! hover:text-cyan-700! font-semibold!"
-                : "text-slate-500 hover:bg-slate-50"
-            }`}
+            className={`flex items-center justify-between px-4 py-6 transition-colors ${isActive
+              ? "bg-cyan-50! text-cyan-600! hover:bg-cyan-100! hover:text-cyan-700! font-semibold!"
+              : "text-slate-500 hover:bg-slate-50"
+              }`}
           >
             <NavLink
               to={item.url}
