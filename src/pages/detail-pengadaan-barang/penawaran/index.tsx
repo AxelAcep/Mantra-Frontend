@@ -1,161 +1,413 @@
-import React, { useState } from 'react';
-import ProgressCard from '../progress-card';
-import TrackingHeader from '../header-card';
-import Step1 from './step1';
-import Step2 from './step2';
-import Step3 from './step3';
-import Step4 from './step4';
-import Step5 from './step5';
-import Step6 from './step6';
-import Step7 from './step7';
-import Step8 from './step8';
-import Step9 from './step9';
-import StepRestricted from './step-restricted';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import ProgressCard from "../progress-card";
+import TrackingHeader from "../header-card";
+import Step1 from "./step1/index";
+import Step2 from "./step2/index";
+import Step3 from "./step3/index";
+import Step4 from "./step4/index";
+import Step5 from "./step5";
+import Step6 from "./step6";
+import Step7 from "./step7";
+import Step8 from "./accounting/index";
+import Step9 from "./step9";
+import { PenawaranChatPanel } from "@/components/penawaranChatPanel";
+import { Button } from "@/components/ui/button";
+import RevisionModal from "../penawaran/step1/RevisionModal";
 import {
-  ChevronLeft,
-  ChevronRight,
-  XCircle,
-  CheckCircle,
-  Upload,
-  FileEdit
-} from 'lucide-react';
+  useDetailPenawaran,
+  useUpdateStatusPermintaan,
+} from "@/hooks/use-penawaran";
+import { useUpdateStatusBoQ, usePreloadBoQ } from "@/hooks/use-boq";
+import { useDetailReviewInternal } from "@/hooks/use-review-internal";
 
-interface Step {
-  n: number;
-  label: string;
-  status: "active" | "inactive" | "done";
-}
-
-function getUserRole(): string {
+// ── Helpers ────────────────────────────────────────────────────────────────
+function getUserInfo() {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    return user.pegawai.divisi || "";
+    return {
+      pegawaiId: user.pegawai?.id ?? "",
+      divisi: user.pegawai?.divisi ?? "",
+      role: user.role ?? "",
+    };
   } catch {
-    return "";
+    return { pegawaiId: "", divisi: "", role: "" };
   }
 }
 
-const ADMIN_ROLES = ["SEKERTARIAT", "DIREKTUR", "MANAGER_OPERASIONAL", "KOMISARIS"];
+type Mode = "master" | "admin" | "sales" | "readonly" | "presales";
 
-function detectMode(divisi: string): "sales" | "admin" | "forbidden" {
-  if (divisi === "SALES") return "sales";
-  if (ADMIN_ROLES.includes(divisi)) return "admin";
-  return "forbidden";
+function detectMode(divisi: string, role: string): Mode {
+  if (role === "MASTER") return "master";
+  if (role === "SUPERVISI" && divisi === "SALES") return "admin";
+  if (role === "PROJEK" && divisi === "SALES") return "sales";
+  if (role === "PROJEK" && divisi === "PRESALES") return "presales";
+  return "readonly";
 }
 
+function getNextButtonLabel(
+  activeStep: number,
+  isPermintaanSelesai: boolean,
+  isBoQSelesai: boolean,
+  isReviewInternalSelesai: boolean,
+): string {
+  if (activeStep === 1 && !isPermintaanSelesai)
+    return "Permintaan Belum Selesai";
+  if (activeStep === 2 && !isBoQSelesai) return "BoQ Belum Selesai";
+  if (activeStep >= 3 && !isReviewInternalSelesai) return "Belum Tersedia";
+  return "Selanjutnya";
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
 export default function PenawaranPage() {
-  const [divisiOverride, setDivisiOverride] = useState<string>(() => getUserRole() || "SALES");
-  const mode = detectMode(divisiOverride);
+  const { id } = useParams<{ id: string }>();
+  const trackingId = id ?? "";
+  const userInfo = getUserInfo();
+  const mode = detectMode(userInfo.divisi, userInfo.role);
+
   const [activeStep, setActiveStep] = useState(1);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
+  const [revisionTarget, setRevisionTarget] = useState<
+    "step1" | "step2" | "step4"
+  >("step1");
 
-  const handleStepClick = (stepNumber: number) => {
-    setActiveStep(stepNumber);
-  };
+  const [step4Info, setStep4Info] = useState<{
+    status: string;
+    canAcc: boolean;
+    canKonfirmasiUlang: boolean;
+    isUpdating: boolean;
+    onAcc: () => void;
+    onPerluTindakan: (alasan: string) => void;
+    onKonfirmasiUlang: () => void;
+  } | null>(null);
 
-  const stepsBase = [
-    { n: 1, label: "Permintaan Masuk" },
-    { n: 2, label: "Penyusunan BoQ" },
-    { n: 3, label: "Review Internal" },
-    { n: 4, label: "Persetujuan Manajemen" },
-    { n: 5, label: "Follow Up" },
-    { n: 6, label: "Implementasi" },
-    { n: 7, label: "BAST" },
-    { n: 8, label: "Pembayaran" },
-    { n: 9, label: "Garansi" },
-  ];
+  // ── Data & Mutations ───────────────────────────────────────────────────
+  const { data: penawaran, isLoading } = useDetailPenawaran(trackingId);
+  const { mutate: updateStatusPermintaan, isPending: isUpdatingPermintaan } =
+    useUpdateStatusPermintaan(trackingId);
+  const { mutate: updateStatusBoQ, isPending: isUpdatingBoQ } =
+    useUpdateStatusBoQ(trackingId);
+  const { data: boqData } = usePreloadBoQ(trackingId);
 
-  const steps: Step[] = stepsBase.map(s => ({
-    ...s,
-    status: s.n === activeStep ? "active" : (s.n < activeStep ? "done" : "inactive")
-  }));
+  // ── Derived Status ─────────────────────────────────────────────────────
+  const permintaanStatus = penawaran?.permintaanMasuk?.status as
+    | string
+    | undefined;
+  const isPermintaanSelesai = permintaanStatus === "SELESAI";
+  const isPermintaanKonfirmasi = permintaanStatus === "KONFIRMASI_SELESAI";
+  const isPermintaanPerluTindakan = permintaanStatus === "PERLU_TINDAKAN";
+  const isPermintaanOnProgress =
+    !permintaanStatus || permintaanStatus === "ON_PROGRESS";
+
+  const boqStatus = boqData?.status as string | undefined;
+  const isBoQSelesai = boqStatus === "SELESAI";
+  const isBoQKonfirmasi = boqStatus === "KONFIRMASI_SELESAI";
+  const isBoQPerluTindakan = boqStatus === "PERLU_TINDAKAN";
+  const isBoQOnProgress = !boqStatus || boqStatus === "ON_PROGRESS";
+
+  // ── Role Flags ─────────────────────────────────────────────────────────
+  const isMaster = userInfo.role === "MASTER";
+  const isSupervisiOrPresales =
+    (userInfo.role === "SUPERVISI" && userInfo.divisi === "SALES") ||
+    (userInfo.role === "PROJEK" && userInfo.divisi === "PRESALES");
+
+  // ── Action Permissions per Step ────────────────────────────────────────
+  // Step 1
+  const canKonfirmasiStep1 =
+    isSupervisiOrPresales &&
+    (isPermintaanOnProgress || isPermintaanPerluTindakan);
+  const canMasterAccStep1 = isMaster && isPermintaanKonfirmasi;
+
+  // Step 2
+  const canKonfirmasiStep2 =
+    ((userInfo.role === "SUPERVISI" && userInfo.divisi === "SALES") ||
+      (userInfo.role === "PROJEK" && userInfo.divisi === "SALES") ||
+      (userInfo.role === "PROJEK" && userInfo.divisi === "PRESALES")) &&
+    (isBoQOnProgress || isBoQPerluTindakan);
+  const canMasterAccStep2 = isMaster && isBoQKonfirmasi;
+
+  // Step 3
+  const { data: reviewInternalData } = useDetailReviewInternal(trackingId);
+  const isReviewInternalSelesai = reviewInternalData?.status === "SELESAI";
+
+  // Step 4
+  const isStep4Selesai = step4Info?.status === "SELESAI";
+
+  //Accounting
+  const canAccessAccounting =
+    [
+      "KOMISARIS",
+      "DIREKTUR",
+      "MANAGER_OPERASIONAL",
+      "FINANCE_ACCOUNTING",
+    ].includes(userInfo.divisi) && isStep4Selesai;
+
+  // ── Next Button ────────────────────────────────────────────────────────
+  const isNextBlocked =
+    (activeStep === 1 && !isPermintaanSelesai) ||
+    (activeStep === 2 && !isBoQSelesai) ||
+    (activeStep === 3 && !isReviewInternalSelesai) ||
+    (activeStep === 4 && !isStep4Selesai) || // ✅ tambah ini
+    activeStep >= 5; // ✅ ubah dari >= 4 ke >= 5
+
+  // ── Handlers ───────────────────────────────────────────────────────────
+  function handleKonfirmasiStep1() {
+    updateStatusPermintaan({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTerimaStep1() {
+    updateStatusPermintaan({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTolakStep1(alasan: string) {
+    updateStatusPermintaan({
+      status: "PERLU_TINDAKAN",
+      alasanPenolakan: alasan,
+    });
+  }
+
+  function handleKonfirmasiStep2() {
+    updateStatusBoQ({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTerimaStep2() {
+    updateStatusBoQ({ status: "KONFIRMASI_SELESAI" });
+  }
+
+  function handleTolakStep2(alasan: string) {
+    updateStatusBoQ({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan });
+  }
+
+  function openRevisionModal(target: "step1" | "step2" | "step4") {
+    setRevisionTarget(target);
+    setIsRevisionModalOpen(true);
+  }
+
+  function handleRevisionConfirm(alasan: string) {
+    if (revisionTarget === "step1") handleTolakStep1(alasan);
+    else if (revisionTarget === "step2") handleTolakStep2(alasan);
+    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan); // ✅ bukan handleTolakStep4
+    setIsRevisionModalOpen(false);
+  }
+
+  if (isLoading) return <div className="p-10 text-center">Memuat...</div>;
+
+  const isUpdating = isUpdatingPermintaan || isUpdatingBoQ;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-6 font-sans flex flex-col">
-      <div className="max-w-[1440px] mx-auto w-full flex-1 flex flex-col space-y-6">
+    <div className="min-h-screen bg-[#f8fafc] p-6 flex flex-col">
+      <div className="max-w-[1440px] mx-auto w-full flex-1 space-y-6">
+        {/* Header */}
         <TrackingHeader
           title="Tracking Penawaran"
-          project="PAC Montair"
-          code="#PNW-2025-0142"
-          company="PT ABC Indonesia"
-          status="Dalam Proses"
+          project={penawaran?.jenisPenawaran?.join(", ") ?? "-"}
+          code={`#${penawaran?.nomorPenawaran ?? ""}`}
+          company={penawaran?.perusahaan?.nama ?? "-"}
+          status={penawaran?.stepSaatIni ?? "-"}
         />
-        <ProgressCard steps={steps} onStepClick={handleStepClick} />
 
-        <div className="flex-1">
-          {mode == "forbidden" && (
-            <div className="flex flex-col h-full">
-              <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 text-center flex-1 flex items-center justify-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Akses Ditolak</h2>
-                  <p className="text-gray-600 mb-6">
-                    Anda tidak memiliki izin untuk melihat detail penawaran ini.
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Progress */}
+        <ProgressCard
+          steps={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => {
+            const isAccounting = n === 8;
+
+            return {
+              n,
+              label: isAccounting ? "Accounting" : `Tahap ${n}`,
+              status:
+                n === activeStep
+                  ? "active"
+                  : n < activeStep
+                    ? "done"
+                    : "inactive",
+              disabled: isAccounting && !canAccessAccounting,
+            };
+          })}
+          onStepClick={(step) => {
+            if (step === 8 && !canAccessAccounting) return;
+            setActiveStep(step);
+          }}
+        />
+
+        {/* Step Content */}
+        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+          {activeStep === 1 && (
+            <Step1
+              mode={mode}
+              trackingId={trackingId}
+              data={penawaran}
+              onChatClick={() => setIsChatOpen(true)}
+            />
           )}
-
-          {mode !== "forbidden" && (
-            <>
-              {activeStep === 1 && <Step1 mode={mode} />}
-              {activeStep === 2 && <Step2 />}
-              {activeStep === 3 && <Step3 />}
-              {activeStep === 4 && <Step4 />}
-              {activeStep === 5 && <Step5 />}
-              {activeStep === 6 && <Step6 />}
-              {activeStep === 7 && <Step7 />}
-              {activeStep === 8 && <Step8 />}
-              {activeStep === 9 && <Step9 />}
-            </>
+          {activeStep === 2 && (
+            <Step2
+              mode={mode}
+              trackingId={trackingId}
+              data={penawaran}
+              onChatClick={() => setIsChatOpen(true)}
+            />
+          )}
+          {activeStep === 3 && (
+            <Step3
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+            />
+          )}
+          {activeStep === 4 && (
+            <Step4
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+              onStatusChange={setStep4Info} // ✅
+            />
+          )}
+          {activeStep === 5 && <Step5 />}
+          {activeStep === 6 && <Step6 />}
+          {activeStep === 7 && <Step7 />}
+          {activeStep === 8 && <Step9 />}
+          {activeStep === 9 && (
+            <Step8
+              trackingId={trackingId}
+              onChatClick={() => setIsChatOpen(true)}
+            />
           )}
         </div>
 
-        {/* Bottom Action Bar — Sticky di bawah */}
-        <div className="sticky bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-t border-gray-200 p-4 px-6 flex justify-end items-center gap-3 mt-8 -mx-6 -mb-6">
+        {/* Bottom Action Bar */}
+        <div className="sticky bottom-0 bg-white/80 backdrop-blur-md border-t p-4 flex justify-end items-center gap-3 mt-8">
           <Button
             variant="outline"
-            className="bg-red-50 border-red-100 text-red-500 hover:bg-red-100 hover:text-red-600 font-bold px-6 h-10 rounded-lg"
-          >
-            Tolak
-          </Button>
-
-          {/* Hidden for now: Unggah & Revisi */}
-          {/* 
-          {mode === "sales" && (
-            <Button className="bg-green-500 hover:bg-green-600 text-white font-bold shadow-lg shadow-green-100">
-              <Upload className="w-4 h-4 mr-2" />
-              Unggah
-            </Button>
-          )}
-
-          {mode !== "sales" && (
-            <Button className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold shadow-lg shadow-yellow-100">
-              <FileEdit className="w-4 h-4 mr-2" />
-              Revisi
-            </Button>
-          )} 
-          */}
-
-          <Button
-            variant="outline"
-            onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+            onClick={() => setActiveStep((p) => Math.max(1, p - 1))}
             disabled={activeStep === 1}
-            className="border-cyan-500 text-cyan-500 hover:bg-cyan-50 font-bold px-6 h-10 rounded-lg disabled:opacity-50"
           >
             Sebelumnya
           </Button>
 
+          {/* Step 1: Supervisi/Presales konfirmasi selesai */}
+          {activeStep === 1 && canKonfirmasiStep1 && (
+            <Button
+              onClick={handleKonfirmasiStep1}
+              disabled={isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {isUpdatingPermintaan ? "Memproses..." : "Konfirmasi Selesai"}
+            </Button>
+          )}
+
+          {/* Step 1: Master terima atau tolak */}
+          {activeStep === 1 && canMasterAccStep1 && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step1")}
+                disabled={isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Tolak
+              </Button>
+              <Button
+                onClick={handleTerimaStep1}
+                disabled={isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {isUpdatingPermintaan ? "Memproses..." : "Terima"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 2: Supervisi/Presales konfirmasi selesai */}
+          {activeStep === 2 && canKonfirmasiStep2 && (
+            <Button
+              onClick={handleKonfirmasiStep2}
+              disabled={isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {isUpdatingBoQ ? "Memproses..." : "Konfirmasi Selesai"}
+            </Button>
+          )}
+
+          {/* Step 2: Master terima atau tolak */}
+          {activeStep === 2 && canMasterAccStep2 && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step2")}
+                disabled={isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Tolak
+              </Button>
+              <Button
+                onClick={handleTerimaStep2}
+                disabled={isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {isUpdatingBoQ ? "Memproses..." : "Terima"}
+              </Button>
+            </>
+          )}
+
+          {activeStep === 4 && step4Info?.canAcc && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step4")}
+                disabled={step4Info.isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Perlu Tindakan
+              </Button>
+              <Button
+                onClick={step4Info.onAcc}
+                disabled={step4Info.isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {step4Info.isUpdating ? "Memproses..." : "Approve"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 4: Sales/PreSales/Supervisi/Manajer — Konfirmasi Ulang */}
+          {activeStep === 4 && step4Info?.canKonfirmasiUlang && (
+            <Button
+              onClick={step4Info.onKonfirmasiUlang}
+              disabled={step4Info.isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {step4Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
+            </Button>
+          )}
+
           <Button
-            onClick={() => setActiveStep(prev => Math.min(10, prev + 1))}
-            disabled={activeStep === 10}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold px-6 h-10 rounded-lg shadow-sm"
+            onClick={() => setActiveStep((p) => Math.min(9, p + 1))}
+            disabled={isNextBlocked}
+            className="bg-cyan-500 hover:bg-cyan-600"
           >
-            Selanjutnya
+            {getNextButtonLabel(
+              activeStep,
+              isPermintaanSelesai,
+              isBoQSelesai,
+              isReviewInternalSelesai,
+            )}
           </Button>
         </div>
-
       </div>
+
+      {/* Revision Modal — shared untuk step 1 & 2 */}
+      <RevisionModal
+        isOpen={isRevisionModalOpen}
+        onClose={() => setIsRevisionModalOpen(false)}
+        onConfirm={handleRevisionConfirm}
+      />
+
+      {/* Chat Panel */}
+      <PenawaranChatPanel
+        activityId={trackingId}
+        activityJudul={`Chat · ${penawaran?.nomorPenawaran ?? ""}`}
+        open={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        currentPegawaiId={userInfo.pegawaiId}
+      />
     </div>
   );
 }

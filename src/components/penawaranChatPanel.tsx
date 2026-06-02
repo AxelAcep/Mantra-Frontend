@@ -11,12 +11,12 @@ import {
   CheckCheck,
 } from "lucide-react";
 import {
-  useChat,
-  useKirimChat,
-  useReadChat,
-  useUpdateChat,
-} from "@/hooks/use-activity";
-import type { Chat } from "../../../services/activity.services";
+  usePenawaranChat as useChat,
+  useKirimPenawaranChat as useKirimChat,
+  useReadPenawaranChat as useReadChat,
+  useUpdatePenawaranChat as useUpdateChat,
+} from "@/hooks/use-penawaran";
+import type { PenawaranChat as Chat } from "@/services/penawaran.services";
 
 function HighlightText({ text, query }: { text: string; query: string }) {
   if (!query) return <>{text}</>;
@@ -98,7 +98,7 @@ function getAvatarColor(id: string) {
   return AVATAR_COLORS[index % AVATAR_COLORS.length];
 }
 
-export function ChatPanel({
+export function PenawaranChatPanel({
   activityId,
   activityJudul,
   terkaitPO,

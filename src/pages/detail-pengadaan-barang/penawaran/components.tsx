@@ -1,13 +1,14 @@
-import React from 'react';
-import { User, FileText, Download, CheckCircle2 } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
+import { FileText, Download } from "lucide-react";
 
 export interface LogEntry {
   id: number;
   user: string;
   action: string;
   time: string;
-  date: 'HARI INI' | 'KEMARIN';
-  type: 'comment' | 'system' | 'success';
+  date: "HARI INI" | "KEMARIN";
+  type: "comment" | "system" | "success";
 }
 
 export function InfoCard({ title, name, sub, initials, icon }: any) {
@@ -22,7 +23,9 @@ export function InfoCard({ title, name, sub, initials, icon }: any) {
           {initials}
         </div>
         <div className="flex flex-col">
-          <p className="text-sm font-bold text-slate-800 leading-none">{name}</p>
+          <p className="text-sm font-bold text-slate-800 leading-none">
+            {name}
+          </p>
           <p className="text-[11px] text-gray-400">{sub}</p>
         </div>
       </div>
@@ -54,17 +57,44 @@ export function InfoCard2({ title, icon }: any) {
 export function DetailItem({ label, value, bold, isBadge }: any) {
   return (
     <div className="space-y-1">
-      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{label}</p>
+      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+        {label}
+      </p>
       {isBadge ? (
-        <span className="inline-block px-3 py-1 bg-cyan-50 text-cyan-600 text-[10px] font-bold rounded">{value}</span>
+        <span className="inline-block px-3 py-1 bg-cyan-50 text-cyan-600 text-[10px] font-bold rounded">
+          {value}
+        </span>
       ) : (
-        <p className={`text-xs ${bold ? "font-bold text-slate-800" : "text-slate-600 font-semibold"}`}>{value}</p>
+        <p
+          className={`text-xs ${bold ? "font-bold text-slate-800" : "text-slate-600 font-semibold"}`}
+        >
+          {value}
+        </p>
       )}
     </div>
   );
 }
 
-export function DocumentItem({ name, size, tag, path, allowDelete }: any) {
+export function DocumentItem({
+  name,
+  size,
+  tag,
+  path,
+  allowDelete,
+  onDelete,
+}: {
+  name: string;
+  size: string;
+  tag?: string;
+  path: string;
+  allowDelete?: boolean;
+  onDelete?: () => void;
+}) {
+  // Gabungkan BASE_URL backend + path dari DB
+  const fileUrl = path.startsWith("http")
+    ? path
+    : `${import.meta.env.VITE_API_URL}${path}`;
+
   return (
     <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors">
       <div className="flex items-center gap-3">
@@ -74,20 +104,49 @@ export function DocumentItem({ name, size, tag, path, allowDelete }: any) {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-xs font-bold text-slate-700">{name}</p>
-            {tag && <span className="bg-green-100 text-green-600 text-[8px] font-bold px-1.5 py-0.5 rounded">{tag}</span>}
+            {tag && (
+              <span className="bg-green-100 text-green-600 text-[8px] font-bold px-1.5 py-0.5 rounded">
+                {tag}
+              </span>
+            )}
           </div>
           <p className="text-[10px] text-gray-400">
-            {typeof size === 'string' && size.includes("Diunggah") ? size : `Diunggah oleh ${size}`}
+            {typeof size === "string" && size.includes("Diunggah")
+              ? size
+              : `Diunggah oleh ${size}`}
           </p>
         </div>
       </div>
+
       <div className="flex items-center gap-2">
         {allowDelete && (
-          <button className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+          <button
+            onClick={onDelete}
+            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 6h18" />
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            </svg>
           </button>
         )}
-        <a href={path} download className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors">
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={name}
+          className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors"
+        >
           <Download size={18} />
         </a>
       </div>
@@ -95,7 +154,13 @@ export function DocumentItem({ name, size, tag, path, allowDelete }: any) {
   );
 }
 
-export function LogSection({ title, items }: { title: string, items: LogEntry[] }) {
+export function LogSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: LogEntry[];
+}) {
   if (items.length === 0) return null;
   return (
     <div className="space-y-4">
@@ -109,9 +174,9 @@ export function LogSection({ title, items }: { title: string, items: LogEntry[] 
           <div key={log.id} className="relative">
             {/* The Dot */}
             <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden text-[#94a3b8]">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
             </div>
-            
+
             <div className="flex justify-between items-start gap-4">
               <div className="space-y-1">
                 <p className="text-xs font-bold text-slate-800 leading-tight">
