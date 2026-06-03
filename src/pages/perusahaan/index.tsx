@@ -4,6 +4,7 @@ import { useHeaderTitle } from '@/components/layout/layout';
 import { Button } from '@/components/ui/button';
 import { DialogTambahPerusahaan } from './dialog-tambah-perusahaan';
 import { getPerusahaanList, createPerusahaan } from '@/services/perusahaan.services';
+import { getTimeAgo } from '@/lib/utils';
 
 export default function PerusahaanPage() {
   const { setTitle } = useHeaderTitle();
@@ -12,6 +13,8 @@ export default function PerusahaanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<string>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -28,9 +31,9 @@ export default function PerusahaanPage() {
           name: item.nama,
           address: item.alamat || "-",
           phone: item.nomor_telepon || "-",
-          activity: "Baru saja",
+          activity: getTimeAgo(item.updatedAt || item.createdAt || ""),
+          rawDate: item.updatedAt || item.createdAt || "",
           pengadaan: 0,
-          maintenance: 0,
           total: 0
         }));
         setCompanyList(mapped);
@@ -43,10 +46,26 @@ export default function PerusahaanPage() {
     loadCompanies();
   }, []);
 
-  // Reset page to 1 when search changes
+  // Reset page to 1 when search or sorting changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [search, sortField, sortOrder]);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(prev => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (sortField === field) {
+      return sortOrder === "asc" ? " ↑" : " ↓";
+    }
+    return " ↕";
+  };
 
   const filteredCompanies = companyList.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -54,9 +73,29 @@ export default function PerusahaanPage() {
     c.phone.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredCompanies.length / ITEMS_PER_PAGE);
+  const sortedCompanies = [...filteredCompanies].sort((a, b) => {
+    let valA = a[sortField];
+    let valB = b[sortField];
+
+    if (sortField === "activity") {
+      valA = a.rawDate || "";
+      valB = b.rawDate || "";
+    }
+
+    if (typeof valA === "string" && typeof valB === "string") {
+      return sortOrder === "asc"
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    } else {
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    }
+  });
+
+  const totalPages = Math.ceil(sortedCompanies.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedCompanies = filteredCompanies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedCompanies = sortedCompanies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
@@ -98,9 +137,9 @@ export default function PerusahaanPage() {
           name: created.nama,
           address: created.alamat || "-",
           phone: created.nomor_telepon || "-",
-          activity: "Baru saja",
+          activity: getTimeAgo(created.updatedAt || created.createdAt || ""),
+          rawDate: created.updatedAt || created.createdAt || "",
           pengadaan: 0,
-          maintenance: 0,
           total: 0
         }
       ]);
@@ -136,24 +175,35 @@ export default function PerusahaanPage() {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
           <thead>
             <tr className="bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500 font-semibold border-b border-gray-100">
-              <th className="px-6 py-4">Nama Perusahaan ↕</th>
-              <th className="px-6 py-4">Alamat ↕</th>
-              <th className="px-6 py-4">Nomor Telepon ↕</th>
-              <th className="px-6 py-4">Aktivitas Terakhir ↕</th>
-              <th className="px-6 py-4 text-center">Pengadaan Barang ↕</th>
-              <th className="px-6 py-4 text-center">Maintenance ↕</th>
-              <th className="px-6 py-4 text-center">Total Proyek ↕</th>
-              <th className="px-6 py-4 text-right">Aksi ↕</th>
+              <th className="px-6 py-4 w-[22%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("name")}>
+                Nama Perusahaan{getSortIcon("name")}
+              </th>
+              <th className="px-6 py-4 w-[18%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("address")}>
+                Alamat{getSortIcon("address")}
+              </th>
+              <th className="px-6 py-4 w-[14%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("phone")}>
+                Nomor Telepon{getSortIcon("phone")}
+              </th>
+              <th className="px-6 py-4 w-[16%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("activity")}>
+                Aktivitas Terakhir{getSortIcon("activity")}
+              </th>
+              <th className="px-6 py-4 text-center w-[12%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("pengadaan")}>
+                Pengadaan Barang{getSortIcon("pengadaan")}
+              </th>
+              <th className="px-6 py-4 text-center w-[9%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("total")}>
+                Total Proyek{getSortIcon("total")}
+              </th>
+              <th className="px-6 py-4 text-right w-[9%]">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {paginatedCompanies.map((item, idx) => (
               <tr key={idx} className="hover:bg-gray-50/80 transition-colors text-sm text-gray-700">
-                <td className="px-6 py-4 font-md text-slate-800">{item.name}</td>
-                <td className="px-6 py-4 text-gray-500 max-w-[200px] truncate">{item.address}</td>
+                <td className="px-6 py-4 font-md text-slate-800 truncate">{item.name}</td>
+                <td className="px-6 py-4 text-gray-500 truncate">{item.address}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <Phone size={14} className="text-gray-400" />
@@ -172,20 +222,17 @@ export default function PerusahaanPage() {
                       {item.pengadaan} Aktif
                     </span>
                   ) : (
-                    <span className="text-gray-300">-</span>
+                    <span className="text-slate-800">0</span>
                   )}
                 </td>
                 <td className="px-6 py-4 text-center">
-                  {item.maintenance > 0 ? (
-                    <span className="bg-orange-50 text-orange-600 px-3 py-1 rounded-md text-xs font-semibold border border-orange-100">
-                      {item.maintenance} Jalan
-                    </span>
+                  {item.total > 0 ? (
+                    <span className="font-bold text-slate-800">{item.total}</span>
                   ) : (
-                    <span className="text-gray-300">-</span>
+                    <span className="text-slate-800">0</span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-center font-bold text-slate-800">{item.total}</td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-4 text-right whitespace-nowrap">
                   <a className="inline-flex items-center gap-1 text-cyan-500 font-semibold hover:text-cyan-600 transition-colors" href={`/perusahaan/${item.id}`}>
                     Lihat Detail <ArrowRight size={14} />
                   </a>
@@ -218,8 +265,8 @@ export default function PerusahaanPage() {
                 key={idx}
                 onClick={() => setCurrentPage(Number(page))}
                 className={`w-7 h-7 flex items-center justify-center rounded font-bold text-xs transition-all ${currentPage === page
-                    ? "bg-cyan-500 text-white shadow-sm"
-                    : "hover:bg-gray-100 text-gray-600"
+                  ? "bg-cyan-500 text-white shadow-sm"
+                  : "hover:bg-gray-100 text-gray-600"
                   }`}
               >
                 {page}
