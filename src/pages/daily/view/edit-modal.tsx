@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandInput } from "@/components/ui/command"
 import { useUpdateActivity } from "@/hooks/use-activity"
 import { usePerusahaan } from "@/hooks/use-perusahaan"
 import { cn } from "@/lib/utils"
@@ -173,21 +173,19 @@ export function EditActivityModal({ open, onClose, onSuccess, activity }: EditAc
                         <Label className="text-sm text-gray-600">Perusahaan</Label>
                         <Popover open={openPerusahaan} onOpenChange={setOpenPerusahaan}>
                             <PopoverTrigger asChild>
-                                <div className="relative cursor-text">
-                                    <Input
-                                        value={form.perusahaan}
-                                        onChange={(e) => {
-                                            setForm((prev) => ({ ...prev, perusahaan: e.target.value }))
-                                            if (!openPerusahaan) setOpenPerusahaan(true)
-                                        }}
-                                        onFocus={() => {
-                                            if (perusahaanList.length > 0) setOpenPerusahaan(true)
-                                        }}
-                                        placeholder="Pilih atau ketik perusahaan..."
-                                        className="bg-slate-50 border-gray-200 text-gray-700 pr-10"
-                                    />
-                                    <ChevronsUpDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
-                                </div>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                        "w-full justify-between bg-slate-50 border-gray-200 text-gray-700 px-3 h-10 font-normal hover:bg-slate-50/80 focus:ring-cyan-600 focus:border-cyan-600 focus:ring-1 shadow-none",
+                                        !form.perusahaan && "text-gray-400"
+                                    )}
+                                >
+                                    <span className="truncate">
+                                        {form.perusahaan || "Pilih perusahaan..."}
+                                    </span>
+                                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
                             </PopoverTrigger>
                             <PopoverContent
                                 align="start"
@@ -196,34 +194,47 @@ export function EditActivityModal({ open, onClose, onSuccess, activity }: EditAc
                                 onOpenAutoFocus={(e) => e.preventDefault()}
                             >
                                 <Command>
+                                    <CommandInput placeholder="Cari perusahaan..." className="h-9" />
                                     <CommandList>
                                         <CommandEmpty className="py-3 text-center text-sm text-gray-500">Tidak ditemukan.</CommandEmpty>
                                         <CommandGroup className="max-h-[220px] overflow-y-auto p-1">
-                                            {perusahaanList
-                                                .filter((p) =>
-                                                    p.nama.toLowerCase().includes(form.perusahaan.toLowerCase())
-                                                )
-                                                .map((p) => (
-                                                    <CommandItem
-                                                        key={p.id}
-                                                        value={p.nama}
-                                                        onSelect={(currentValue) => {
-                                                            setForm((prev) => ({ ...prev, perusahaan: currentValue }))
-                                                            setOpenPerusahaan(false)
-                                                        }}
-                                                        className="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors"
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4 shrink-0",
-                                                                form.perusahaan.toLowerCase() === p.nama.toLowerCase()
-                                                                    ? "opacity-100 text-cyan-600"
-                                                                    : "opacity-0"
-                                                            )}
-                                                        />
-                                                        <span className="text-sm text-gray-700 truncate">{p.nama}</span>
-                                                    </CommandItem>
-                                                ))}
+                                            {/* Opsi Tanpa Perusahaan */}
+                                            <CommandItem
+                                                onSelect={() => {
+                                                    setForm((prev) => ({ ...prev, perusahaan: "" }))
+                                                    setOpenPerusahaan(false)
+                                                }}
+                                                className="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors"
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4 shrink-0",
+                                                        form.perusahaan === "" ? "opacity-100 text-cyan-600" : "opacity-0"
+                                                    )}
+                                                />
+                                                <span className="text-sm font-semibold text-slate-400">Tanpa Perusahaan</span>
+                                            </CommandItem>
+                                            {perusahaanList.map((p) => (
+                                                <CommandItem
+                                                    key={p.id}
+                                                    value={p.nama}
+                                                    onSelect={() => {
+                                                        setForm((prev) => ({ ...prev, perusahaan: p.nama }))
+                                                        setOpenPerusahaan(false)
+                                                    }}
+                                                    className="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors"
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4 shrink-0",
+                                                            form.perusahaan.toLowerCase() === p.nama.toLowerCase()
+                                                                ? "opacity-100 text-cyan-600"
+                                                                : "opacity-0"
+                                                        )}
+                                                    />
+                                                    <span className="text-sm text-gray-700 truncate">{p.nama}</span>
+                                                </CommandItem>
+                                            ))}
                                         </CommandGroup>
                                     </CommandList>
                                 </Command>
