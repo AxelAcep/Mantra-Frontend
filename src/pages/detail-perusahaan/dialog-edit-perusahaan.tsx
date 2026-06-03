@@ -15,9 +15,10 @@ interface DialogEditPerusahaanProps {
     children: React.ReactNode
     company: CompanyData
     onEditCompany: (updatedCompany: CompanyData) => void
+    onDeleteCompany: () => void
 }
 
-export function DialogEditPerusahaan({ children, company, onEditCompany }: DialogEditPerusahaanProps) {
+export function DialogEditPerusahaan({ children, company, onEditCompany, onDeleteCompany }: DialogEditPerusahaanProps) {
     const [open, setOpen] = React.useState(false)
     const [form, setForm] = React.useState({
         nama: company.name,
@@ -49,6 +50,11 @@ export function DialogEditPerusahaan({ children, company, onEditCompany }: Dialo
             address: form.alamat.trim() || "-",
             phone: form.telepon.trim() || "-",
         })
+        setOpen(false)
+    }
+
+    function handleDelete() {
+        onDeleteCompany()
         setOpen(false)
     }
 
@@ -97,12 +103,14 @@ export function DialogEditPerusahaan({ children, company, onEditCompany }: Dialo
                         />
                     </div>
                 </div>
-                <DialogFooter className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 sm:gap-3 flex-row bg-slate-50/30">
-                    <DialogClose asChild>
-                        <Button type="button" variant="outline" className="h-10 px-6 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-800 font-semibold rounded-lg shadow-none">
-                            Batal
-                        </Button>
-                    </DialogClose>
+                <DialogFooter className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 flex-row bg-slate-50/30">
+                    <Button
+                        type="button"
+                        onClick={handleDelete}
+                        className="h-10 px-6 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg border border-rose-200 shadow-none transition-all"
+                    >
+                        Hapus Perusahaan
+                    </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={!isComplete}

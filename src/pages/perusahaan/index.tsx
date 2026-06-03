@@ -6,6 +6,11 @@ import { DialogTambahPerusahaan } from './dialog-tambah-perusahaan';
 import { getPerusahaanList, createPerusahaan } from '@/services/perusahaan.services';
 import { getTimeAgo } from '@/lib/utils';
 
+const truncate = (text: any, maxLength: number) => {
+  const str = String(text || "");
+  return str.length > maxLength ? `${str.slice(0, maxLength)}...` : str;
+};
+
 export default function PerusahaanPage() {
   const { setTitle } = useHeaderTitle();
   const [companyList, setCompanyList] = useState<any[]>([]);
@@ -202,18 +207,22 @@ export default function PerusahaanPage() {
           <tbody className="divide-y divide-gray-50">
             {paginatedCompanies.map((item, idx) => (
               <tr key={idx} className="hover:bg-gray-50/80 transition-colors text-sm text-gray-700">
-                <td className="px-6 py-4 font-md text-slate-800 truncate">{item.name}</td>
-                <td className="px-6 py-4 text-gray-500 truncate">{item.address}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 font-md text-slate-800 truncate" title={item.name}>
+                  {truncate(item.name, 30)}
+                </td>
+                <td className="px-6 py-4 text-gray-500 truncate" title={item.address}>
+                  {truncate(item.address, 30)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap" title={item.phone}>
                   <div className="flex items-center gap-2">
-                    <Phone size={14} className="text-gray-400" />
-                    {item.phone}
+                    <Phone size={14} className="text-gray-400 shrink-0" />
+                    <span className="truncate">{truncate(item.phone, 20)}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap" title={item.activity}>
                   <div className="flex items-center gap-2 text-gray-500">
-                    <Clock size={14} className="text-gray-400" />
-                    {item.activity}
+                    <Clock size={14} className="text-gray-400 shrink-0" />
+                    <span className="truncate">{truncate(item.activity, 25)}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-center">

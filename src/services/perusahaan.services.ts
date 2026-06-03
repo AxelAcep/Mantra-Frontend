@@ -77,3 +77,13 @@ export async function updatePerusahaan(id: string, company: { nama: string; alam
     if (!res.ok) throw new Error(data.error ?? "Gagal memperbarui data perusahaan.")
     return data
 }
+
+export async function deletePerusahaan(id: string): Promise<{ message: string }> {
+    const res = await fetchClient(`/perusahaan/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error ?? "Gagal menghapus data perusahaan.")
+    return data
+}

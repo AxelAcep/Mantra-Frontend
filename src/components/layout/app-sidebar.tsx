@@ -36,8 +36,8 @@ const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] 
   }
 
   menu.push(
-    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount }
-    // { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
+    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount },
+    { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
   );
 
   if (role === "MASTER") {

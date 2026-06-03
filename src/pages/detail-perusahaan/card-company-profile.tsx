@@ -4,12 +4,24 @@ import { Icons } from "@/assets";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { DialogEditPerusahaan } from "./dialog-edit-perusahaan";
-import { useParams } from "react-router-dom";
-import { getPerusahaanDetail, updatePerusahaan } from "@/services/perusahaan.services";
+import { useParams, useNavigate } from "react-router-dom";
+import { getPerusahaanDetail, updatePerusahaan, deletePerusahaan } from "@/services/perusahaan.services";
 import { getTimeAgo } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function CardCompanyProfileDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [companyInfo, setCompanyInfo] = useState({
     name: "PT. ABC Maju Jaya",
     address: "Jl. Sudirman No. 45, Jakarta Selatan",
@@ -56,81 +68,118 @@ export default function CardCompanyProfileDetail() {
     }
   }
 
+  async function handleDeleteCompany() {
+    if (!id) return;
+    try {
+      await deletePerusahaan(id);
+      navigate("/perusahaan");
+    } catch (err: any) {
+      alert(err.message || "Gagal menghapus perusahaan.");
+    }
+  }
+
   function truncateText(text: string, maxLength: number = 100): string {
     if (!text) return "";
     if (text.length > maxLength) {
-      return text.slice(0, 97) + "...";
+      return text.slice(0, 200) + "...";
     }
     return text;
   }
 
   return (
-    <Card className="p-6 rounded-xl border-slate-200 shadow-sm">
+    <>
+      <Card className="p-6 rounded-xl border-slate-200 shadow-sm">
 
-      {/* --- BAGIAN ATAS: Info Perusahaan --- */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-bold text-slate-800 break-words" title={companyInfo.name}>
-            {truncateText(companyInfo.name)}
-          </h2>
+        {/* --- BAGIAN ATAS: Info Perusahaan --- */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-bold text-slate-800 break-words" title={companyInfo.name}>
+              {truncateText(companyInfo.name)}
+            </h2>
 
-          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-500">
-            <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.address}>
-              <img src={Icons.Location} className="w-4 h-4 opacity-70 shrink-0" />
-              <span>{truncateText(companyInfo.address)}</span>
+            <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-500">
+              <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.address}>
+                <img src={Icons.Location} className="w-4 h-4 opacity-70 shrink-0" />
+                <span>{truncateText(companyInfo.address)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.phone}>
+                <img src={Icons.Phone} className="w-4 h-4 opacity-70 shrink-0" />
+                <span>{truncateText(companyInfo.phone)}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.phone}>
-              <img src={Icons.Phone} className="w-4 h-4 opacity-70 shrink-0" />
-              <span>{truncateText(companyInfo.phone)}</span>
+          </div>
+
+          {/* Badge & Button container */}
+          <div className="flex items-center gap-3 shrink-0 w-full md:w-auto justify-between md:justify-start">
+            {/* Badge Aktivitas Terakhir */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-md border border-slate-200 text-xs font-medium text-slate-600 shrink-0">
+              <img src={Icons.LastActivity} className="w-3.5 h-3.5 opacity-70" />
+              <span>Aktivitas terakhir: <strong>{companyInfo.lastActivity}</strong></span>
             </div>
+
+            {/* Button Edit Perusahaan */}
+            <DialogEditPerusahaan company={companyInfo} onEditCompany={handleEditCompany} onDeleteCompany={() => setIsDeleteOpen(true)}>
+              <Button className="bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-lg px-4 shadow-none shrink-0 h-9">
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit Perusahaan
+              </Button>
+            </DialogEditPerusahaan>
           </div>
         </div>
 
-        {/* Badge & Button container */}
-        <div className="flex items-center gap-3 shrink-0 w-full md:w-auto justify-between md:justify-start">
-          {/* Badge Aktivitas Terakhir */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-md border border-slate-200 text-xs font-medium text-slate-600 shrink-0">
-            <img src={Icons.LastActivity} className="w-3.5 h-3.5 opacity-70" />
-            <span>Aktivitas terakhir: <strong>{companyInfo.lastActivity}</strong></span>
-          </div>
+        {/* --- BAGIAN BAWAH: Ringkasan Proyek (Grid 2 Kolom) --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-          {/* Button Edit Perusahaan */}
-          <DialogEditPerusahaan company={companyInfo} onEditCompany={handleEditCompany}>
-            <Button className="bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-lg px-4 shadow-none shrink-0 h-9">
-              <Pencil className="w-4 h-4 mr-2" />
-              Edit Perusahaan
-            </Button>
-          </DialogEditPerusahaan>
-        </div>
-      </div>
-
-      {/* --- BAGIAN BAWAH: Ringkasan Proyek (Grid 2 Kolom) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-        {/* Kolom Kiri: Proyek Pengadaan Barang */}
-        <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-          <div className="flex items-center gap-2 mb-4">
-            <img src={Icons.Pengadaan} className="w-4 h-4 text-cyan-600" />
-            <h3 className="text-sm font-bold text-slate-700">Proyek Pengadaan Barang</h3>
-          </div>
-
-          {/* Sub-grid untuk 3 Status */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
-              <p className="text-lg font-bold text-emerald-500">0</p>
+          {/* Kolom Kiri: Proyek Pengadaan Barang */}
+          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div className="flex items-center gap-2 mb-4">
+              <img src={Icons.Pengadaan} className="w-4 h-4 text-cyan-600" />
+              <h3 className="text-sm font-bold text-slate-700">Proyek Pengadaan Barang</h3>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Menunggu Persetujuan</p>
-              <p className="text-lg font-bold text-slate-800">0</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-              <p className="text-[10px] text-slate-500 mb-1">Selesai</p>
-              <p className="text-lg font-bold text-slate-800">0</p>
+
+            {/* Sub-grid untuk 3 Status */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
+                <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
+                <p className="text-lg font-bold text-emerald-500">0</p>
+              </div>
+              <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
+                <p className="text-[10px] text-slate-500 mb-1">Menunggu Persetujuan</p>
+                <p className="text-lg font-bold text-slate-800">0</p>
+              </div>
+              <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
+                <p className="text-[10px] text-slate-500 mb-1">Selesai</p>
+                <p className="text-lg font-bold text-slate-800">0</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent className="bg-white rounded-xl shadow-xl border-slate-100 max-w-[450px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-slate-800">
+              Hapus Perusahaan?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate-500 mt-2 leading-relaxed">
+              Apakah Anda yakin ingin menghapus data perusahaan <strong>{companyInfo.name}</strong>? Tindakan ini bersifat permanen dan tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4 flex items-center justify-end gap-3 flex-row border-t border-slate-100 pt-4">
+            <AlertDialogCancel className="h-10 px-4 border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-700 font-semibold rounded-lg shadow-none">
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteCompany}
+              variant="destructive"
+              className="h-10 px-4 font-semibold rounded-lg shadow-none"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
