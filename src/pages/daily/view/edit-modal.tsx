@@ -60,6 +60,7 @@ const toTimeInput = (dateStr: string) => {
 }
 
 export function EditActivityModal({ open, onClose, onSuccess, activity }: EditActivityModalProps) {
+    const isChild = !!activity?.parentId
     const [form, setForm] = useState<EditActivityForm>({
         tanggalInput: "",
         waktu: "",
@@ -174,11 +175,13 @@ export function EditActivityModal({ open, onClose, onSuccess, activity }: EditAc
                         <Popover open={openPerusahaan} onOpenChange={setOpenPerusahaan}>
                             <PopoverTrigger asChild>
                                 <Button
+                                    disabled={isChild}
                                     variant="outline"
                                     role="combobox"
                                     className={cn(
                                         "w-full justify-between bg-slate-50 border-gray-200 text-gray-700 px-3 h-10 font-normal hover:bg-slate-50/80 focus:ring-cyan-600 focus:border-cyan-600 focus:ring-1 shadow-none",
-                                        !form.perusahaan && "text-gray-400"
+                                        !form.perusahaan && "text-gray-400",
+                                        isChild && "bg-slate-100 text-gray-400 cursor-not-allowed opacity-100 hover:bg-slate-100"
                                     )}
                                 >
                                     <span className="truncate">
@@ -187,6 +190,11 @@ export function EditActivityModal({ open, onClose, onSuccess, activity }: EditAc
                                     <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
+                            {isChild && (
+                                <p className="text-xs text-amber-600 font-normal mt-1">
+                                    Aktivitas kolaboratif: perusahaan diatur oleh aktivitas utama.
+                                </p>
+                            )}
                             <PopoverContent
                                 align="start"
                                 className="p-0 border-gray-200 shadow-lg"
