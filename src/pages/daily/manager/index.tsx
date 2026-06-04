@@ -5,6 +5,8 @@ import { KPIChart } from "./card-kpi-chart"   // ← tambah import
 import { KaryawanTable } from "./card-karyawan"
 import { CardAktifTable } from "./card-atkif-table"
 import { CardRiwayatTable } from "./card-riwayat-table"
+import { Badge } from "@/components/ui/badge"
+import { useMasterReschedule, useMasterSelesai } from "@/hooks/use-master-activity"
 
 // ─── Tab config ───────────────────────────────────────────────────────────────
 
@@ -22,6 +24,16 @@ export default function ActivityPageMaster() {
     const [searchParams, setSearchParams] = useSearchParams()
     const activeTab = searchParams.get("tab") || "reschedule"
     const page = parseInt(searchParams.get("page") || "1", 10)
+
+    const { data: rescheduleData } = useMasterReschedule(1, 1, "")
+    const { data: selesaiData } = useMasterSelesai(1, 1, "", "", "")
+    const rescheduleCount = rescheduleData?.total ?? 0
+    const selesaiCount = selesaiData?.total ?? 0
+
+    const tabCounts: Record<string, number> = {
+        reschedule: rescheduleCount,
+        selesai: selesaiCount,
+    }
 
     const setActiveTab = (tab: string) => {
         const params = new URLSearchParams(searchParams)
@@ -45,13 +57,21 @@ export default function ActivityPageMaster() {
                         <button
                             key={tab.value}
                             onClick={() => setActiveTab(tab.value)}
-                            className={`py-3 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors
+                            className={`py-3 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors flex items-center gap-2
                                 ${activeTab === tab.value
                                     ? "border-cyan-600 text-cyan-600 font-medium"
                                     : "border-transparent text-gray-500 hover:text-gray-700"
                                 }`}
                         >
-                            {tab.label}
+                            <span>{tab.label}</span>
+                            {tabCounts[tab.value] ? (
+                                <Badge
+                                    variant="destructive"
+                                    className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                >
+                                    {tabCounts[tab.value]}
+                                </Badge>
+                            ) : null}
                         </button>
                     ))}
                 </div>

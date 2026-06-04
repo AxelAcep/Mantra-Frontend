@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Icons } from "@/assets";
 import { useTotalUnreadChatCount } from "@/hooks/use-activity";
+import { useMasterReschedule, useMasterSelesai } from "@/hooks/use-master-activity";
 
 type MenuItem = {
   title: string;
@@ -36,8 +37,8 @@ const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] 
   }
 
   menu.push(
-    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount },
-    { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
+    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount }
+    // { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
   );
 
   if (role === "MASTER") {
@@ -47,7 +48,7 @@ const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] 
   return menu;
 };
 
-const getMenuManajemen = (): MenuItem[] => {
+const getMenuManajemen = (dailyActivityBadge?: number): MenuItem[] => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isMaster = user?.role === "MASTER";
   const isSupervisi = user?.role === "SUPERVISI";
@@ -67,6 +68,7 @@ const getMenuManajemen = (): MenuItem[] => {
         title: "Daily Activity",
         icon: Icons.AktivitasHarian,
         url: "/dailyactivity",
+        badge: isMaster ? dailyActivityBadge : undefined,
       },
   ];
 
@@ -85,6 +87,16 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
   const pathname = location.pathname;
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isMaster = user?.role === "MASTER";
+
+  const { data: rescheduleData } = useMasterReschedule(1, 1, "", isMaster);
+  const { data: selesaiData } = useMasterSelesai(1, 1, "", "", "", isMaster);
+
+  const dailyActivityBadge = isMaster
+    ? (rescheduleData?.total ?? 0) + (selesaiData?.total ?? 0)
+    : undefined;
 
   const { data: unreadChatCount = 0 } = useTotalUnreadChatCount();
 
@@ -225,9 +237,6 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
       );
     });
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const isMaster = user?.role === "MASTER";
-
   return (
     <>
       <SidebarHeader className="p-4 h-16 flex flex-row items-center justify-between gap-3 border-b border-slate-200 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
@@ -265,7 +274,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {renderMenu(getMenuManajemen())}
+              {renderMenu(getMenuManajemen(dailyActivityBadge))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/assets"
 import { StatCard } from "./card-stat"
 import { ActivityTable } from "./card-table"
@@ -141,18 +142,21 @@ export default function ActivityPagePegawai() {
                         <button
                             key={tab.value}
                             onClick={() => setActiveTab(tab.value)}
-                            className={`py-3 text-sm whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px transition-colors
+                            className={`py-3 text-sm whitespace-nowrap flex items-center gap-2 border-b-2 -mb-px transition-colors
                                 ${activeTab === tab.value
-                                    ? "border-cyan-500 text-cyan-500"
+                                    ? "border-cyan-500 text-cyan-500 font-medium"
                                     : "border-transparent text-gray-500 hover:text-gray-700"
                                 }`}
                         >
-                            {tab.value === "perlu-tindakan" ? "Perlu Tindakan" : tab.label}
-                            {tab.value === "perlu-tindakan" && perluTindakanCount > 0 && (
-                                <span className="bg-red-500 text-white text-xs font-medium rounded-full px-1.5 py-0.5">
+                            <span>{tab.value === "perlu-tindakan" ? "Perlu Tindakan" : tab.label}</span>
+                            {tab.value === "perlu-tindakan" && perluTindakanCount > 0 ? (
+                                <Badge
+                                    variant="destructive"
+                                    className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                >
                                     {perluTindakanCount}
-                                </span>
-                            )}
+                                </Badge>
+                            ) : null}
                         </button>
                     ))}
                 </div>

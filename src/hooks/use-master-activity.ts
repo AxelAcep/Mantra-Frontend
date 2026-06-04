@@ -18,10 +18,11 @@ import {
     type PaginatedActivity
 } from "../services/master-activity.services"
 
-export function useMasterReschedule(page = 1, limit = 10, search = "") {
+export function useMasterReschedule(page = 1, limit = 10, search = "", enabled = true) {
     return useQuery({
         queryKey: ["master", "reschedule", page, search],
         queryFn: () => getMasterReschedule(page, limit, search),
+        enabled,
     })
 }
 
@@ -30,11 +31,13 @@ export function useMasterSelesai(
     limit = 10,
     search = "",
     sortBy = "",
-    sortDir = ""
+    sortDir = "",
+    enabled = true
 ) {
     return useQuery({
         queryKey: ["master", "selesai", page, search, sortBy, sortDir],
         queryFn: () => getMasterSelesai(page, limit, search, sortBy, sortDir),
+        enabled,
     })
 }
 
