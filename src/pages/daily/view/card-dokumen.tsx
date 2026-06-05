@@ -56,9 +56,9 @@ export function DokumenCard({
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
         if (file) {
-            if (file.size > 5 * 1024 * 1024) {
+            if (file.size > 10 * 1024 * 1024) {
                 toast.error("Ukuran file terlalu besar", {
-                    description: "Maksimal ukuran dokumen yang dapat diunggah adalah 5MB.",
+                    description: "Maksimal ukuran dokumen yang dapat diunggah adalah 10MB.",
                 })
                 e.target.value = ""
                 return
