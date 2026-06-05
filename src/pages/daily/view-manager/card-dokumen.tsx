@@ -54,14 +54,12 @@ export function DokumenCard({
         const file = e.target.files?.[0]
         if (file) onUpload(file)
         e.target.value = ""
-        window.location.reload()
     }
 
     function handleConfirmDelete() {
         if (!deleteTarget) return
         onDelete(deleteTarget.id)
         setDeleteTarget(null)
-        window.location.reload()
     }
 
     return (
