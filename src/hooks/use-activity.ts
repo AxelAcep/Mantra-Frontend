@@ -261,6 +261,7 @@ export function useUploadDokumen(activityId: string, onSuccess?: () => void) {
         mutationFn: (file: File) => uploadDokumen(activityId, file),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["activity", activityId] })
+            qc.invalidateQueries({ queryKey: ["master", "activity", activityId] })
             toast.success("File berhasil diunggah.")
             onSuccess?.()
         },
@@ -274,6 +275,7 @@ export function useDeleteDokumen(activityId: string, onSuccess?: () => void) {
         mutationFn: (dokumenId: string) => deleteDokumen(activityId, dokumenId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["activity", activityId] })
+            qc.invalidateQueries({ queryKey: ["master", "activity", activityId] })
             toast.success("Dokumen berhasil dihapus.")
             onSuccess?.()
         },
