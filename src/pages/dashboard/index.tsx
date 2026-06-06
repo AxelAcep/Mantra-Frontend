@@ -87,10 +87,6 @@ export default function DashboardPage() {
             <div className="mt-6">
                 <LogbookMonitoring />
             </div>
-
-            <div className="mt-6">
-                <KpiKaryawan />
-            </div>
         </div>
     );
 }
