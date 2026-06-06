@@ -172,10 +172,11 @@ export function useMasterKaryawan(
     tahun:   number,
     sortBy:  string = "",
     sortDir: string = "",
+    limit:   number = 10,
 ) {
     return useQuery<KaryawanListResult>({
-        queryKey: ["master", "karyawan", page, search, mode, bulan, tahun, sortBy, sortDir],
-        queryFn:  () => getMasterKaryawan(page, search, mode, bulan, tahun, sortBy, sortDir),
+        queryKey: ["master", "karyawan", page, search, mode, bulan, tahun, sortBy, sortDir, limit],
+        queryFn:  () => getMasterKaryawan(page, search, mode, bulan, tahun, sortBy, sortDir, limit),
     })
 }
 
