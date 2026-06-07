@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { Plus, ChevronLeft, ChevronRight, Search, ChevronDown } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,9 +18,12 @@ type TokenPayload = {
 export default function ManajemenAkunPage() {
     const [page, setPage] = useState(1)
     const [search, setSearch] = useState("")
+    const [status, setStatus] = useState("")
+    const [sortBy, setSortBy] = useState("nama")
+    const [sortDir, setSortDir] = useState("asc")
     const debouncedSearch = useDebounce(search, 400)
 
-    const { data, isLoading, isError } = useUsers(page, LIMIT, debouncedSearch)
+    const { data, isLoading, isError } = useUsers(page, LIMIT, debouncedSearch, status, sortBy, sortDir)
 
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (token) {
@@ -84,8 +87,8 @@ export default function ManajemenAkunPage() {
                     </CardAction>
                 </CardHeader>
 
-                <div className="px-6 py-4 border-b border-slate-100 bg-white">
-                    <div className="relative max-w-sm">
+                <div className="px-6 py-4 border-b border-slate-100 bg-white flex items-center gap-3">
+                    <div className="relative max-w-sm flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
                             placeholder="Cari nama atau email..."
@@ -93,6 +96,23 @@ export default function ManajemenAkunPage() {
                             onChange={handleSearch}
                             className="pl-9 h-10 border-slate-200 text-slate-700 focus-visible:ring-4 focus-visible:ring-cyan-500/10 focus-visible:border-cyan-500 font-medium rounded-lg shadow-none"
                         />
+                    </div>
+                    <div className="relative w-44">
+                        <select
+                            value={status}
+                            onChange={(e) => {
+                                setStatus(e.target.value)
+                                setPage(1)
+                            }}
+                            className="w-full appearance-none h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium pr-10"
+                        >
+                            <option value="">Semua Status</option>
+                            <option value="aktif">Aktif</option>
+                            <option value="nonaktif">Nonaktif</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                            <ChevronDown className="h-4 w-4" />
+                        </div>
                     </div>
                 </div>
 
@@ -102,7 +122,22 @@ export default function ManajemenAkunPage() {
                     {data && data.data.length === 0 && (
                         <div className="py-16 text-center text-slate-400 font-medium">Tidak ada data ditemukan.</div>
                     )}
-                    {data && data.data.length > 0 && <UserTable users={data.data} />}
+                    {data && data.data.length > 0 && (
+                        <UserTable
+                            users={data.data}
+                            sortBy={sortBy}
+                            sortDir={sortDir}
+                            onSort={(field) => {
+                                if (sortBy === field) {
+                                    setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+                                } else {
+                                    setSortBy(field)
+                                    setSortDir("asc")
+                                }
+                                setPage(1)
+                            }}
+                        />
+                    )}
 
                     <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
                         <div className="text-sm text-slate-500 font-medium">
