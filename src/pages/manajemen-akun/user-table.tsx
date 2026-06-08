@@ -65,16 +65,16 @@ export interface UserTableProps {
 export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
     return (
         <>
-            <Table className="w-full table-fixed">
+            <Table className="w-full table-fixed min-w-[1000px]">
                 <TableHeader>
                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[23%] px-6" />
-                        <SortableHeader label="DIVISI" field="divisi" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[17%]" />
-                        <SortableHeader label="EMAIL" field="email" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[23%]" />
-                        <SortableHeader label="ROLE" field="role" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[11%]" />
-                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[11%]" />
-                        <SortableHeader label="AKTIVITAS TERAKHIR" field="last_login" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[11%]" />
-                        <TableHead className="font-semibold text-slate-500 h-12 text-right px-6 w-[4%]">AKSI</TableHead>
+                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[22%] px-6" />
+                        <SortableHeader label="DIVISI" field="divisi" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[14%]" />
+                        <SortableHeader label="EMAIL" field="email" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[21%]" />
+                        <SortableHeader label="ROLE" field="role" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[10%]" />
+                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[10%]" />
+                        <SortableHeader label="AKTIVITAS TERAKHIR" field="last_login" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[15%]" />
+                        <TableHead className="text-xs font-semibold text-slate-500 h-12 text-right pl-2 pr-6 w-[8%]">AKSI</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -115,7 +115,7 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                                         {waktu && <span className="text-xs text-slate-400 mt-0.5 font-medium truncate">{waktu}</span>}
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-right px-6">
+                                <TableCell className="text-right pl-2 pr-6">
                                     <div className="flex items-center justify-end gap-3">
                                         <DialogEditKaryawan user={user}>
                                             <button className="text-cyan-500 font-semibold hover:text-cyan-600 text-sm">
