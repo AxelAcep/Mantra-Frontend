@@ -33,11 +33,11 @@ export function DialogTambahKaryawan({ children }: { children: React.ReactNode }
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white gap-0 border-slate-100 shadow-xl rounded-xl">
-                <DialogHeader className="px-6 py-5 border-b border-slate-100">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden bg-white gap-0 border-slate-100 shadow-xl rounded-xl">
+                <DialogHeader className="px-6 py-5 border-b border-slate-100 shrink-0">
                     <DialogTitle className="text-xl font-bold text-slate-800">Tambah Karyawan</DialogTitle>
                 </DialogHeader>
-                <div className="px-6 py-6 flex flex-col gap-5">
+                <div className="px-6 py-6 flex-1 overflow-y-auto flex flex-col gap-5">
                     {[
                         { id: "nama", label: "Nama Karyawan", type: "text", placeholder: "Masukkan nama karyawan" },
                         { id: "email", label: "Email", type: "email", placeholder: "Masukkan email karyawan" },
@@ -92,7 +92,7 @@ export function DialogTambahKaryawan({ children }: { children: React.ReactNode }
                         </div>
                     ))}
                 </div>
-                <DialogFooter className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 sm:gap-3 flex-row bg-slate-50/30">
+                <DialogFooter className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 sm:gap-3 flex-row bg-slate-50/30 shrink-0">
                     <DialogClose asChild>
                         <Button type="button" variant="outline" className="h-10 px-6 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-800 font-semibold rounded-lg shadow-none">
                             Batal

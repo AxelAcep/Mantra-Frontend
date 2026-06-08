@@ -35,7 +35,7 @@ export default function Layout() {
                 <SidebarInset>
                     {/* Kirim title yang sudah diupdate ke SiteHeader */}
                     <SiteHeader title={title} />
-                    <main className="flex-1">
+                    <main className="flex-1 min-w-0">
                         {/* Kirim fungsi setTitle ke semua halaman di dalam Outlet */}
                         <Outlet context={{ setTitle } satisfies ContextType} />
                     </main>
