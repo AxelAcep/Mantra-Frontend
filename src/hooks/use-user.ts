@@ -14,10 +14,10 @@ import {
 } from "../services/user.services"
 import { toast } from "sonner"
 
-export function useUsers(page = 1, limit = 10, search = "") {
+export function useUsers(page = 1, limit = 10, search = "", status = "", sortBy = "", sortDir = "") {
     return useQuery({
-        queryKey: ["users", page, limit, search],
-        queryFn: () => getAllUsers(page, limit, search),
+        queryKey: ["users", page, limit, search, status, sortBy, sortDir],
+        queryFn: () => getAllUsers(page, limit, search, status, sortBy, sortDir),
     })
 }
 

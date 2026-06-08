@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ChevronDown, Eye, EyeOff } from "lucide-react"
-import { useEditUser } from "@/hooks/use-user"
+import { useEditUser, useUsers } from "@/hooks/use-user"
 import { DIVISI_OPTIONS, ROLE_OPTIONS } from "./divisi-options"
 import { DialogKonfirmasi } from "./dialog-konfirmasi"
 import type { User } from "../../services/user.services"
@@ -21,12 +21,16 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
     const [showPassword, setShowPassword] = React.useState(false)
     const [open, setOpen] = React.useState(false)
     const [konfirmasi, setKonfirmasi] = React.useState(false)
+    const { data: usersData } = useUsers(1, 100, "")
+
     const [form, setForm] = React.useState({
         nama: user.pegawai.nama,
         email: user.email,
         role: user.role,
         divisi: user.pegawai.divisi,
         password: "",
+        activeStatus: user.activeStatus ?? true,
+        transferPegawaiId: "",
     })
 
     const isChanged =
@@ -34,7 +38,12 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
         form.email !== user.email ||
         form.role !== user.role ||
         form.divisi !== user.pegawai.divisi ||
-        form.password !== ""
+        form.password !== "" ||
+        form.activeStatus !== (user.activeStatus ?? true) ||
+        form.transferPegawaiId !== ""
+
+    const isTransferRequired = (user.activeStatus ?? true) === true && form.activeStatus === false && (user.berjalanCount ?? 0) > 0
+    const isValid = !isTransferRequired || form.transferPegawaiId !== ""
 
     const { mutate, isPending } = useEditUser(() => {
         setOpen(false)
@@ -42,7 +51,11 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
     })
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+        const { name, value } = e.target
+        setForm((prev) => ({
+            ...prev,
+            [name]: name === "activeStatus" ? value === "true" : value
+        }))
     }
 
     function handleSubmit() {
@@ -50,8 +63,18 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
     }
 
     function handleConfirm() {
-        mutate({ id: user.id, payload: form })
+        mutate({
+            id: user.id,
+            payload: {
+                ...form,
+                transferPegawaiId: form.activeStatus === false ? form.transferPegawaiId : undefined,
+            }
+        })
     }
+
+    const activeUsers = usersData?.data?.filter((u) => u.id !== user.id && (u.activeStatus ?? true)) ?? []
+    const showTransferDropdown = form.activeStatus === false
+    const isTransferDisabled = form.activeStatus === (user.activeStatus ?? true)
 
     return (
         <>
@@ -79,7 +102,7 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
                                         id={`edit-${field.id}`}
                                         name={field.id}
                                         type={field.id === "password" ? (showPassword ? "text" : "password") : field.type}
-                                        value={form[field.id as keyof typeof form]}
+                                        value={form[field.id as "nama" | "email" | "password"]}
                                         onChange={handleChange}
                                         className={`h-11 border-slate-200 text-slate-700 focus-visible:ring-4 focus-visible:ring-cyan-500/10 focus-visible:border-cyan-500 font-medium rounded-lg shadow-none ${field.id === "password" ? "pr-11" : ""}`}
                                     />
@@ -105,7 +128,7 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
                                     <select
                                         id={`edit-${field.id}`}
                                         name={field.id}
-                                        value={form[field.id as keyof typeof form]}
+                                        value={form[field.id as keyof typeof form] as string}
                                         onChange={handleChange}
                                         className="w-full appearance-none h-11 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium"
                                     >
@@ -119,6 +142,57 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
                                 </div>
                             </div>
                         ))}
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="edit-status" className="text-sm font-medium text-slate-700">Status Akun</Label>
+                                <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-cyan-50 text-cyan-600">
+                                    Aktivitas Berjalan: {user.berjalanCount ?? 0}
+                                </span>
+                            </div>
+                            <div className="relative">
+                                <select
+                                    id="edit-status"
+                                    name="activeStatus"
+                                    value={String(form.activeStatus)}
+                                    onChange={handleChange}
+                                    disabled={(user.activeStatus ?? true) === false}
+                                    className="w-full appearance-none h-11 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                >
+                                    <option value="true">Aktif</option>
+                                    <option value="false">Nonaktif</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                                    <ChevronDown className="h-4 w-4" />
+                                </div>
+                            </div>
+                        </div>
+                        {showTransferDropdown && (
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="edit-transfer" className="text-sm font-medium text-slate-700">
+                                    Pindahkan Daily Activity Ke Karyawan
+                                </Label>
+                                <div className="relative">
+                                    <select
+                                        id="edit-transfer"
+                                        name="transferPegawaiId"
+                                        value={form.transferPegawaiId}
+                                        onChange={handleChange}
+                                        disabled={isTransferDisabled}
+                                        className="w-full appearance-none h-11 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500 transition-all font-medium disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                    >
+                                        <option value="">-- Pilih Karyawan Penerus --</option>
+                                        {activeUsers.map((u) => (
+                                            <option key={u.id} value={u.pegawai.id}>
+                                                {u.pegawai.nama} ({u.pegawai.divisi})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                                        <ChevronDown className="h-4 w-4" />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-3 sm:gap-3 flex-row bg-slate-50/30">
                         <DialogClose asChild>
@@ -128,10 +202,10 @@ export function DialogEditKaryawan({ children, user }: { children: React.ReactNo
                         </DialogClose>
                         <Button
                             onClick={handleSubmit}
-                            disabled={isPending || !isChanged}
-                            className={`h-10 px-6 font-semibold shadow-none rounded-lg transition-all ${!isChanged
-                                    ? "bg-slate-200 text-slate-400 cursor-not-allowed hover:bg-slate-200"
-                                    : "bg-cyan-500 hover:bg-cyan-600 text-white"
+                            disabled={isPending || !isChanged || !isValid}
+                            className={`h-10 px-6 font-semibold shadow-none rounded-lg transition-all ${(!isChanged || !isValid)
+                                ? "bg-slate-200 text-slate-400 cursor-not-allowed hover:bg-slate-200"
+                                : "bg-cyan-500 hover:bg-cyan-600 text-white"
                                 }`}
                         >
                             {isPending ? "Menyimpan..." : "Simpan Perubahan"}

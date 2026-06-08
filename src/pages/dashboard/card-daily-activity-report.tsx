@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useMasterStats } from "@/hooks/use-kpi";
 import { useMasterKaryawan } from "@/hooks/use-master-activity";
 import { Link, useNavigate } from "react-router-dom";
+import { TablePagination } from "@/pages/daily/manager/table-pagination";
 
 export default function DailyActivityReport() {
   const navigate = useNavigate();
@@ -19,11 +21,15 @@ export default function DailyActivityReport() {
   const bulan = now.getMonth() + 1;
   const tahun = now.getFullYear();
 
-  const { data: stats } = useMasterStats();
-  const { data: karyawanData, isLoading } = useMasterKaryawan(1, "", "tahun", bulan, tahun);
+  const [page, setPage] = useState(1);
 
-  // Ambil 5 data teratas untuk dashboard
-  const activities = karyawanData?.data?.slice(0, 5) ?? [];
+  const { data: stats } = useMasterStats();
+  const { data: karyawanData, isLoading } = useMasterKaryawan(page, "", "tahun", bulan, tahun, "", "", 7);
+
+  // Ambil seluruh data hasil pagination (limit 7)
+  const activities = karyawanData?.data ?? [];
+  const total = karyawanData?.total ?? 0;
+  const totalPages = karyawanData?.totalPages ?? 1;
 
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden p-0 gap-0">
@@ -65,16 +71,16 @@ export default function DailyActivityReport() {
 
       {/* --- BAGIAN ISI TABEL --- */}
       <CardContent className="p-0">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[20%]">KARYAWAN</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[15%]">DIVISI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[12%] text-center">OVERDUE</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[12%] text-center">PROGRESS</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[12%] text-center">SELESAI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[12%] text-center">TOTAL</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 text-right">AKSI</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[25%]">KARYAWAN</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[18%]">DIVISI</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">OVERDUE</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">PROGRESS</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">SELESAI</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">TOTAL</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[13%] text-right">AKSI</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -95,11 +101,11 @@ export default function DailyActivityReport() {
             {activities.map((row) => (
               <TableRow key={row.id}>
 
-                <TableCell className="font-medium text-slate-800 text-sm">
+                <TableCell className="font-medium text-slate-800 text-sm truncate" title={row.nama}>
                   {row.nama}
                 </TableCell>
 
-                <TableCell className="text-slate-500 text-sm">
+                <TableCell className="text-slate-500 text-sm truncate" title={row.divisi}>
                   {row.divisi}
                 </TableCell>
 
@@ -157,6 +163,17 @@ export default function DailyActivityReport() {
             ))}
           </TableBody>
         </Table>
+        {!isLoading && activities.length > 0 && (
+          <div className="p-4 border-t border-slate-100">
+            <TablePagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              showing={activities.length}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

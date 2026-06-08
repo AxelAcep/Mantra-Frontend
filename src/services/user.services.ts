@@ -37,6 +37,8 @@ export type User = {
     id: string
     email: string
     role: string
+    activeStatus?: boolean
+    berjalanCount?: number
     lastLogin?: string
     pegawai: {
         id: string
@@ -59,6 +61,8 @@ export type EditUserPayload = {
     role?: string
     divisi?: string
     password?: string
+    activeStatus?: boolean
+    transferPegawaiId?: string
 }
 
 export type PaginatedUsers = {
@@ -71,11 +75,14 @@ export type PaginatedUsers = {
     }
 }
 
-export async function getAllUsers(page = 1, limit = 10, search = ""): Promise<PaginatedUsers> {
+export async function getAllUsers(page = 1, limit = 10, search = "", status = "", sortBy = "", sortDir = ""): Promise<PaginatedUsers> {
     const params = new URLSearchParams({
         page: String(page),
         limit: String(limit),
         ...(search ? { search } : {}),
+        ...(status ? { status } : {}),
+        ...(sortBy ? { sortBy } : {}),
+        ...(sortDir ? { sortDir } : {}),
     })
     const res = await fetchClient(`/user?${params}`, { headers: authHeaders() })
     const data = await res.json()

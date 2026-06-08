@@ -317,10 +317,11 @@ export async function getMasterKaryawan(
     tahun:  number,
     sortBy: string = "",
     sortDir: string = "",
+    limit:  number = 10,
 ): Promise<KaryawanListResult> {
     const params = new URLSearchParams({
         page:   String(page),
-        limit:  "10",
+        limit:  String(limit),
         search,
         mode,
         bulan:  String(bulan),
