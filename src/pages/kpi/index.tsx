@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useKPIOverview } from "@/hooks/use-kpi"
 import { Icons } from "@/assets"
@@ -12,7 +12,8 @@ import { StatusBadge } from "@/pages/daily/manager/status-badge"
 
 // ─── Donuts Chartsss ─────────────────────────────────────────────────────────────
 function DonutChart({ baik, cukup, buruk }: KPISummary) {
-  const total = baik + cukup + buruk || 1
+  const actualTotal = baik + cukup + buruk
+  const divisor = actualTotal || 1
   const r = 54
   const cx = 70
   const cy = 70
@@ -26,7 +27,7 @@ function DonutChart({ baik, cukup, buruk }: KPISummary) {
 
   let offset = 0
   const slices = segments.map((seg) => {
-    const dash = (seg.value / total) * circumference
+    const dash = (seg.value / divisor) * circumference
     const gap = circumference - dash
     const slice = { ...seg, dash, gap, offset }
     offset += dash
@@ -35,22 +36,33 @@ function DonutChart({ baik, cukup, buruk }: KPISummary) {
 
   return (
     <svg width={140} height={140} viewBox="0 0 140 140">
-      {slices.map((s, i) => (
+      {actualTotal > 0 ? (
+        slices.map((s, i) => (
+          <circle
+            key={i}
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke={s.color}
+            strokeWidth={14}
+            strokeDasharray={`${s.dash} ${s.gap}`}
+            strokeDashoffset={-s.offset + circumference * 0.25}
+            style={{ transition: "stroke-dasharray 0.5s" }}
+          />
+        ))
+      ) : (
         <circle
-          key={i}
           cx={cx}
           cy={cy}
           r={r}
           fill="none"
-          stroke={s.color}
+          stroke="#e2e8f0"
           strokeWidth={14}
-          strokeDasharray={`${s.dash} ${s.gap}`}
-          strokeDashoffset={-s.offset + circumference * 0.25}
-          style={{ transition: "stroke-dasharray 0.5s" }}
         />
-      ))}
+      )}
       <text x={cx} y={cy - 6} textAnchor="middle" fontSize={20} fontWeight="700" fill="#1e293b">
-        {total}
+        {actualTotal}
       </text>
       <text x={cx} y={cy + 14} textAnchor="middle" fontSize={10} fill="#64748b">
         Aktivitas
@@ -62,23 +74,27 @@ function DonutChart({ baik, cukup, buruk }: KPISummary) {
 // ─── Trend Line Chart ─────────────────────────────────────────────────────────
 type SeriesKey = "baik" | "cukup" | "buruk"
 
-function TrendChart({ trends }: { trends: WeeklyTrend[] }) {
-  const weeks = ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5", "Minggu 6"]
+function TrendChart({ trends, period }: { trends: WeeklyTrend[]; period: TimePeriod }) {
+  const isYearly = period === "tahun"
+  const labels = isYearly
+    ? ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"]
+    : ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5", "Minggu 6"]
+
   const W = 340, H = 140, padL = 28, padB = 24, padT = 10, padR = 10
   const innerW = W - padL - padR
   const innerH = H - padT - padB
 
-  const byWeek: Record<number, WeeklyTrend> = {}
-  trends.forEach((t) => { byWeek[t.minggu] = t })
+  const byIndex: Record<number, WeeklyTrend> = {}
+  trends.forEach((t) => { byIndex[t.minggu] = t })
 
   const series: Record<SeriesKey, number[]> = {
-    baik: weeks.map((_, i) => byWeek[i + 1]?.baik ?? 0),
-    cukup: weeks.map((_, i) => byWeek[i + 1]?.cukup ?? 0),
-    buruk: weeks.map((_, i) => byWeek[i + 1]?.buruk ?? 0),
+    baik: labels.map((_, i) => byIndex[i + 1]?.baik ?? 0),
+    cukup: labels.map((_, i) => byIndex[i + 1]?.cukup ?? 0),
+    buruk: labels.map((_, i) => byIndex[i + 1]?.buruk ?? 0),
   }
 
   const maxVal = Math.max(...Object.values(series).flat(), 1)
-  const xStep = innerW / (weeks.length - 1)
+  const xStep = innerW / (labels.length - 1)
 
   const pts = (arr: number[]) =>
     arr.map((v, i) => `${padL + i * xStep},${padT + innerH - (v / maxVal) * innerH}`).join(" ")
@@ -124,9 +140,9 @@ function TrendChart({ trends }: { trends: WeeklyTrend[] }) {
           />
         ))
       )}
-      {weeks.map((w, i) => (
+      {labels.map((lbl, i) => (
         <text key={i} x={padL + i * xStep} y={H - 4} fontSize={7.5} fill="#94a3b8" textAnchor="middle">
-          {w}
+          {lbl}
         </text>
       ))}
     </svg>
@@ -142,6 +158,13 @@ interface ActivityTableProps {
   totalPages: number
   activeTab: "aktivitas" | "riwayat"
   onPageChange: (page: number) => void
+  search: string
+  onSearchChange: (search: string) => void
+  statusFilter: string
+  onStatusChange: (status: string) => void
+  sortBy: string
+  sortDir: "asc" | "desc"
+  onSort: (field: string) => void
 }
 
 function KPIRatingBadge({ rating }: { rating?: NilaiKPI }) {
@@ -171,10 +194,63 @@ function formatTimeOnly(dateStr: string) {
   return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false }).replace(".", ":")
 }
 
-function ActivityTable({ data, page, total, totalPages, activeTab, onPageChange }: ActivityTableProps) {
+function ActivityTable({
+  data,
+  page,
+  total,
+  totalPages,
+  activeTab,
+  onPageChange,
+  search,
+  onSearchChange,
+  statusFilter,
+  onStatusChange,
+  sortBy,
+  sortDir,
+  onSort,
+}: ActivityTableProps) {
   const navigate = useNavigate()
-
   const isRiwayat = activeTab === "riwayat"
+
+  const SortableHeader = ({
+    label,
+    field,
+    widthClass,
+    center,
+  }: {
+    label: string
+    field: string
+    widthClass?: string
+    center?: boolean
+  }) => {
+    const isSorted = sortBy === field
+    return (
+      <TableHead
+        className={`py-4 text-slate-500 text-xs font-bold uppercase tracking-wider ${widthClass || "px-6"} cursor-pointer hover:bg-slate-100/30 hover:text-slate-800 transition-colors select-none`}
+        onClick={() => onSort(field)}
+      >
+        <div className={`flex items-center gap-1.5 ${center ? "justify-center" : ""}`}>
+          <span>{label}</span>
+          <span className="flex flex-col text-[8px] gap-[2px] opacity-70">
+            <svg
+              className={`w-2.5 h-2.5 -mb-1 ${isSorted && sortDir === "asc" ? "text-cyan-500" : "text-slate-300"}`}
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 4l-8 8h16z" />
+            </svg>
+            <svg
+              className={`w-2.5 h-2.5 ${isSorted && sortDir === "desc" ? "text-cyan-500" : "text-slate-300"}`}
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 20l8-8H4z" />
+            </svg>
+          </span>
+        </div>
+      </TableHead>
+    )
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -189,15 +265,81 @@ function ActivityTable({ data, page, total, totalPages, activeTab, onPageChange 
         </p>
       </div>
 
+      {/* Search and Status/Rating Filter Bar */}
+      <div className="px-6 py-4 flex flex-col md:flex-row gap-3 border-b border-gray-100 bg-slate-50/20">
+        {/* Search Input */}
+        <div className="relative flex-1">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            placeholder="Cari aktivitas, deskripsi, perusahaan, atau no. ref..."
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-9 pr-8 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 bg-white transition-all placeholder:text-slate-400"
+          />
+          {search && (
+            <button
+              onClick={() => onSearchChange("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Status Filter */}
+        <div className="w-full md:w-52">
+          <select
+            value={statusFilter}
+            onChange={(e) => onStatusChange(e.target.value)}
+            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 bg-white transition-all text-slate-700 font-medium cursor-pointer"
+          >
+            {isRiwayat ? (
+              <>
+                <option value="">Semua Penilaian KPI</option>
+                <option value="BAIK">Baik</option>
+                <option value="CUKUP">Cukup</option>
+                <option value="BURUK">Buruk</option>
+              </>
+            ) : (
+              <>
+                <option value="">Semua Status</option>
+                <option value="ON_PROGRESS">On Progress</option>
+                <option value="OVERDUE">Overdue</option>
+                <option value="KONFIRMASI_SELESAI">Konfirmasi Selesai</option>
+                <option value="PENDING">Pending</option>
+                <option value="PENDING_PEGAWAI">Pending Pegawai</option>
+                <option value="DITOLAK">Ditolak</option>
+                <option value="DIBATALKAN">Dibatalkan</option>
+              </>
+            )}
+          </select>
+        </div>
+      </div>
+
       {data.length === 0 ? (
         <div className="py-20 flex flex-col items-center justify-center text-center">
           <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-4">
             <img src={Icons.CalendarX} alt="Empty" className="w-6 h-6 opacity-60" />
           </div>
           <h3 className="text-slate-700 font-semibold text-sm mb-1">
-            {isRiwayat ? "Tidak ada riwayat aktivitas" : "Tidak ada aktivitas berjalan"}
+            {search || statusFilter
+              ? "Tidak ada data yang cocok"
+              : isRiwayat
+                ? "Tidak ada riwayat aktivitas"
+                : "Tidak ada aktivitas berjalan"}
           </h3>
-          <p className="text-slate-400 text-[11px]">Saat ini belum ada data yang tersedia.</p>
+          <p className="text-slate-400 text-[11px]">
+            {search || statusFilter
+              ? "Coba ubah kata kunci pencarian atau filter status Anda."
+              : "Saat ini belum ada data yang tersedia."}
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-b-xl">
@@ -206,22 +348,22 @@ function ActivityTable({ data, page, total, totalPages, activeTab, onPageChange 
               <TableRow className="bg-slate-50/50">
                 {isRiwayat ? (
                   <>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Tanggal</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[35%]">Aktivitas</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Perusahaan</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Kategori</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider text-center w-[10%]">Penilaian</TableHead>
+                    <SortableHeader label="Tanggal" field="tanggal" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Aktivitas" field="judul" widthClass="px-6 w-[32%]" />
+                    <SortableHeader label="Perusahaan" field="perusahaan" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Kategori" field="kategori" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Penilaian" field="nilaiKPI" widthClass="px-4 w-[15%]" center />
                   </>
                 ) : (
                   <>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Kategori Pekerjaan</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[35%]">Judul Aktivitas</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Nomor Referensi</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider w-[15%]">Perusahaan</TableHead>
-                    <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider text-center w-[10%]">Status</TableHead>
+                    <SortableHeader label="Kategori Pekerjaan" field="kategori" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Judul Aktivitas" field="judul" widthClass="px-6 w-[32%]" />
+                    <SortableHeader label="Nomor Referensi" field="terkaitPO" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Perusahaan" field="perusahaan" widthClass="px-6 w-[13%]" />
+                    <SortableHeader label="Status" field="status" widthClass="px-4 w-[15%]" center />
                   </>
                 )}
-                <TableHead className="px-6 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider text-right w-[10%]">Aksi</TableHead>
+                <TableHead className="px-4 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider text-right w-[14%]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-50">
@@ -243,7 +385,7 @@ function ActivityTable({ data, page, total, totalPages, activeTab, onPageChange 
                           {row.kategori.toLowerCase().replace(/_/g, " ")}
                         </span>
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-center"><KPIRatingBadge rating={row.nilaiKPI} /></TableCell>
+                      <TableCell className="px-4 py-4 text-center"><KPIRatingBadge rating={row.nilaiKPI} /></TableCell>
                     </>
                   ) : (
                     <>
@@ -258,10 +400,18 @@ function ActivityTable({ data, page, total, totalPages, activeTab, onPageChange 
                       </TableCell>
                       <TableCell className="px-6 py-4 text-cyan-600 font-bold text-xs tracking-tight">{row.terkaitPO || "-"}</TableCell>
                       <TableCell className="px-6 py-4 text-gray-700 font-medium text-xs line-clamp-1 mt-2">{row.perusahaan || "-"}</TableCell>
-                      <TableCell className="px-6 py-4 text-center"><StatusBadge status={row.status} /></TableCell>
+                      <TableCell className="px-4 py-4 text-center">
+                        <StatusBadge
+                          status={
+                            row.status === "ON_PROGRESS" && new Date() > new Date(row.targetSelesai)
+                              ? "OVERDUE"
+                              : row.status
+                          }
+                        />
+                      </TableCell>
                     </>
                   )}
-                  <TableCell className="px-6 py-4 text-right">
+                  <TableCell className="px-4 py-4 text-right">
                     <button
                       onClick={() => navigate(`/dailyactivity/${row.id}`)}
                       className="text-cyan-500 text-xs font-bold hover:text-cyan-600 flex items-center gap-1 justify-end ml-auto"
@@ -364,7 +514,37 @@ export default function KPIOverviewPage() {
   const [draftBulan, setDraftBulan] = useState<number>(now.getMonth() + 1)
   const [draftTahun, setDraftTahun] = useState<number>(now.getFullYear())
 
-  const { data, isLoading, isError } = useKPIOverview(pegawaiId ?? "", page, bulan, tahun, activeTab)
+  // Search & Sorting States
+  const [search, setSearch] = useState<string>("")
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("")
+  const [statusFilter, setStatusFilter] = useState<string>("")
+  const [sortBy, setSortBy] = useState<string>("")
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc")
+
+  // Debounce search input by 500ms
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [search])
+
+  const { data, isLoading, isError } = useKPIOverview(
+    pegawaiId ?? "",
+    page,
+    bulan,
+    tahun,
+    activeTab,
+    debouncedSearch,
+    statusFilter,
+    sortBy,
+    sortDir
+  )
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pegawaiId])
 
   const handlePeriod = (period: TimePeriod) => {
     setTimePeriod(period)
@@ -388,6 +568,16 @@ export default function KPIOverviewPage() {
   const resetFilter = () => {
     setDraftBulan(now.getMonth() + 1)
     setDraftTahun(now.getFullYear())
+  }
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+    } else {
+      setSortBy(field)
+      setSortDir("asc")
+    }
+    setPage(1)
   }
 
   // Generate year options: 3 years back to current
@@ -428,6 +618,10 @@ export default function KPIOverviewPage() {
     .slice(0, 2)
     .toUpperCase()
 
+  const isDefaultMonth = timePeriod === "bulan" && bulan === now.getMonth() + 1 && tahun === now.getFullYear()
+  const isDefaultYear = timePeriod === "tahun" && bulan === 0 && tahun === now.getFullYear()
+  const isCustomFilter = !isDefaultMonth && !isDefaultYear
+
   return (
     <div className="p-6 bg-slate-50 min-h-screen space-y-6">
       <div className="flex items-center gap-4">
@@ -460,29 +654,32 @@ export default function KPIOverviewPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {(["bulan", "tahun"] as TimePeriod[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => handlePeriod(p)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${timePeriod === p ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-              >
-                1 {p.charAt(0).toUpperCase() + p.slice(1)}
-              </button>
-            ))}
+            {(["bulan", "tahun"] as TimePeriod[]).map((p) => {
+              const isActive = p === "bulan" ? isDefaultMonth : isDefaultYear
+              return (
+                <button
+                  key={p}
+                  onClick={() => handlePeriod(p)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isActive ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                >
+                  1 {p.charAt(0).toUpperCase() + p.slice(1)}
+                </button>
+              )
+            })}
             <div className="relative">
               <button
                 onClick={() => { setFilterOpen((o) => !o); setDraftBulan(bulan); setDraftTahun(tahun) }}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors ${filterOpen ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors ${isCustomFilter || filterOpen ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
               >
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M2 4h12M4 8h8M6 12h4" />
                 </svg>
-                Filter
-                {(bulan !== now.getMonth() + 1 || tahun !== now.getFullYear()) && (
-                  <span className="ml-1 w-1.5 h-1.5 rounded-full bg-cyan-300 inline-block" />
-                )}
+                {isCustomFilter
+                  ? (bulan > 0 ? `${BULAN_LABELS[bulan - 1]} ${tahun}` : `Tahun ${tahun}`)
+                  : "Filter"
+                }
               </button>
 
               {filterOpen && (
@@ -554,7 +751,9 @@ export default function KPIOverviewPage() {
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-[10px] text-gray-500 mb-1">Total Aktivitas</div>
                 <div className="text-xl font-bold text-gray-900">{totalKPI}</div>
-                <div className="text-[10px] text-gray-400">Bulan ini</div>
+                <div className="text-[10px] text-gray-400">
+                  {timePeriod === "tahun" ? "Tahun ini" : "Bulan ini"}
+                </div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 text-center">
                 <div className="text-[10px] text-gray-500 mb-1">Rata-rata Nilai</div>
@@ -612,7 +811,7 @@ export default function KPIOverviewPage() {
             <p className="text-xs text-gray-400 mb-3">
               Tiga garis menunjukkan perubahan jumlah aktivitas kategori Baik, Cukup, dan Buruk. Dapat dipakai untuk membandingkan kestabilan performa bulanan atau tahunan.
             </p>
-            <TrendChart trends={weeklyTrends ?? []} />
+            <TrendChart trends={weeklyTrends ?? []} period={timePeriod} />
             <div className="flex items-center gap-3 mt-2 justify-center">
               {(
                 [
@@ -638,6 +837,10 @@ export default function KPIOverviewPage() {
               onClick={() => {
                 setActiveTab(tab)
                 setPage(1)
+                setSearch("")
+                setStatusFilter("")
+                setSortBy("")
+                setSortDir("desc")
               }}
               className={`py-3 text-sm capitalize whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px transition-colors ${activeTab === tab
                 ? "border-cyan-500 text-cyan-500"
@@ -657,6 +860,16 @@ export default function KPIOverviewPage() {
           totalPages={activities.totalPages}
           activeTab={activeTab}
           onPageChange={setPage}
+          search={search}
+          onSearchChange={setSearch}
+          statusFilter={statusFilter}
+          onStatusChange={(status) => {
+            setStatusFilter(status)
+            setPage(1)
+          }}
+          sortBy={sortBy}
+          sortDir={sortDir}
+          onSort={handleSort}
         />
       </div>
     </div>

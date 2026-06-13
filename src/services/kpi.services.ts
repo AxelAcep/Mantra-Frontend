@@ -146,7 +146,11 @@ export async function getKPIOverview(
     page: number,
     bulan: number,
     tahun: number,
-    tab: string
+    tab: string,
+    search?: string,
+    status?: string,
+    sortBy?: string,
+    sortDir?: string
 ): Promise<KPIOverviewResponse> {
     const params = new URLSearchParams({
         page: String(page),
@@ -154,6 +158,11 @@ export async function getKPIOverview(
         tahun: String(tahun),
         tab: tab,
     })
+    if (search) params.append("search", search)
+    if (status) params.append("status", status)
+    if (sortBy) params.append("sortBy", sortBy)
+    if (sortDir) params.append("sortDir", sortDir)
+
     const res = await fetchClient(`/kpi/overview/${pegawaiId}?${params}`, { headers: authHeaders() })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? "Gagal mengambil data KPI.")

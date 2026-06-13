@@ -41,10 +41,20 @@ export function useAddKPI(pegawaiId: string) {
     })
 }
 
-export function useKPIOverview(pegawaiId: string, page: number, bulan: number, tahun: number, tab: string) {
+export function useKPIOverview(
+  pegawaiId: string,
+  page: number,
+  bulan: number,
+  tahun: number,
+  tab: string,
+  search?: string,
+  status?: string,
+  sortBy?: string,
+  sortDir?: string
+) {
   return useQuery<KPIOverviewResponse>({
-    queryKey: ["kpi", "overview", pegawaiId, page, bulan, tahun, tab],
-    queryFn: () => getKPIOverview(pegawaiId, page, bulan, tahun, tab),
+    queryKey: ["kpi", "overview", pegawaiId, page, bulan, tahun, tab, search, status, sortBy, sortDir],
+    queryFn: () => getKPIOverview(pegawaiId, page, bulan, tahun, tab, search, status, sortBy, sortDir),
     enabled: !!pegawaiId,
   })
 }

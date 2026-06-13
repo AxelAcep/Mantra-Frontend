@@ -161,6 +161,7 @@ export function useMasterActivityDetail(id: string) {
         queryKey: ["master", "activity", id],
         queryFn:  () => getMasterActivityDetail(id),
         enabled:  !!id,
+        refetchInterval: 10000,
     })
 }
 

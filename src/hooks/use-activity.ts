@@ -96,6 +96,7 @@ export function useDetailActivity(id: string) {
         queryKey: ["activity", id],
         queryFn: () => getDetailActivity(id),
         enabled: !!id,
+        refetchInterval: 10000,
     })
 }
 
