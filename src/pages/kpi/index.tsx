@@ -74,27 +74,22 @@ function DonutChart({ baik, cukup, buruk }: KPISummary) {
 // ─── Trend Line Chart ─────────────────────────────────────────────────────────
 type SeriesKey = "baik" | "cukup" | "buruk"
 
-function TrendChart({ trends, period }: { trends: WeeklyTrend[]; period: TimePeriod }) {
-  const isYearly = period === "tahun"
-  const labels = isYearly
-    ? ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"]
-    : ["Minggu 1", "Minggu 2", "Minggu 3", "Minggu 4", "Minggu 5", "Minggu 6"]
-
+function TrendChart({ trends }: { trends: WeeklyTrend[] }) {
   const W = 340, H = 140, padL = 28, padB = 24, padT = 10, padR = 10
   const innerW = W - padL - padR
   const innerH = H - padT - padB
 
-  const byIndex: Record<number, WeeklyTrend> = {}
-  trends.forEach((t) => { byIndex[t.minggu] = t })
+  const safeTrends = trends || []
+  const labels = safeTrends.map((t) => t.label)
 
   const series: Record<SeriesKey, number[]> = {
-    baik: labels.map((_, i) => byIndex[i + 1]?.baik ?? 0),
-    cukup: labels.map((_, i) => byIndex[i + 1]?.cukup ?? 0),
-    buruk: labels.map((_, i) => byIndex[i + 1]?.buruk ?? 0),
+    baik: safeTrends.map((t) => t.baik),
+    cukup: safeTrends.map((t) => t.cukup),
+    buruk: safeTrends.map((t) => t.buruk),
   }
 
   const maxVal = Math.max(...Object.values(series).flat(), 1)
-  const xStep = innerW / (labels.length - 1)
+  const xStep = labels.length > 1 ? innerW / (labels.length - 1) : innerW
 
   const pts = (arr: number[]) =>
     arr.map((v, i) => `${padL + i * xStep},${padT + innerH - (v / maxVal) * innerH}`).join(" ")
@@ -118,7 +113,7 @@ function TrendChart({ trends, period }: { trends: WeeklyTrend[]; period: TimePer
           </g>
         )
       })}
-      {(Object.entries(series) as [SeriesKey, number[]][]).map(([key, arr]) => (
+      {labels.length > 0 && (Object.entries(series) as [SeriesKey, number[]][]).map(([key, arr]) => (
         <polyline
           key={key}
           points={pts(arr)}
@@ -129,7 +124,7 @@ function TrendChart({ trends, period }: { trends: WeeklyTrend[]; period: TimePer
           strokeLinecap="round"
         />
       ))}
-      {(Object.entries(series) as [SeriesKey, number[]][]).map(([key, arr]) =>
+      {labels.length > 0 && (Object.entries(series) as [SeriesKey, number[]][]).map(([key, arr]) =>
         arr.map((v, i) => (
           <circle
             key={`${key}-${i}`}
@@ -491,7 +486,6 @@ function ActivityTable({
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-type TimePeriod = "bulan" | "tahun"
 type Tab = "aktivitas" | "riwayat"
 
 const BULAN_LABELS = [
@@ -504,15 +498,23 @@ export default function KPIOverviewPage() {
   const navigate = useNavigate()
   const now = new Date()
 
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>("bulan")
+  const [filterType, setFilterType] = useState<"semua" | "range">("semua")
   const [activeTab, setActiveTab] = useState<Tab>("aktivitas")
   const [page, setPage] = useState<number>(1)
-  const [bulan, setBulan] = useState<number>(now.getMonth() + 1)
-  const [tahun, setTahun] = useState<number>(now.getFullYear())
+
+  // Date ranges
+  const [startBulan, setStartBulan] = useState<number>(now.getMonth() + 1)
+  const [startTahun, setStartTahun] = useState<number>(now.getFullYear())
+  const [endBulan, setEndBulan] = useState<number>(now.getMonth() + 1)
+  const [endTahun, setEndTahun] = useState<number>(now.getFullYear())
+
   const [filterOpen, setFilterOpen] = useState<boolean>(false)
+
   // draft state — only applied when user clicks Terapkan
-  const [draftBulan, setDraftBulan] = useState<number>(now.getMonth() + 1)
-  const [draftTahun, setDraftTahun] = useState<number>(now.getFullYear())
+  const [draftStartBulan, setDraftStartBulan] = useState<number>(now.getMonth() + 1)
+  const [draftStartTahun, setDraftStartTahun] = useState<number>(now.getFullYear())
+  const [draftEndBulan, setDraftEndBulan] = useState<number>(now.getMonth() + 1)
+  const [draftEndTahun, setDraftEndTahun] = useState<number>(now.getFullYear())
 
   // Search & Sorting States
   const [search, setSearch] = useState<string>("")
@@ -533,8 +535,11 @@ export default function KPIOverviewPage() {
   const { data, isLoading, isError } = useKPIOverview(
     pegawaiId ?? "",
     page,
-    bulan,
-    tahun,
+    filterType,
+    startBulan,
+    startTahun,
+    endBulan,
+    endTahun,
     activeTab,
     debouncedSearch,
     statusFilter,
@@ -546,28 +551,24 @@ export default function KPIOverviewPage() {
     window.scrollTo(0, 0)
   }, [pegawaiId])
 
-  const handlePeriod = (period: TimePeriod) => {
-    setTimePeriod(period)
-    setPage(1)
-    if (period === "bulan") {
-      setBulan(now.getMonth() + 1)
-      setTahun(now.getFullYear())
-    } else {
-      setBulan(0)
-      setTahun(now.getFullYear())
+  const applyFilter = () => {
+    const diff = (draftEndTahun - draftStartTahun) * 12 + (draftEndBulan - draftStartBulan) + 1
+    if (diff >= 1 && diff <= 12) {
+      setStartBulan(draftStartBulan)
+      setStartTahun(draftStartTahun)
+      setEndBulan(draftEndBulan)
+      setEndTahun(draftEndTahun)
+      setFilterType("range")
+      setPage(1)
+      setFilterOpen(false)
     }
   }
 
-  const applyFilter = () => {
-    setBulan(draftBulan)
-    setTahun(draftTahun)
-    setPage(1)
-    setFilterOpen(false)
-  }
-
   const resetFilter = () => {
-    setDraftBulan(now.getMonth() + 1)
-    setDraftTahun(now.getFullYear())
+    setDraftStartBulan(now.getMonth() + 1)
+    setDraftStartTahun(now.getFullYear())
+    setDraftEndBulan(now.getMonth() + 1)
+    setDraftEndTahun(now.getFullYear())
   }
 
   const handleSort = (field: string) => {
@@ -618,9 +619,8 @@ export default function KPIOverviewPage() {
     .slice(0, 2)
     .toUpperCase()
 
-  const isDefaultMonth = timePeriod === "bulan" && bulan === now.getMonth() + 1 && tahun === now.getFullYear()
-  const isDefaultYear = timePeriod === "tahun" && bulan === 0 && tahun === now.getFullYear()
-  const isCustomFilter = !isDefaultMonth && !isDefaultYear
+  const isSemua = filterType === "semua"
+  const isCustomFilter = filterType === "range"
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen space-y-6">
@@ -654,22 +654,25 @@ export default function KPIOverviewPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {(["bulan", "tahun"] as TimePeriod[]).map((p) => {
-              const isActive = p === "bulan" ? isDefaultMonth : isDefaultYear
-              return (
-                <button
-                  key={p}
-                  onClick={() => handlePeriod(p)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isActive ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                >
-                  1 {p.charAt(0).toUpperCase() + p.slice(1)}
-                </button>
-              )
-            })}
+            <button
+              onClick={() => {
+                setFilterType("semua")
+                setPage(1)
+              }}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isSemua ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+            >
+              Semua
+            </button>
             <div className="relative">
               <button
-                onClick={() => { setFilterOpen((o) => !o); setDraftBulan(bulan); setDraftTahun(tahun) }}
+                onClick={() => {
+                  setFilterOpen((o) => !o)
+                  setDraftStartBulan(startBulan)
+                  setDraftStartTahun(startTahun)
+                  setDraftEndBulan(endBulan)
+                  setDraftEndTahun(endTahun)
+                }}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors ${isCustomFilter || filterOpen ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
               >
@@ -677,64 +680,95 @@ export default function KPIOverviewPage() {
                   <path d="M2 4h12M4 8h8M6 12h4" />
                 </svg>
                 {isCustomFilter
-                  ? (bulan > 0 ? `${BULAN_LABELS[bulan - 1]} ${tahun}` : `Tahun ${tahun}`)
+                  ? `${BULAN_LABELS[startBulan - 1].slice(0, 3)} ${startTahun} - ${BULAN_LABELS[endBulan - 1].slice(0, 3)} ${endTahun}`
                   : "Filter"
                 }
               </button>
 
-              {filterOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 z-50 p-4 space-y-4">
-                  {/* Tahun */}
-                  <div>
-                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Tahun</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {yearOptions.map((y) => (
-                        <button
-                          key={y}
-                          onClick={() => setDraftTahun(y)}
-                          className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${draftTahun === y ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                            }`}
+              {filterOpen && (() => {
+                const diff = (draftEndTahun - draftStartTahun) * 12 + (draftEndBulan - draftStartBulan) + 1
+                let errorMessage = ""
+                if (diff < 1) {
+                  errorMessage = "Mulai harus sebelum selesai."
+                } else if (diff > 12) {
+                  errorMessage = "Maksimal rentang 12 bulan."
+                }
+
+                return (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 z-50 p-4 space-y-4">
+                    {/* Mulai Dari */}
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Mulai Dari</p>
+                      <div className="flex gap-2">
+                        <select
+                          value={draftStartBulan}
+                          onChange={(e) => setDraftStartBulan(Number(e.target.value))}
+                          className="flex-1 px-2 py-1 border border-slate-200 rounded-md text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                         >
-                          {y}
-                        </button>
-                      ))}
+                          {BULAN_LABELS.map((label, idx) => (
+                            <option key={idx} value={idx + 1}>{label}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={draftStartTahun}
+                          onChange={(e) => setDraftStartTahun(Number(e.target.value))}
+                          className="px-2 py-1 border border-slate-200 rounded-md text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                        >
+                          {yearOptions.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Sampai Dengan */}
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Sampai Dengan</p>
+                      <div className="flex gap-2">
+                        <select
+                          value={draftEndBulan}
+                          onChange={(e) => setDraftEndBulan(Number(e.target.value))}
+                          className="flex-1 px-2 py-1 border border-slate-200 rounded-md text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                        >
+                          {BULAN_LABELS.map((label, idx) => (
+                            <option key={idx} value={idx + 1}>{label}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={draftEndTahun}
+                          onChange={(e) => setDraftEndTahun(Number(e.target.value))}
+                          className="px-2 py-1 border border-slate-200 rounded-md text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                        >
+                          {yearOptions.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {errorMessage && (
+                      <p className="text-[10px] text-red-500 font-semibold">{errorMessage}</p>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-1 border-t border-gray-100">
+                      <button
+                        onClick={resetFilter}
+                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        onClick={applyFilter}
+                        disabled={!!errorMessage}
+                        className="flex-1 py-1.5 rounded-md text-xs font-medium bg-cyan-500 text-white hover:bg-cyan-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Terapkan
+                      </button>
                     </div>
                   </div>
-
-                  {/* Bulan */}
-                  <div>
-                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Bulan</p>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {BULAN_LABELS.map((label, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setDraftBulan(idx + 1)}
-                          className={`py-1 rounded-md text-xs font-medium transition-colors ${draftBulan === idx + 1 ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                            }`}
-                        >
-                          {label.slice(0, 3)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-1 border-t border-gray-100">
-                    <button
-                      onClick={resetFilter}
-                      className="flex-1 py-1.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-                    >
-                      Reset
-                    </button>
-                    <button
-                      onClick={applyFilter}
-                      className="flex-1 py-1.5 rounded-md text-xs font-medium bg-cyan-500 text-white hover:bg-cyan-600 transition-colors"
-                    >
-                      Terapkan
-                    </button>
-                  </div>
-                </div>
-              )}
+                )
+              })()}
             </div>
           </div>
         </div>
@@ -752,7 +786,7 @@ export default function KPIOverviewPage() {
                 <div className="text-[10px] text-gray-500 mb-1">Total Aktivitas</div>
                 <div className="text-xl font-bold text-gray-900">{totalKPI}</div>
                 <div className="text-[10px] text-gray-400">
-                  {timePeriod === "tahun" ? "Tahun ini" : "Bulan ini"}
+                  {filterType === "semua" ? "Semua" : "Periode Filter"}
                 </div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 text-center">
@@ -811,7 +845,7 @@ export default function KPIOverviewPage() {
             <p className="text-xs text-gray-400 mb-3">
               Tiga garis menunjukkan perubahan jumlah aktivitas kategori Baik, Cukup, dan Buruk. Dapat dipakai untuk membandingkan kestabilan performa bulanan atau tahunan.
             </p>
-            <TrendChart trends={weeklyTrends ?? []} period={timePeriod} />
+            <TrendChart trends={weeklyTrends ?? []} />
             <div className="flex items-center gap-3 mt-2 justify-center">
               {(
                 [

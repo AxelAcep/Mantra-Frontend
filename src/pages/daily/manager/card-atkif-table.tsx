@@ -4,7 +4,7 @@ import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
 } from "@/components/ui/table"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import {
     useMasterAktif,
     useKonfirmasiReschedule,
@@ -198,12 +198,18 @@ export function CardAktifTable({
     onPageChange: (p: number) => void
 }) {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const urlStatus = searchParams.get("status") || ""
 
     // ── Search & Filter State ─────────────────────────────────────────────────
     const [searchInput, setSearchInput] = useState("")
     const [filterKaryawan, setFilterKaryawan] = useState("")
     const [filterKategori, setFilterKategori] = useState("")
-    const [filterStatus, setFilterStatus] = useState("")
+    const [filterStatus, setFilterStatus] = useState(urlStatus)
+
+    useEffect(() => {
+        setFilterStatus(urlStatus)
+    }, [urlStatus])
     const [sortBy, setSortBy] = useState("")
     const [sortDir, setSortDir] = useState<SortDir>("")
 
@@ -319,7 +325,17 @@ export function CardAktifTable({
                 {/* Filter Status */}
                 <select
                     value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
+                    onChange={(e) => {
+                        const val = e.target.value
+                        setFilterStatus(val)
+                        const params = new URLSearchParams(searchParams)
+                        if (val) {
+                            params.set("status", val)
+                        } else {
+                            params.delete("status")
+                        }
+                        setSearchParams(params, { replace: true })
+                    }}
                     className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
                 >
                     <option value="">Semua Status</option>
@@ -331,7 +347,15 @@ export function CardAktifTable({
                 {/* Reset */}
                 {(search || filterKategori || filterStatus) && (
                     <button
-                        onClick={() => { setSearchInput(""); setFilterKaryawan(""); setFilterKategori(""); setFilterStatus("") }}
+                        onClick={() => {
+                            setSearchInput("")
+                            setFilterKaryawan("")
+                            setFilterKategori("")
+                            setFilterStatus("")
+                            const params = new URLSearchParams(searchParams)
+                            params.delete("status")
+                            setSearchParams(params, { replace: true })
+                        }}
                         className="px-3 py-2 text-sm text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg transition-colors"
                     >
                         Reset

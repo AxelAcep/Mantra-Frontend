@@ -55,16 +55,30 @@ export async function getKPIBulan(bulan: number, tahun: number): Promise<KPIBula
     return json
 }
 
-export async function getKPIYearly(tahun: number, bulanAwal = 1, bulanAkhir = 12): Promise<KPIYearlyResult> {
-    const params = new URLSearchParams({ tahun: String(tahun), bulanAwal: String(bulanAwal), bulanAkhir: String(bulanAkhir) })
+export async function getKPIYearly(startBulan: number, startTahun: number, endBulan: number, endTahun: number): Promise<KPIYearlyResult> {
+    const params = new URLSearchParams({
+        startBulan: String(startBulan),
+        startTahun: String(startTahun),
+        endBulan: String(endBulan),
+        endTahun: String(endTahun),
+    })
     const res = await fetchClient(`/kpi/yearly?${params}`, { headers: authHeaders() })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? "Gagal mengambil data KPI tahunan.")
     return json
 }
 
-export async function getDistribusiKPI(bulan: number, tahun: number): Promise<KPIDistribusi> {
-    const params = new URLSearchParams({ bulan: String(bulan), tahun: String(tahun) })
+export async function getDistribusiKPI(bulan: number, tahun: number, startBulan?: number, startTahun?: number, endBulan?: number, endTahun?: number): Promise<KPIDistribusi> {
+    const params = new URLSearchParams()
+    if (startBulan && startTahun && endBulan && endTahun) {
+        params.append("startBulan", String(startBulan))
+        params.append("startTahun", String(startTahun))
+        params.append("endBulan", String(endBulan))
+        params.append("endTahun", String(endTahun))
+    } else {
+        params.append("bulan", String(bulan))
+        params.append("tahun", String(tahun))
+    }
     const res = await fetchClient(`/kpi/distribusi?${params}`, { headers: authHeaders() })
     const json = await res.json()
     if (!res.ok) throw new Error(json.error ?? "Gagal mengambil distribusi KPI.")
@@ -104,7 +118,7 @@ export type KPISummary = {
 }
 
 export type WeeklyTrend = {
-    minggu: number
+    label: string
     baik: number
     cukup: number
     buruk: number
@@ -144,8 +158,11 @@ export type KPIOverviewResponse = {
 export async function getKPIOverview(
     pegawaiId: string,
     page: number,
-    bulan: number,
-    tahun: number,
+    filterType: "semua" | "range",
+    startBulan: number,
+    startTahun: number,
+    endBulan: number,
+    endTahun: number,
     tab: string,
     search?: string,
     status?: string,
@@ -154,8 +171,11 @@ export async function getKPIOverview(
 ): Promise<KPIOverviewResponse> {
     const params = new URLSearchParams({
         page: String(page),
-        bulan: String(bulan),
-        tahun: String(tahun),
+        filterType,
+        startBulan: String(startBulan),
+        startTahun: String(startTahun),
+        endBulan: String(endBulan),
+        endTahun: String(endTahun),
         tab: tab,
     })
     if (search) params.append("search", search)

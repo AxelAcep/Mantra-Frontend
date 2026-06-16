@@ -23,7 +23,7 @@ import ActivityPageAdmin from "./pages/daily/manager";
 import ActivityPageSupervisi from "./pages/daily/supervisi";
 import DetailActivityPagePegawai from "./pages/daily/view";
 import DetailActivityPagePegawaiAdmin from "./pages/daily/view-manager";
-import ChatPage from "./pages/notifikasi/chat";
+import NotifikasiPage from "./pages/notifikasi";
 import DetailKPIPage from "./pages/kpi";
 import PengaturanPegawaiPage from "./pages/pengaturan/pegawai";
 import PengaturanManagerPage from "./pages/pengaturan/manager";
@@ -127,7 +127,8 @@ function App() {
             path="dailyactivity/supervisi/:id"
             element={<DetailActivityPagePegawaiAdmin />}
           />
-          <Route path="notifikasi/chat" element={<ChatPage />} />
+          <Route path="notifikasi" element={<NotifikasiPage />} />
+          <Route path="notifikasi/chat" element={<Navigate to="/notifikasi?tab=chat" replace />} />
           <Route path="kpi/:pegawaiId" element={<DetailKPIPage />} />
           <Route path="pengaturan" element={<PengaturanWrapper />} />
         </Route>

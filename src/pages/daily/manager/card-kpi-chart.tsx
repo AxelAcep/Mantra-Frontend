@@ -34,40 +34,86 @@ function toPercentage(data: KPIItem[]) {
 
 // ─── Filter Dropdown ──────────────────────────────────────────────────────────
 
-function FilterDropdown({ bulan, tahun, onBulan, onTahun, onClose }: {
-    bulan: number; tahun: number
-    onBulan: (b: number) => void
-    onTahun: (t: number) => void
+function FilterDropdown({
+    startBulan, startTahun, endBulan, endTahun,
+    onApply, onClose
+}: {
+    startBulan: number; startTahun: number
+    endBulan: number; endTahun: number
+    onApply: (sb: number, st: number, eb: number, et: number) => void
     onClose: () => void
 }) {
+    const [dStartBulan, setDStartBulan] = useState(startBulan)
+    const [dStartTahun, setDStartTahun] = useState(startTahun)
+    const [dEndBulan, setDEndBulan] = useState(endBulan)
+    const [dEndTahun, setDEndTahun] = useState(endTahun)
+
+    const diff = (dEndTahun - dStartTahun) * 12 + (dEndBulan - dStartBulan) + 1
+    let errorMessage = ""
+    if (diff < 1) {
+        errorMessage = "Mulai harus sebelum selesai."
+    } else if (diff > 12) {
+        errorMessage = "Maksimal rentang 12 bulan."
+    }
+
     return (
-        <div className="absolute right-0 top-11 z-50 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-52 space-y-3">
+        <div className="absolute right-0 top-11 z-50 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-64 space-y-4">
             <div className="space-y-1">
-                <label className="text-xs font-medium text-gray-500">Bulan</label>
-                <select
-                    value={bulan}
-                    onChange={e => onBulan(Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                >
-                    {MONTHS.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
-                </select>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Mulai Dari</label>
+                <div className="flex gap-2">
+                    <select
+                        value={dStartBulan}
+                        onChange={e => setDStartBulan(Number(e.target.value))}
+                        className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    >
+                        {MONTHS.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
+                    </select>
+                    <select
+                        value={dStartTahun}
+                        onChange={e => setDStartTahun(Number(e.target.value))}
+                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    >
+                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                </div>
             </div>
             <div className="space-y-1">
-                <label className="text-xs font-medium text-gray-500">Tahun</label>
-                <select
-                    value={tahun}
-                    onChange={e => onTahun(Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                >
-                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Sampai Dengan</label>
+                <div className="flex gap-2">
+                    <select
+                        value={dEndBulan}
+                        onChange={e => setDEndBulan(Number(e.target.value))}
+                        className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    >
+                        {MONTHS.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
+                    </select>
+                    <select
+                        value={dEndTahun}
+                        onChange={e => setDEndTahun(Number(e.target.value))}
+                        className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                    >
+                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                </div>
             </div>
-            <button
-                onClick={onClose}
-                className="w-full bg-cyan-500 text-white rounded-lg py-1.5 text-sm hover:bg-cyan-600 transition-colors"
-            >
-                Terapkan
-            </button>
+            {errorMessage && (
+                <p className="text-[10px] text-red-500 font-semibold">{errorMessage}</p>
+            )}
+            <div className="flex gap-2 pt-1 border-t border-gray-100">
+                <button
+                    onClick={onClose}
+                    className="flex-1 border border-gray-200 text-gray-600 rounded-lg py-1.5 text-xs hover:bg-gray-50 transition-colors"
+                >
+                    Batal
+                </button>
+                <button
+                    onClick={() => onApply(dStartBulan, dStartTahun, dEndBulan, dEndTahun)}
+                    disabled={!!errorMessage}
+                    className="flex-1 bg-cyan-500 text-white rounded-lg py-1.5 text-xs hover:bg-cyan-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Terapkan
+                </button>
+            </div>
         </div>
     )
 }
@@ -157,15 +203,38 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function KPIChart() {
     const now = new Date()
-    const [mode, setMode] = useState<"bulan" | "tahun">("bulan")
+    const [mode, setMode] = useState<"bulan" | "tahun" | "range">("bulan")
     const [bulan, setBulan] = useState(now.getMonth() + 1)
     const [tahun, setTahun] = useState(now.getFullYear())
+
+    // Custom range states
+    const [startBulan, setStartBulan] = useState(now.getMonth() + 1)
+    const [startTahun, setStartTahun] = useState(now.getFullYear())
+    const [endBulan, setEndBulan] = useState(now.getMonth() + 1)
+    const [endTahun, setEndTahun] = useState(now.getFullYear())
+
     const [showFilter, setShowFilter] = useState(false)
 
     const { data: dataBulan, isLoading: loadBulan } = useKPIBulan(bulan, tahun)
-    const { data: dataTahunan, isLoading: loadTahunan } = useKPIYearly(tahun)
-    const { data: dataDistrib } = useDistribusiKPI(bulan, tahun)
-    const { data: stats } = useMasterStats()   // ← balik ke sini
+
+    const isYearlyMode = mode === "tahun"
+    const isRangeMode = mode === "range"
+
+    const queryStartBulan = isYearlyMode ? 1 : (isRangeMode ? startBulan : 1)
+    const queryStartTahun = isYearlyMode ? tahun : (isRangeMode ? startTahun : tahun)
+    const queryEndBulan = isYearlyMode ? 12 : (isRangeMode ? endBulan : 12)
+    const queryEndTahun = isYearlyMode ? tahun : (isRangeMode ? endTahun : tahun)
+
+    const { data: dataTahunan, isLoading: loadTahunan } = useKPIYearly(queryStartBulan, queryStartTahun, queryEndBulan, queryEndTahun)
+    const { data: dataDistrib } = useDistribusiKPI(
+        mode === "bulan" ? bulan : 0,
+        mode === "bulan" ? tahun : 0,
+        mode === "bulan" ? undefined : queryStartBulan,
+        mode === "bulan" ? undefined : queryStartTahun,
+        mode === "bulan" ? undefined : queryEndBulan,
+        mode === "bulan" ? undefined : queryEndTahun
+    )
+    const { data: stats } = useMasterStats()
 
     const isLoading = mode === "bulan" ? loadBulan : loadTahunan
     const allRawData = mode === "bulan" ? (dataBulan?.data ?? []) : (dataTahunan?.data ?? [])
@@ -193,7 +262,12 @@ export function KPIChart() {
                         <h2 className="text-xl font-bold">Ringkasan KPI Karyawan</h2>
                         <p className="text-sm text-muted-foreground">
                             Komposisi penilaian KPI {rawData.length} karyawan —{" "}
-                            {mode === "bulan" ? `${MONTHS[bulan - 1]} ${tahun}` : `Tahun ${tahun}`}
+                            {mode === "bulan"
+                                ? `${MONTHS[bulan - 1]} ${tahun}`
+                                : mode === "tahun"
+                                    ? `Tahun ${tahun}`
+                                    : `${MONTHS[startBulan - 1]} ${startTahun} - ${MONTHS[endBulan - 1]} ${endTahun}`
+                            }
                         </p>
                     </div>
 
@@ -212,15 +286,31 @@ export function KPIChart() {
                         ))}
                         <button
                             onClick={() => setShowFilter(v => !v)}
-                            className="px-3 py-1.5 rounded-full text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center gap-1.5 transition-colors"
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium border flex items-center gap-1.5 transition-colors ${mode === "range" || showFilter
+                                ? "bg-cyan-500 text-white border-cyan-500"
+                                : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                                }`}
                         >
                             <Filter className="w-3.5 h-3.5" />
-                            Filter
+                            {mode === "range"
+                                ? `${MONTHS[startBulan - 1]} ${startTahun} - ${MONTHS[endBulan - 1]} ${endTahun}`
+                                : "Filter"
+                            }
                         </button>
                         {showFilter && (
                             <FilterDropdown
-                                bulan={bulan} tahun={tahun}
-                                onBulan={setBulan} onTahun={setTahun}
+                                startBulan={mode === "range" ? startBulan : bulan}
+                                startTahun={mode === "range" ? startTahun : tahun}
+                                endBulan={mode === "range" ? endBulan : bulan}
+                                endTahun={mode === "range" ? endTahun : tahun}
+                                onApply={(sb, st, eb, et) => {
+                                    setStartBulan(sb)
+                                    setStartTahun(st)
+                                    setEndBulan(eb)
+                                    setEndTahun(et)
+                                    setMode("range")
+                                    setShowFilter(false)
+                                }}
                                 onClose={() => setShowFilter(false)}
                             />
                         )}

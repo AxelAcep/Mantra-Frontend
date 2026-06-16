@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getDetailTrackingPenawaran,
   type TrackingPenawaranDetail,
-} from "@/services/tracking-penawaran.service";
+} from "@/services/penawaran.services";
 
 export function useDetailTrackingPenawaran(id: string) {
   return useQuery({
