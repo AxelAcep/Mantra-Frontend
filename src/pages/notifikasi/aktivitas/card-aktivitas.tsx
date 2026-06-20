@@ -107,9 +107,6 @@ export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
 
                 {/* Expanded Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-100">
-                    {/* Judul */}
-                    <FieldBox label="Judul" value={item.activity?.judul || item.judul} />
-
                     {/* Nama / Divisi */}
                     <FieldBox
                         label="Nama / Divisi"
@@ -121,6 +118,9 @@ export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
                                     : "-"
                         }
                     />
+
+                    {/* Judul */}
+                    <FieldBox label="Judul" value={item.activity?.judul || item.judul} />
 
                     {/* Kategori */}
                     <FieldBox

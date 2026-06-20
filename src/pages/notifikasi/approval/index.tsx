@@ -113,7 +113,7 @@ export function ApprovalTab({
     const konfirmasiKolaborasi = useKonfirmasiKolaborasi();
 
     useEffect(() => {
-        if (isSupervisi && selectedFilter !== "daily-activity") {
+        if (isSupervisi && selectedFilter !== "daily-activity" && selectedFilter !== "kolaborasi") {
             setSelectedFilter("daily-activity");
         } else if (isPegawai && selectedFilter !== "kolaborasi") {
             setSelectedFilter("kolaborasi");
@@ -220,7 +220,7 @@ export function ApprovalTab({
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div className="flex items-center gap-3">
                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">Tampilkan</span>
-                    {isMaster ? (
+                    {isMaster || isSupervisi ? (
                         <Select
                             value={selectedFilter}
                             onValueChange={(value) => setSelectedFilter(value)}
@@ -229,49 +229,83 @@ export function ApprovalTab({
                                 <SelectValue placeholder="Pilih Kategori" />
                             </SelectTrigger>
                             <SelectContent className="bg-white" position="popper">
-                                <SelectItem value="reschedule" className="cursor-pointer">
-                                    <div className="flex items-center justify-between w-full gap-2">
-                                        <span>Reschedule</span>
-                                        {rescheduleCount > 0 && (
-                                            <Badge
-                                                variant="destructive"
-                                                className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
-                                            >
-                                                {rescheduleCount}
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="daily-activity" className="cursor-pointer">
-                                    <div className="flex items-center justify-between w-full gap-2">
-                                        <span>Daily Activity</span>
-                                        {selesaiCount > 0 && (
-                                            <Badge
-                                                variant="destructive"
-                                                className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
-                                            >
-                                                {selesaiCount}
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </SelectItem>
-                                <SelectItem value="konfirmasi-proyek" className="cursor-pointer">
-                                    <div className="flex items-center justify-between w-full gap-2">
-                                        <span>Konfirmasi Proyek</span>
-                                    </div>
-                                </SelectItem>
+                                {isMaster && (
+                                    <>
+                                        <SelectItem value="reschedule" className="cursor-pointer">
+                                            <div className="flex items-center justify-between w-full gap-2">
+                                                <span>Reschedule</span>
+                                                {rescheduleCount > 0 && (
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                                    >
+                                                        {rescheduleCount}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="daily-activity" className="cursor-pointer">
+                                            <div className="flex items-center justify-between w-full gap-2">
+                                                <span>Daily Activity</span>
+                                                {selesaiCount > 0 && (
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                                    >
+                                                        {selesaiCount}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="konfirmasi-proyek" className="cursor-pointer">
+                                            <div className="flex items-center justify-between w-full gap-2">
+                                                <span>Konfirmasi Proyek</span>
+                                            </div>
+                                        </SelectItem>
+                                    </>
+                                )}
+                                {isSupervisi && (
+                                    <>
+                                        <SelectItem value="daily-activity" className="cursor-pointer">
+                                            <div className="flex items-center justify-between w-full gap-2">
+                                                <span>Daily Activity</span>
+                                                {supervisiCount > 0 && (
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                                    >
+                                                        {supervisiCount}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="kolaborasi" className="cursor-pointer">
+                                            <div className="flex items-center justify-between w-full gap-2">
+                                                <span>Kolaborasi</span>
+                                                {kolaborasiCount > 0 && (
+                                                    <Badge
+                                                        variant="destructive"
+                                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                                    >
+                                                        {kolaborasiCount}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </SelectItem>
+                                    </>
+                                )}
                             </SelectContent>
                         </Select>
                     ) : (
                         <div className="flex items-center gap-2">
                             <span className="px-3 py-1 bg-cyan-50 text-cyan-700 rounded-lg text-xs font-semibold uppercase tracking-wider border border-cyan-200/50 flex items-center gap-2">
-                                <span>{isSupervisi ? "Daily Activity" : "Kolaborasi"}</span>
-                                {(isSupervisi ? supervisiCount : kolaborasiCount) > 0 && (
+                                <span>Kolaborasi</span>
+                                {kolaborasiCount > 0 && (
                                     <Badge
                                         variant="destructive"
                                         className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
                                     >
-                                        {isSupervisi ? supervisiCount : kolaborasiCount}
+                                        {kolaborasiCount}
                                     </Badge>
                                 )}
                             </span>

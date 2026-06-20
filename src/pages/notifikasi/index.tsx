@@ -44,7 +44,7 @@ export default function NotifikasiPage() {
     const approvalCount = isMaster
         ? (rescheduleData?.total ?? 0) + (selesaiData?.total ?? 0)
         : isSupervisi
-        ? (supervisiData?.total ?? 0)
+        ? (supervisiData?.total ?? 0) + (kolaborasiData?.length ?? 0)
         : (kolaborasiData?.length ?? 0);
 
     const setActiveTab = (tab: string) => {
