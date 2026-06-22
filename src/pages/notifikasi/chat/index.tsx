@@ -10,7 +10,7 @@ const tabs = [
     { value: "chat", label: "Chat" },
 ]
 
-export default function ChatPage() {
+export default function ChatPage({ hideHeader = false }: { hideHeader?: boolean }) {
     const user = JSON.parse(localStorage.getItem("user") || "{}")
     const currentPegawaiId = user?.pegawai?.id || ""
 
@@ -46,7 +46,8 @@ export default function ChatPage() {
     return (
         <div className="flex flex-col h-[calc(100vh-64px)] w-full bg-[#FBFCFD]">
             <div className="flex flex-col h-full w-full">
-                <div className="bg-slate-50 px-6 pt-4">
+                {!hideHeader && (
+                    <div className="bg-slate-50 px-6 pt-4">
                     <div className="flex items-center justify-between border-b border-gray-200">
                         <div className="flex gap-6">
                             {tabs.map((tab) => (
@@ -81,6 +82,7 @@ export default function ChatPage() {
                         </Button>
                     </div>
                 </div>
+                )}
 
                 <div className="flex-1 overflow-hidden">
                     {activeTab === "chat" && (

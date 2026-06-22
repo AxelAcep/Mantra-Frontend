@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/assets";
 import { useTotalUnreadChatCount } from "@/hooks/use-activity";
 import { useMasterReschedule, useMasterSelesai } from "@/hooks/use-master-activity";
+import { useUnreadNotifikasiCount } from "@/hooks/use-notifikasi";
 
 type MenuItem = {
   title: string;
@@ -29,7 +30,7 @@ type MenuItem = {
   children?: { title: string; url: string }[];
 };
 
-const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] => {
+const getMenuOperasional = (unreadCount: number, role?: string): MenuItem[] => {
   const menu: MenuItem[] = [];
 
   if (role === "MASTER") {
@@ -37,8 +38,7 @@ const getMenuOperasional = (unreadChatCount: number, role?: string): MenuItem[] 
   }
 
   menu.push(
-    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi/chat", badge: unreadChatCount }
-    // { title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang", badge: 3 }
+    { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi", badge: unreadCount }
   );
 
   if (role === "MASTER") {
@@ -99,6 +99,8 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
     : undefined;
 
   const { data: unreadChatCount = 0 } = useTotalUnreadChatCount();
+  const { data: unreadNotifikasiCount = 0 } = useUnreadNotifikasiCount();
+  const totalNotifications = unreadChatCount + unreadNotifikasiCount;
 
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
@@ -263,7 +265,7 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {renderMenu(getMenuOperasional(unreadChatCount, user?.role))}
+              {renderMenu(getMenuOperasional(totalNotifications, user?.role))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -8,17 +8,17 @@ export function useKPIBulan(bulan: number, tahun: number) {
     })
 }
 
-export function useKPIYearly(tahun: number, bulanAwal = 1, bulanAkhir = 12) {
+export function useKPIYearly(startBulan: number, startTahun: number, endBulan: number, endTahun: number) {
     return useQuery({
-        queryKey: ["kpi", "yearly", tahun, bulanAwal, bulanAkhir],
-        queryFn:  () => getKPIYearly(tahun, bulanAwal, bulanAkhir),
+        queryKey: ["kpi", "yearly", startBulan, startTahun, endBulan, endTahun],
+        queryFn:  () => getKPIYearly(startBulan, startTahun, endBulan, endTahun),
     })
 }
 
-export function useDistribusiKPI(bulan: number, tahun: number) {
+export function useDistribusiKPI(bulan: number, tahun: number, startBulan?: number, startTahun?: number, endBulan?: number, endTahun?: number) {
     return useQuery({
-        queryKey: ["kpi", "distribusi", bulan, tahun],
-        queryFn:  () => getDistribusiKPI(bulan, tahun),
+        queryKey: ["kpi", "distribusi", bulan, tahun, startBulan, startTahun, endBulan, endTahun],
+        queryFn:  () => getDistribusiKPI(bulan, tahun, startBulan, startTahun, endBulan, endTahun),
     })
 }
 
@@ -41,10 +41,23 @@ export function useAddKPI(pegawaiId: string) {
     })
 }
 
-export function useKPIOverview(pegawaiId: string, page: number, bulan: number, tahun: number, tab: string) {
+export function useKPIOverview(
+  pegawaiId: string,
+  page: number,
+  filterType: "semua" | "range",
+  startBulan: number,
+  startTahun: number,
+  endBulan: number,
+  endTahun: number,
+  tab: string,
+  search?: string,
+  status?: string,
+  sortBy?: string,
+  sortDir?: string
+) {
   return useQuery<KPIOverviewResponse>({
-    queryKey: ["kpi", "overview", pegawaiId, page, bulan, tahun, tab],
-    queryFn: () => getKPIOverview(pegawaiId, page, bulan, tahun, tab),
+    queryKey: ["kpi", "overview", pegawaiId, page, filterType, startBulan, startTahun, endBulan, endTahun, tab, search, status, sortBy, sortDir],
+    queryFn: () => getKPIOverview(pegawaiId, page, filterType, startBulan, startTahun, endBulan, endTahun, tab, search, status, sortBy, sortDir),
     enabled: !!pegawaiId,
   })
 }

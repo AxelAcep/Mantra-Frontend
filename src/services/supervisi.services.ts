@@ -77,6 +77,7 @@ export type PaginatedResponse<T> = {
 
 export type SupervisiActivityParams = {
     page?: number
+    limit?: number
     search?: string
     sortBy?: string
     sortDir?: "asc" | "desc"

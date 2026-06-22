@@ -14,11 +14,12 @@ export const supervisiActivityKeys = {
 
 // ─── Get Aktif ────────────────────────────────────────────────────────────────
 
-export function useSupervisiActivityAktif(params: SupervisiActivityParams = {}) {
+export function useSupervisiActivityAktif(params: SupervisiActivityParams = {}, enabled = true) {
     return useQuery({
         queryKey: supervisiActivityKeys.aktif(params),
         queryFn: () => supervisiActivityService.getAktif(params),
         placeholderData: (prev) => prev,
+        enabled,
     })
 }
 

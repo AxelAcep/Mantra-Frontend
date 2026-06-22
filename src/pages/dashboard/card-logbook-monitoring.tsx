@@ -71,7 +71,7 @@ export default function LogbookMonitoring() {
             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
               <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[20%]">NAMA</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[15%]">DIVISI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[40%]">INPUT LOGBOOK</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[40%]">DAILY ACTIVITY</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[15%]">TERKAIT PROSES</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[10%] text-right">AKSI</TableHead>
             </TableRow>
@@ -132,7 +132,7 @@ export default function LogbookMonitoring() {
                             ))}
                           </ul>
                           <div className="text-center pt-2 border-t border-slate-100">
-                            <Link to={`/dailyactivity`} className="text-xs font-medium text-cyan-600 hover:underline">
+                            <Link to={`/kpi/${row.id}`} className="text-xs font-medium text-cyan-600 hover:underline">
                               Lihat Semua ›
                             </Link>
                           </div>

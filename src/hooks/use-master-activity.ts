@@ -20,7 +20,7 @@ import {
 
 export function useMasterReschedule(page = 1, limit = 10, search = "", enabled = true) {
     return useQuery({
-        queryKey: ["master", "reschedule", page, search],
+        queryKey: ["master", "reschedule", page, limit, search],
         queryFn: () => getMasterReschedule(page, limit, search),
         enabled,
     })
@@ -35,7 +35,7 @@ export function useMasterSelesai(
     enabled = true
 ) {
     return useQuery({
-        queryKey: ["master", "selesai", page, search, sortBy, sortDir],
+        queryKey: ["master", "selesai", page, limit, search, sortBy, sortDir],
         queryFn: () => getMasterSelesai(page, limit, search, sortBy, sortDir),
         enabled,
     })
@@ -53,7 +53,7 @@ export function useMasterAktif(
     status = "",
 ) {
     return useQuery({
-        queryKey: ["master", "aktif", page, search, sortBy, sortDir, karyawan, kategori, status],
+        queryKey: ["master", "aktif", page, limit, search, sortBy, sortDir, karyawan, kategori, status],
         queryFn: () => getMasterAktif(page, limit, search, sortBy, sortDir, karyawan, kategori, status),
         refetchInterval: 10000,
         refetchIntervalInBackground: true,
@@ -72,7 +72,7 @@ export function useMasterRiwayat(
     status = "",
 ) {
     return useQuery({
-        queryKey: ["master", "aktif", page, search, sortBy, sortDir, karyawan, kategori, status],
+        queryKey: ["master", "riwayat", page, limit, search, sortBy, sortDir, karyawan, kategori, status],
         queryFn: () => getMasterRiwayat(page, limit, search, sortBy, sortDir, karyawan, kategori, status),
         refetchInterval: 10000,
         refetchIntervalInBackground: true,
@@ -161,6 +161,7 @@ export function useMasterActivityDetail(id: string) {
         queryKey: ["master", "activity", id],
         queryFn:  () => getMasterActivityDetail(id),
         enabled:  !!id,
+        refetchInterval: 10000,
     })
 }
 
