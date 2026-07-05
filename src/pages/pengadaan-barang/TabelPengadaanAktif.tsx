@@ -1,78 +1,165 @@
-import { ArrowRight } from 'lucide-react';
+import { useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
 
-interface PengadaanAktif {
-  po: string;
-  tgl: string;
-  perusahaan: string;
-  lokasi: string;
-  jenis: string;
-  status: 'Penyusunan WO' | 'Perlu tindakan' | 'Pengiriman Terjadwal' | 'Pembelian Barang';
-  alert?: boolean;
+function formatTanggal(iso: string | null | undefined) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
-const data: PengadaanAktif[] = [
-  { po: "PO-2310-089", tgl: "22 Okt 2023", perusahaan: "PT Graha Mandiri", lokasi: "Jakarta Selatan", jenis: "PAC Montair", status: "Penyusunan WO" },
-  { po: "PO-2310-088", tgl: "21 Okt 2023", perusahaan: "CV Baja Konstruksi", lokasi: "Bandung Kota", jenis: "Fire GeneratorPro", status: "Perlu tindakan", alert: true },
-  { po: "PO-2310-087", tgl: "20 Okt 2023", perusahaan: "PT Sinar Jaya", lokasi: "Surabaya Barat", jenis: "Fire GeneratorPro", status: "Pengiriman Terjadwal" },
-  { po: "PO-2310-086", tgl: "19 Okt 2023", perusahaan: "Mitra Abadi Sentosa", lokasi: "Tangerang", jenis: "Fire GeneratorPro", status: "Pembelian Barang" },
-  { po: "PO-2310-085", tgl: "18 Okt 2023", perusahaan: "PT Bangun Persada", lokasi: "Semarang", jenis: "PAC Montair", status: "Penyusunan WO" },
-  { po: "PO-2310-084", tgl: "18 Okt 2023", perusahaan: "CV Cipta Karya", lokasi: "Medan", jenis: "PAC Montair", status: "Pengiriman Terjadwal" },
-];
+function formatStepName(step: string) {
+  const labels: Record<string, string> = {
+    PERMINTAAN_MASUK: "Permintaan Masuk",
+    PENYUSUNAN_BOQ: "Penyusunan BoQ",
+    REVIEW_INTERNAL: "Review Internal",
+    PERSETUJUAN_MANAJEMEN: "Persetujuan Manajemen",
+    FOLLOW_UP: "Follow Up Klien",
+    IMPLEMENTASI: "Implementasi",
+    BAST: "BAST",
+    PEMBAYARAN: "Accounting",
+    GARANSI: "Garansi",
+  };
+  return labels[step] || step;
+}
 
 export default function TablePengadaanAktif() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+
+  const { data, isLoading, isError } = usePenawaranListAktif({
+    page,
+    limit: 10,
+    search,
+  });
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
-        <thead className="bg-gray-50/50 border-y border-gray-100">
-          <tr className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
-            <th className="px-6 py-4">Nomor PO ↕</th>
-            <th className="px-6 py-4">Tanggal Terbit ↕</th>
-            <th className="px-6 py-4">Nama Perusahaan ↕</th>
-            <th className="px-6 py-4">Lokasi Proyek ↕</th>
-            <th className="px-6 py-4">Jenis Pengadaan ↕</th>
-            <th className="px-6 py-4 text-center">Status ↕</th>
-            <th className="px-6 py-4 text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-50 text-sm">
-          {data.map((item, idx) => (
-            <tr key={idx} className={`transition-colors ${item.alert ? 'bg-[#fffbeb]' : 'hover:bg-gray-50/50'}`}>
-              <td className="px-6 py-5 font-bold text-slate-700">{item.po}</td>
-              <td className="px-6 py-5 text-gray-500">{item.tgl}</td>
-              <td className="px-6 py-5 font-bold text-slate-700">{item.perusahaan}</td>
-              <td className="px-6 py-5 text-gray-500">{item.lokasi}</td>
-              <td className="px-6 py-5">
-                 <span className="px-3 py-1 bg-gray-100 text-slate-600 rounded text-[10px] font-bold">
-                    {item.jenis}
-                 </span>
-              </td>
-              <td className="px-6 py-5 text-center">
-                <StatusBadge status={item.status} />
-              </td>
-              <td className="px-6 py-5 text-right">
-                <button className="inline-flex items-center gap-1 text-cyan-500 font-bold hover:text-cyan-600">
-                  Lihat Detail <ArrowRight size={14} />
-                </button>
-              </td>
+    <div>
+      {/* Search */}
+      <div className="px-6 py-4 border-b border-gray-100">
+        <input
+          type="text"
+          placeholder="Cari nomor PO, perusahaan, lokasi..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          className="w-full max-w-sm px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 placeholder:text-gray-300"
+        />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-50/50 border-y border-gray-100">
+            <tr className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+              <th className="px-6 py-4">Nomor PO</th>
+              <th className="px-6 py-4">Tanggal Terbit</th>
+              <th className="px-6 py-4">Nama Perusahaan</th>
+              <th className="px-6 py-4">Lokasi Proyek</th>
+              <th className="px-6 py-4">Jenis Pengadaan</th>
+              <th className="px-6 py-4 text-center">Status / Tahapan</th>
+              <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-50 text-sm">
+            {isLoading && (
+              <tr>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400 text-sm">
+                  Memuat data...
+                </td>
+              </tr>
+            )}
+            {isError && (
+              <tr>
+                <td colSpan={7} className="px-6 py-10 text-center text-red-400 text-sm">
+                  Gagal memuat data.
+                </td>
+              </tr>
+            )}
+            {!isLoading && !isError && data?.data.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-300 text-sm">
+                  Tidak ada data pengadaan aktif.
+                </td>
+              </tr>
+            )}
+            {!isError && data?.data.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="px-6 py-5 font-bold text-slate-700 uppercase">
+                  {item.nomorPenawaran}
+                </td>
+                <td className="px-6 py-5 text-gray-500">
+                  {formatTanggal(item.tanggalTerbit || item.tanggalMasuk)}
+                </td>
+                <td className="px-6 py-5 font-bold text-slate-700">
+                  {item.perusahaanName || "—"}
+                </td>
+                <td className="px-6 py-5 text-gray-500">
+                  {item.lokasiProyek || "—"}
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex flex-wrap gap-1">
+                    {item.jenisPenawaran?.map((jenis) => (
+                      <span
+                        key={jenis}
+                        className="px-2 py-0.5 bg-gray-100 text-slate-600 rounded text-[10px] font-bold border border-gray-200 uppercase"
+                      >
+                        {jenis.replace("_", " ")}
+                      </span>
+                    )) || "—"}
+                  </div>
+                </td>
+                <td className="px-6 py-5 text-center">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                    {formatStepName(item.stepSaatIni)}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <Link
+                    to={`/penawaran/${item.id}`}
+                    className="inline-flex items-center gap-1 text-cyan-500 font-bold hover:text-cyan-600 transition-colors"
+                  >
+                    Lihat Detail <ArrowRight size={14} />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      {data && data.meta.totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <p className="text-xs text-gray-400">
+            Menampilkan {data.data.length} dari {data.meta.total} data
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Sebelumnya
+            </button>
+            <span className="text-xs text-gray-500">
+              {page} / {data.meta.totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
+              disabled={page === data.meta.totalPages}
+              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Berikutnya
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: PengadaanAktif['status'] }) {
-  const styles = {
-    "Penyusunan WO": "bg-blue-50 text-blue-600 border-blue-100",
-    "Perlu tindakan": "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5] ring-1 ring-[#fed7aa]",
-    "Pengiriman Terjadwal": "bg-green-50 text-green-600 border-green-100",
-    "Pembelian Barang": "bg-orange-50 text-orange-600 border-orange-100",
-  };
-
-  return (
-    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold border ${styles[status]}`}>
-      {status === "Perlu tindakan" && "⚠️"} {status}
-    </span>
   );
 }

@@ -1,10 +1,6 @@
 import { useState } from "react";
 import {
-  // Search,
-  // Filter,
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   Plus,
 } from "lucide-react";
 import TablePermintaanPenawaran from "./TablePermintaanPenawaran";
@@ -152,29 +148,6 @@ export default function ListPengadaan() {
           </div> */}
 
           {renderTable()}
-
-          {/* Footer */}
-          <div className="p-4 flex items-center justify-between border-t border-gray-100 text-[11px] text-gray-400">
-            <p>
-              Menampilkan <span className="font-bold text-gray-700">6</span>{" "}
-              dari <span className="font-bold text-gray-700">42</span> data
-            </p>
-            <div className="flex items-center gap-1">
-              <button className="p-1">
-                <ChevronLeft size={16} />
-              </button>
-              <button className="w-7 h-7 rounded bg-cyan-500 text-white font-bold">
-                1
-              </button>
-              <button className="w-7 h-7 rounded hover:bg-gray-100">2</button>
-              <button className="w-7 h-7 rounded hover:bg-gray-100">3</button>
-              <span className="px-1">...</span>
-              <button className="w-7 h-7 rounded hover:bg-gray-100">7</button>
-              <button className="p-1">
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

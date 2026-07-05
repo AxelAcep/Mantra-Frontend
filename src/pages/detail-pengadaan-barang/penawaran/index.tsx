@@ -6,7 +6,7 @@ import Step1 from "./step1/index";
 import Step2 from "./step2/index";
 import Step3 from "./step3/index";
 import Step4 from "./step4/index";
-import Step5 from "./step5";
+import Step5 from "./step5/index";
 import Step6 from "./step6";
 import Step7 from "./step7";
 import Step8 from "./accounting/index";
@@ -121,6 +121,7 @@ const STEP_LABELS: Record<number, string> = {
   9: "Garansi",
 };
 
+
 // ─── Main Component ─────────────────────────────────────────────────────────
 export default function PenawaranPage() {
   const { id } = useParams<{ id: string }>();
@@ -132,10 +133,20 @@ export default function PenawaranPage() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [revisionTarget, setRevisionTarget] = useState<
-    "step1" | "step2" | "step4"
+    "step1" | "step2" | "step4" | "step5"
   >("step1");
 
   const [step4Info, setStep4Info] = useState<{
+    status: string;
+    canAcc: boolean;
+    canKonfirmasiUlang: boolean;
+    isUpdating: boolean;
+    onAcc: () => void;
+    onPerluTindakan: (alasan: string) => void;
+    onKonfirmasiUlang: () => void;
+  } | null>(null);
+
+  const [step5Info, setStep5Info] = useState<{
     status: string;
     canAcc: boolean;
     canKonfirmasiUlang: boolean;
@@ -197,6 +208,9 @@ export default function PenawaranPage() {
   // Step 4
   const isStep4Selesai = step4Info?.status === "SELESAI";
 
+  // Step 5
+  const isStep5Selesai = getStepNumber(penawaran?.stepSaatIni) > 5;
+
   //Accounting
   const canAccessAccounting =
     [
@@ -211,8 +225,9 @@ export default function PenawaranPage() {
     (activeStep === 1 && !isPermintaanSelesai) ||
     (activeStep === 2 && !isBoQSelesai) ||
     (activeStep === 3 && !isReviewInternalSelesai) ||
-    (activeStep === 4 && !isStep4Selesai) || // ✅ tambah ini
-    activeStep >= 5; // ✅ ubah dari >= 4 ke >= 5
+    (activeStep === 4 && !isStep4Selesai) ||
+    (activeStep === 5 && !isStep5Selesai) ||
+    activeStep >= 6;
 
   // ── Handlers ───────────────────────────────────────────────────────────
   function handleKonfirmasiStep1() {
@@ -242,7 +257,7 @@ export default function PenawaranPage() {
     updateStatusBoQ({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan });
   }
 
-  function openRevisionModal(target: "step1" | "step2" | "step4") {
+  function openRevisionModal(target: "step1" | "step2" | "step4" | "step5") {
     setRevisionTarget(target);
     setIsRevisionModalOpen(true);
   }
@@ -250,7 +265,8 @@ export default function PenawaranPage() {
   function handleRevisionConfirm(alasan: string) {
     if (revisionTarget === "step1") handleTolakStep1(alasan);
     else if (revisionTarget === "step2") handleTolakStep2(alasan);
-    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan); // ✅ bukan handleTolakStep4
+    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan);
+    else if (revisionTarget === "step5") step5Info?.onPerluTindakan(alasan);
     setIsRevisionModalOpen(false);
   }
 
@@ -328,7 +344,13 @@ export default function PenawaranPage() {
                   onStatusChange={setStep4Info} // ✅
                 />
               )}
-              {activeStep === 5 && <Step5 />}
+              {activeStep === 5 && (
+                <Step5
+                  trackingId={trackingId}
+                  onChatClick={() => setIsChatOpen(true)}
+                  onStatusChange={setStep5Info}
+                />
+              )}
               {activeStep === 6 && <Step6 />}
               {activeStep === 7 && <Step7 />}
               {activeStep === 8 && (
@@ -446,6 +468,37 @@ export default function PenawaranPage() {
               className="bg-emerald-400 hover:bg-emerald-600"
             >
               {step4Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
+            </Button>
+          )}
+
+          {activeStep === 5 && step5Info?.canAcc && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step5")}
+                disabled={step5Info.isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Perlu Tindakan
+              </Button>
+              <Button
+                onClick={step5Info.onAcc}
+                disabled={step5Info.isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {step5Info.isUpdating ? "Memproses..." : "Approve"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 5: Sales — Konfirmasi Ulang */}
+          {activeStep === 5 && step5Info?.canKonfirmasiUlang && (
+            <Button
+              onClick={step5Info.onKonfirmasiUlang}
+              disabled={step5Info.isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {step5Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
             </Button>
           )}
 

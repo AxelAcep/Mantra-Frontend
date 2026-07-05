@@ -14,7 +14,7 @@ interface Props {
   onChatClick: () => void;
 }
 
-export default function ActivityLogSectionReviewInternal({
+export default function ActivityLogSectionFollowUp({
   logs,
   onChatClick,
 }: Props) {
