@@ -7,7 +7,7 @@ import Step2 from "./step2/index";
 import Step3 from "./step3/index";
 import Step4 from "./step4/index";
 import Step5 from "./step5/index";
-import Step6 from "./step6";
+import Step6 from "./step6/index";
 import Step7 from "./step7";
 import Step8 from "./accounting/index";
 import Step9 from "./step9";
@@ -351,7 +351,12 @@ export default function PenawaranPage() {
                   onStatusChange={setStep5Info}
                 />
               )}
-              {activeStep === 6 && <Step6 />}
+              {activeStep === 6 && (
+                <Step6
+                  trackingId={trackingId}
+                  onChatClick={() => setIsChatOpen(true)}
+                />
+              )}
               {activeStep === 7 && <Step7 />}
               {activeStep === 8 && (
                 <Step8
