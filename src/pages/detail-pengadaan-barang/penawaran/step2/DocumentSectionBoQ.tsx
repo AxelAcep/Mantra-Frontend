@@ -17,6 +17,8 @@ interface DocumentSectionBoQProps {
     id: string;
     judul: string;
     createdAt: string;
+    targetSelesai?: string;
+    pegawai?: { nama?: string; divisi?: string };
   };
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
@@ -67,11 +69,14 @@ export default function DocumentSectionBoQ({
                     {activity.judul}
                   </p>
                   <p className="text-sm text-gray-400">
-                    {new Date(activity.createdAt).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {activity.targetSelesai
+                      ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "—"}
                   </p>
                 </div>
               </div>

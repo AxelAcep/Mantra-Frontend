@@ -60,6 +60,8 @@ export interface ActivityDetail {
   judul: string;
   status: string;
   createdAt: string;
+  targetSelesai?: string;
+  pegawai?: { id?: string; nama?: string; divisi?: string };
 }
 
 export interface FollowUpResponse {

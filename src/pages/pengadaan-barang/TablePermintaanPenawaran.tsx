@@ -145,8 +145,8 @@ export default function TablePermintaanPenawaran() {
                 <tr
                   key={item.id}
                   className={`transition-colors ${status === "PERLU_TINDAKAN"
-                      ? "bg-[#fffbeb]"
-                      : "hover:bg-gray-50/50"
+                    ? "bg-[#fffbeb]"
+                    : "hover:bg-gray-50/50"
                     }`}
                 >
                   <td className="px-6 py-5 text-gray-500">
@@ -173,8 +173,8 @@ export default function TablePermintaanPenawaran() {
                       <StatusBadge status={status} />
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-gray-400 font-medium">
-                    {item.stepSaatIni ?? "—"}
+                  <td className="px-6 py-5 text-gray-400 font-medium text-center">
+                    {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
                   </td>
                   <td className="px-6 py-5 text-right">
                     <Link

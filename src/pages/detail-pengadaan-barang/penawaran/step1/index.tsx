@@ -76,6 +76,8 @@ export default function Step1({
                 id: data.permintaanMasuk.activity.id,
                 judul: data.permintaanMasuk.activity.judul,
                 createdAt: data.permintaanMasuk.activity.waktuMulai,
+                targetSelesai: data.permintaanMasuk.activity.targetSelesai,
+                pegawai: data.permintaanMasuk.activity.pegawai,
               }
               : undefined
           }

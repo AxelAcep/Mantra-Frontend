@@ -54,6 +54,7 @@ export interface ActivityInfo {
   status: string;
   targetSelesai: string;
   waktuMulai: string;
+  pegawai?: { id?: string; nama?: string; divisi?: string };
 }
 
 export interface PenawaranDokumen {

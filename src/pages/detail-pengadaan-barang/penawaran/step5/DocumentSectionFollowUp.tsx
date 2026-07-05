@@ -7,8 +7,8 @@ import type { FollowUpDokumen } from "@/services/follow-up.services";
 interface DocumentSectionFollowUpProps {
   dokumen: FollowUpDokumen[];
   isUploading: boolean;
-  activityAdmin?: { id: string; judul: string; status: string; createdAt: string; pegawai?: { nama: string } };
-  activitySales?: { id: string; judul: string; status: string; createdAt: string; pegawai?: { nama: string } };
+  activityAdmin?: { id: string; judul: string; status: string; createdAt: string; targetSelesai?: string; pegawai?: { nama?: string; divisi?: string } };
+  activitySales?: { id: string; judul: string; status: string; createdAt: string; targetSelesai?: string; pegawai?: { nama?: string; divisi?: string } };
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
 }
@@ -74,11 +74,14 @@ export default function DocumentSectionFollowUp({
                       {act.judul}
                     </p>
                     <p className="text-sm text-gray-400">
-                      {new Date(act.createdAt).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {act.pegawai?.nama ?? "—"} · {act.role} ·{" "}
+                      {act.targetSelesai
+                        ? new Date(act.targetSelesai).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "—"}
                     </p>
                   </div>
                 </div>

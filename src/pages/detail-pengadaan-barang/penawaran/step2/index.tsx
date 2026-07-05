@@ -198,6 +198,8 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
                   id: boqData.activity.id,
                   judul: boqData.activity.judul || "Penyusunan BoQ",
                   createdAt: boqData.activity.waktuMulai || boqData.createdAt,
+                  targetSelesai: boqData.activity.targetSelesai,
+                  pegawai: boqData.activity.pegawai,
                 }
               : undefined
           }
