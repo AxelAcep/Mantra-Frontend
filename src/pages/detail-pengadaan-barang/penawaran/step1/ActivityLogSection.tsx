@@ -20,7 +20,7 @@ export default function ActivityLogSection({
   const displayed = showAll ? sorted : sorted.slice(0, LIMIT);
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 sticky top-6">
+    <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 sticky top-20 z-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
@@ -43,17 +43,15 @@ export default function ActivityLogSection({
       ) : (
         <>
           <div
-            className={`max-h-[70vh] space-y-4 overflow-y-auto transition-all ${
-              showAll ? "max-h-[70vh]" : ""
-            }`}
+            className={`max-h-[70vh] space-y-4 overflow-y-auto transition-all ${showAll ? "max-h-[70vh]" : ""
+              }`}
           >
             {displayed.map((log) => (
               <div key={log.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-2 h-2 rounded-full mt-1 shrink-0 ${
-                      log.type === "system" ? "bg-cyan-400" : "bg-slate-300"
-                    }`}
+                    className={`w-2 h-2 rounded-full mt-1 shrink-0 ${log.type === "system" ? "bg-cyan-400" : "bg-slate-300"
+                      }`}
                   />
                   <div className="w-px flex-1 bg-slate-100 mt-1" />
                 </div>

@@ -62,7 +62,7 @@ export function useUpdateStatusReviewInternal(trackingId: string) {
       alasanPenolakan?: string;
     }) => updateStatusReviewInternal(trackingId, status, alasanPenolakan),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["penawaran", trackingId] });
+      qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
       qc.invalidateQueries({
         queryKey: ["review-internal-detail", trackingId],
       });

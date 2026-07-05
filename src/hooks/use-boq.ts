@@ -74,7 +74,7 @@ export function useUpdateStatusBoQ(trackingId: string) {
     onSuccess: () => {
       // Mengambil ulang data detail penawaran agar step selanjutnya terbuka
       // Sesuaikan key query dengan yang Anda gunakan di useDetailPenawaran
-      queryClient.invalidateQueries({ queryKey: ["penawaran", trackingId] });
+      queryClient.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
       queryClient.invalidateQueries({ queryKey: ["boq-detail", trackingId] });
     },
     onError: (error: Error) => {

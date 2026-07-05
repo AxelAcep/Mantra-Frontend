@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageCircle, Activity } from "lucide-react";
 
 interface LogItem {
   id: number;
@@ -33,12 +33,15 @@ export default function ActivityLogSectionPersetujuan({
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
-        <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <Activity size={16} className="text-cyan-500" />
+          Log Aktivitas
+        </div>
         <button
           onClick={onChatClick}
-          className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-all shadow-sm active:scale-95"
+          className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
         >
-          <MessageSquare size={14} />
+          <MessageCircle size={13} />
           Chat
         </button>
       </div>

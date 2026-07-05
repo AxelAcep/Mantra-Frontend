@@ -41,6 +41,8 @@ const getMenuOperasional = (unreadCount: number, role?: string): MenuItem[] => {
     { title: "Notifikasi", icon: Icons.Notifikasi, url: "/notifikasi", badge: unreadCount }
   );
 
+  menu.push({ title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang" });
+
   if (role === "MASTER") {
     menu.push({ title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" });
   }

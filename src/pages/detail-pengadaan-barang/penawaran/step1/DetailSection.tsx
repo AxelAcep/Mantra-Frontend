@@ -190,6 +190,7 @@ function WorkTimeCard({
 }) {
   const progress = React.useMemo(() => {
     if (!activity) return 0;
+    if (activity.status === "SELESAI" || activity.status === "DITERIMA") return 100;
     const start = new Date(activity.waktuMulai).getTime();
     const end = new Date(activity.targetSelesai).getTime();
     // eslint-disable-next-line react-hooks/purity
@@ -203,7 +204,7 @@ function WorkTimeCard({
 
   const sisaWaktu = React.useMemo(() => {
     if (!activity) return "-";
-    if (activity.status == "DITERIMA") return "Selesai";
+    if (activity.status === "DITERIMA" || activity.status === "SELESAI") return "Selesai";
     // eslint-disable-next-line react-hooks/purity
     const diff = new Date(activity.targetSelesai).getTime() - Date.now();
     if (diff <= 0) return "Waktu habis";
@@ -214,9 +215,9 @@ function WorkTimeCard({
 
   const batasWaktu = activity
     ? new Date(activity.targetSelesai).toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }) + " WIB"
+      hour: "2-digit",
+      minute: "2-digit",
+    }) + " WIB"
     : "-";
 
   const statusLabel =
@@ -227,7 +228,7 @@ function WorkTimeCard({
         : (activity?.status ?? "-");
 
   const progressColor =
-    activity?.status === "DITERIMA"
+    activity?.status === "DITERIMA" || activity?.status === "SELESAI"
       ? "bg-green-400"
       : progress >= 80
         ? "bg-red-400"
@@ -242,7 +243,10 @@ function WorkTimeCard({
           <Clock3 size={16} className="text-cyan-500" />
           <span>Waktu Pengerjaan</span>
         </div>
-        <span className="text-[11px] bg-amber-50 text-amber-500 px-3 py-1 rounded-full font-bold uppercase tracking-tight">
+        <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${activity?.status === "SELESAI" || activity?.status === "DITERIMA"
+          ? "bg-cyan-50 text-cyan-600"
+          : "bg-amber-50 text-amber-500"
+          }`}>
           {statusLabel}
         </span>
       </div>

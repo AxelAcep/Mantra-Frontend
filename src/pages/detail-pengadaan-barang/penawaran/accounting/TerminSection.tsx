@@ -369,7 +369,8 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                       onChange={(e) =>
                         updateDraft(draft.id, { deadline: e.target.value })
                       }
-                      className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      onClick={(e) => e.currentTarget.showPicker()}
+                      className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -399,16 +400,14 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-32 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${
-                  totalDraftPersen > 100 ? "bg-red-400" : "bg-cyan-400"
-                }`}
+                className={`h-full rounded-full transition-all ${totalDraftPersen > 100 ? "bg-red-400" : "bg-cyan-400"
+                  }`}
                 style={{ width: `${Math.min(totalDraftPersen, 100)}%` }}
               />
             </div>
             <span
-              className={`text-[10px] font-bold ${
-                totalDraftPersen > 100 ? "text-red-500" : "text-cyan-600"
-              }`}
+              className={`text-[10px] font-bold ${totalDraftPersen > 100 ? "text-red-500" : "text-cyan-600"
+                }`}
             >
               {totalDraftPersen.toFixed(0)}% / 100%
             </span>
@@ -511,9 +510,8 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
 
               <div className="flex-1">
                 <div
-                  className={`border border-gray-100 rounded-xl overflow-hidden transition-all duration-300 ${
-                    isExpanded ? `shadow-md ${card}` : "hover:border-gray-200"
-                  }`}
+                  className={`border border-gray-100 rounded-xl overflow-hidden transition-all duration-300 ${isExpanded ? `shadow-md ${card}` : "hover:border-gray-200"
+                    }`}
                 >
                   {/* Header */}
                   <div
@@ -526,13 +524,12 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                           Termin {item.index}
                         </h4>
                         <Badge
-                          className={`text-[9px] font-bold border-0 px-2 py-0.5 rounded-full ${
-                            item.sudahDibayar
+                          className={`text-[9px] font-bold border-0 px-2 py-0.5 rounded-full ${item.sudahDibayar
                               ? "bg-cyan-50 text-cyan-500"
                               : item.flag === "LEWAT"
                                 ? "bg-red-50 text-red-500"
                                 : "bg-amber-50 text-amber-500"
-                          }`}
+                            }`}
                         >
                           {label}
                         </Badge>
@@ -674,7 +671,8 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                                     deadline: e.target.value,
                                   })
                                 }
-                                className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                                onClick={(e) => e.currentTarget.showPicker()}
+                                className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer"
                               />
                             </div>
                           </div>
