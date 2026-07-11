@@ -7,7 +7,7 @@ import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
 
 interface Step5Props {
   trackingId: string;
-  onChatClick: () => void;
+  onChatClick: (activityId: string, activityJudul: string) => void;
   onStatusChange?: (info: {
     status: string;
     canAcc: boolean;
@@ -196,6 +196,7 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
           isUploading={uploadMut.isPending}
           activityAdmin={data.activityAdmin}
           activitySales={data.activitySales}
+          onChatClick={onChatClick}
           onUpload={(file) => uploadMut.mutate({ file })}
           onDelete={(id) => deleteMut.mutate(id)}
         />
@@ -204,7 +205,6 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSectionFollowUp
           logs={mappedLogs}
-          onChatClick={onChatClick}
         />
       </div>
     </div>

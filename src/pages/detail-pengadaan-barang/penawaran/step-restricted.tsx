@@ -18,7 +18,7 @@ export default function StepRestricted({ currentStepName }: StepRestrictedProps)
       </div>
 
       <h2 className="text-2xl font-bold text-slate-800 mb-3 text-center">
-        Tahap Belum Diakses
+        Tahap Tidak Dapat Diakses
       </h2>
 
       <p className="text-slate-500 text-center max-w-md leading-relaxed font-medium">

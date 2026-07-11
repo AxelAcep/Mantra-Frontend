@@ -22,7 +22,7 @@ interface Step1Props {
   mode: Mode;
   trackingId: string;
   data?: TrackingPenawaranDetail;
-  onChatClick: () => void;
+  onChatClick: (activityId: string, activityJudul: string) => void;
 }
 
 function SectionHeading({ title }: { title: string }) {
@@ -70,6 +70,7 @@ export default function Step1({
           trackingId={trackingId}
           permintaanMasukId={data?.permintaanMasuk?.id}
           dokumen={data?.permintaanMasuk?.dokumen ?? []}
+          onChatClick={onChatClick}
           activity={
             data?.permintaanMasuk?.activity
               ? {
@@ -88,7 +89,6 @@ export default function Step1({
         <ActivityLogSection
           logs={logs}
           onAddLog={() => { }}
-          onChatClick={onChatClick}
         />
       </div>
 

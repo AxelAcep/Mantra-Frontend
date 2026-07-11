@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FileText,
   Plus,
@@ -8,7 +9,18 @@ import {
   X,
   Search,
   Package,
+  ArrowRight,
+  MessageCircle,
 } from "lucide-react";
+import {
+  useAddBarangImplementasi,
+  useUpdateBarangImplementasi,
+  useDeleteBarangImplementasi,
+  useDetailImplementasi,
+} from "@/hooks/use-implementasi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useUnreadChatCount } from "@/hooks/use-activity";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -238,7 +250,7 @@ function FormCard({ isEdit, draft, onUpdate, onSave, onCancel }: FormCardProps) 
           <span className="text-sm font-bold text-cyan-600">
             {formatCurrency(
               parseFloat(draft.qty || "0") *
-                parseFloat(draft.hargaSatuan || "0"),
+              parseFloat(draft.hargaSatuan || "0"),
             )}
           </span>
         </div>
@@ -267,12 +279,27 @@ function FormCard({ isEdit, draft, onUpdate, onSave, onCancel }: FormCardProps) 
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
-export default function BarangSection() {
-  const [items, setItems] = useState<BarangItem[]>([]);
+interface BarangSectionProps {
+  trackingId?: string;
+  activityPembelian?: any;
+  onChatClick: (activityId: string, activityJudul: string) => void;
+}
+
+export default function BarangSection({ trackingId, activityPembelian, onChatClick }: BarangSectionProps) {
+  const navigate = useNavigate();
+  const { data: implData } = useDetailImplementasi(trackingId);
+  const { data: unreadChat = 0 } = useUnreadChatCount(activityPembelian?.id ?? "");
+
+  const addBarangMut = useAddBarangImplementasi(trackingId ?? "");
+  const updateBarangMut = useUpdateBarangImplementasi(trackingId ?? "");
+  const deleteBarangMut = useDeleteBarangImplementasi(trackingId ?? "");
+
+  const items = (implData?.barang as any as BarangItem[]) ?? [];
   const [search, setSearch] = useState("");
   const [formMode, setFormMode] = useState<"add" | "edit" | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<FormDraft>(emptyDraft());
+  const [deleteTarget, setDeleteTarget] = useState<BarangItem | null>(null);
 
   function updateDraft(patch: Partial<FormDraft>) {
     setDraft((prev) => ({ ...prev, ...patch }));
@@ -304,8 +331,7 @@ export default function BarangSection() {
   }
 
   function handleSaveAdd() {
-    const newItem: BarangItem = {
-      id: makeid(),
+    const newItem = {
       namaBarang: draft.namaBarang.trim(),
       status: draft.status,
       qty: parseFloat(draft.qty),
@@ -314,39 +340,54 @@ export default function BarangSection() {
       metode: draft.metode,
       estimasiKedatangan: draft.estimasiKedatangan || undefined,
     };
-    setItems((prev) => [...prev, newItem]);
-    setFormMode(null);
-    setDraft(emptyDraft());
+    addBarangMut.mutate(newItem, {
+      onSuccess: () => {
+        setFormMode(null);
+        setDraft(emptyDraft());
+      },
+    });
   }
 
   function handleSaveEdit() {
     if (!editingId) return;
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === editingId
-          ? {
-              ...item,
-              namaBarang: draft.namaBarang.trim(),
-              status: draft.status,
-              qty: parseFloat(draft.qty),
-              satuan: draft.satuan,
-              hargaSatuan: parseFloat(draft.hargaSatuan),
-              metode: draft.metode,
-              estimasiKedatangan: draft.estimasiKedatangan || undefined,
-            }
-          : item,
-      ),
+    const updatedItem = {
+      namaBarang: draft.namaBarang.trim(),
+      status: draft.status,
+      qty: parseFloat(draft.qty),
+      satuan: draft.satuan,
+      hargaSatuan: parseFloat(draft.hargaSatuan),
+      metode: draft.metode,
+      estimasiKedatangan: draft.estimasiKedatangan || undefined,
+    };
+    updateBarangMut.mutate(
+      {
+        barangId: editingId,
+        payload: updatedItem,
+      },
+      {
+        onSuccess: () => {
+          setFormMode(null);
+          setEditingId(null);
+        },
+      },
     );
-    setFormMode(null);
-    setEditingId(null);
   }
 
-  function handleDelete(id: string) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    if (editingId === id) {
-      setFormMode(null);
-      setEditingId(null);
-    }
+  function handleDelete(item: BarangItem) {
+    setDeleteTarget(item);
+  }
+
+  function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    deleteBarangMut.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        if (editingId === deleteTarget.id) {
+          setFormMode(null);
+          setEditingId(null);
+        }
+        setDeleteTarget(null);
+      },
+    });
   }
 
   // ── Derived ──────────────────────────────────────────────────────────────────
@@ -500,11 +541,10 @@ export default function BarangSection() {
                   {filtered.map((item) => (
                     <tr
                       key={item.id}
-                      className={`border-b border-gray-50 last:border-0 transition-all ${
-                        editingId === item.id
+                      className={`border-b border-gray-50 last:border-0 transition-all ${editingId === item.id
                           ? "bg-cyan-50/20"
                           : "bg-white hover:bg-slate-50/30"
-                      }`}
+                        }`}
                     >
                       <td className="px-4 py-4">
                         <p className="text-xs font-bold text-slate-800">
@@ -513,11 +553,10 @@ export default function BarangSection() {
                       </td>
                       <td className="px-4 py-4 text-center">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            item.status === "Ready"
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.status === "Ready"
                               ? "bg-green-50 text-green-500"
                               : "bg-amber-50 text-amber-500"
-                          }`}
+                            }`}
                         >
                           {item.status}
                         </span>
@@ -555,17 +594,16 @@ export default function BarangSection() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className={`transition-colors ${
-                              editingId === item.id
+                            className={`transition-colors ${editingId === item.id
                                 ? "text-cyan-500"
                                 : "text-gray-400 hover:text-cyan-500"
-                            }`}
+                              }`}
                             title="Edit"
                           >
                             <Pencil size={14} />
                           </button>
                           <button
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => handleDelete(item)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
                             title="Hapus"
                           >
@@ -589,26 +627,109 @@ export default function BarangSection() {
         )}
       </div>
 
-      {/* Logbook Operasional — Kosong */}
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
-        <div className="p-4 border-b border-gray-100/80 flex items-center gap-2">
-          <FileText size={16} className="text-cyan-500" />
-          <h3 className="font-bold text-slate-800 text-sm">
+      {/* Logbook Operasional */}
+      <div className="bg-white border border-gray-100 rounded-xl shadow-sm text-left">
+        <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+            <FileText size={16} className="text-cyan-500" />
             Logbook Operasional Pembelian Barang
-          </h3>
-        </div>
-        <div className="p-8 flex flex-col items-center gap-3 text-center">
-          <div className="p-3 bg-slate-50 rounded-full">
-            <FileText size={24} className="text-slate-300" />
           </div>
-          <p className="text-sm font-medium text-slate-400">
-            Belum ada logbook operasional
-          </p>
-          <p className="text-xs text-slate-400">
-            Logbook akan muncul setelah ada aktivitas pada tahap ini
-          </p>
+        </div>
+        <div className="p-6">
+          {activityPembelian ? (
+            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">
+                    {activityPembelian.judul}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {activityPembelian.pegawai?.nama ?? "—"} · {activityPembelian.pegawai?.divisi ?? "—"} ·{" "}
+                    {activityPembelian.targetSelesai
+                      ? new Date(activityPembelian.targetSelesai).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  onClick={() => onChatClick(activityPembelian.id, activityPembelian.judul)}
+                  className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
+                >
+                  <MessageCircle size={13} /> Chat
+                  {unreadChat > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                      {unreadChat > 9 ? "9+" : unreadChat}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => navigate(`/dailyactivity/${activityPembelian.id}`)}
+                  className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                >
+                  Lihat Detail <ArrowRight size={14} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 flex flex-col items-center gap-3 text-center">
+              <div className="p-3 bg-slate-50 rounded-full">
+                <FileText size={24} className="text-slate-300" />
+              </div>
+              <p className="text-sm font-medium text-slate-400">
+                Belum ada logbook operasional
+              </p>
+              <p className="text-xs text-slate-400">
+                Logbook akan muncul setelah ada aktivitas pada tahap ini
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* ── Dialog Konfirmasi Hapus ── */}
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(v) => { if (!v) setDeleteTarget(null) }}
+      >
+        <DialogContent className="sm:max-w-[400px] bg-white rounded-2xl p-6 gap-0">
+          <DialogHeader className="mb-3">
+            <DialogTitle className="text-lg font-bold text-gray-900">
+              Hapus Barang
+            </DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-gray-600 mb-1">
+            Apakah Anda yakin ingin menghapus barang ini?
+          </p>
+          <p className="text-sm font-semibold text-gray-800 mb-6 truncate">
+            📦 {deleteTarget?.namaBarang}
+          </p>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              className="border-gray-200 text-gray-600 font-semibold"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold"
+            >
+              Ya, hapus
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

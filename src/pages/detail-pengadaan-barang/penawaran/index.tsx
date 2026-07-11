@@ -131,6 +131,14 @@ export default function PenawaranPage() {
 
   const [activeStep, setActiveStep] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [activeChatJudul, setActiveChatJudul] = useState<string>("");
+
+  function handleOpenChat(activityId: string, judul: string) {
+    setActiveChatId(activityId);
+    setActiveChatJudul(judul);
+    setIsChatOpen(true);
+  }
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [revisionTarget, setRevisionTarget] = useState<
     "step1" | "step2" | "step4" | "step5"
@@ -320,7 +328,7 @@ export default function PenawaranPage() {
                   mode={mode}
                   trackingId={trackingId}
                   data={penawaran}
-                  onChatClick={() => setIsChatOpen(true)}
+                  onChatClick={handleOpenChat}
                 />
               )}
               {activeStep === 2 && (
@@ -328,40 +336,37 @@ export default function PenawaranPage() {
                   mode={mode}
                   trackingId={trackingId}
                   data={penawaran}
-                  onChatClick={() => setIsChatOpen(true)}
+                  onChatClick={handleOpenChat}
                 />
               )}
               {activeStep === 3 && (
                 <Step3
                   trackingId={trackingId}
-                  onChatClick={() => setIsChatOpen(true)}
                 />
               )}
               {activeStep === 4 && (
                 <Step4
                   trackingId={trackingId}
-                  onChatClick={() => setIsChatOpen(true)}
                   onStatusChange={setStep4Info} // ✅
                 />
               )}
               {activeStep === 5 && (
                 <Step5
                   trackingId={trackingId}
-                  onChatClick={() => setIsChatOpen(true)}
+                  onChatClick={handleOpenChat}
                   onStatusChange={setStep5Info}
                 />
               )}
               {activeStep === 6 && (
                 <Step6
                   trackingId={trackingId}
-                  onChatClick={() => setIsChatOpen(true)}
+                  onChatClick={handleOpenChat}
                 />
               )}
               {activeStep === 7 && <Step7 />}
               {activeStep === 8 && (
                 <Step8
                   trackingId={trackingId}
-                  onChatClick={() => setIsChatOpen(true)}
                 />
               )}
               {activeStep === 9 && <Step9 />}
@@ -530,13 +535,18 @@ export default function PenawaranPage() {
       />
 
       {/* Chat Panel */}
-      <PenawaranChatPanel
-        activityId={trackingId}
-        activityJudul={`Chat · ${penawaran?.nomorPenawaran ?? ""}`}
-        open={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        currentPegawaiId={userInfo.pegawaiId}
-      />
+      {activeChatId && (
+        <PenawaranChatPanel
+          activityId={activeChatId}
+          activityJudul={activeChatJudul}
+          open={isChatOpen}
+          onClose={() => {
+            setIsChatOpen(false);
+            setActiveChatId(null);
+          }}
+          currentPegawaiId={userInfo.pegawaiId}
+        />
+      )}
     </div>
   );
 }

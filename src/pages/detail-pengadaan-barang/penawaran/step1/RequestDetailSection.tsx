@@ -55,7 +55,7 @@ function DetailField({
           {badges.map((badge) => (
             <span
               key={badge}
-              className="px-3 py-1 bg-cyan-50 text-cyan-600 text-[10px] font-bold rounded-full border border-cyan-100"
+              className="px-3 py-1 bg-slate-200 text-slate-500 text-[10px] font-bold rounded-full border border-slate-100"
             >
               {badge}
             </span>

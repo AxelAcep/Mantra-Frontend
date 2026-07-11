@@ -43,6 +43,7 @@ export interface FollowUpDokumen {
   namaFile: string;
   path: string;
   uploadedBy: string;
+  pegawai?: { id: string; nama: string; divisi?: string };
   followUpId: string;
   createdAt: string;
 }

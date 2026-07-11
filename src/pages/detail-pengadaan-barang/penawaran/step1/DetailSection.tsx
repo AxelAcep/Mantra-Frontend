@@ -220,12 +220,29 @@ function WorkTimeCard({
     }) + " WIB"
     : "-";
 
+  const isOverdue = React.useMemo(() => {
+    if (!activity) return false;
+    if (activity.status === "DITERIMA" || activity.status === "SELESAI") return false;
+    if (activity.status === "OVERDUE") return true;
+    return new Date(activity.targetSelesai).getTime() - Date.now() <= 0;
+  }, [activity]);
+
   const statusLabel =
     activity?.status === "ON_PROGRESS"
-      ? "Proses"
+      ? (isOverdue ? "Overdue" : "Proses")
       : activity?.status === "SELESAI"
         ? "Selesai"
         : (activity?.status ?? "-");
+
+  const statusColor = (() => {
+    if (activity?.status === "DITERIMA" || activity?.status === "SELESAI") {
+      return "bg-green-50 text-green-600";
+    }
+    if (isOverdue) {
+      return "bg-red-50 text-red-600";
+    }
+    return "bg-amber-50 text-amber-500";
+  })();
 
   const progressColor =
     activity?.status === "DITERIMA" || activity?.status === "SELESAI"
@@ -243,10 +260,7 @@ function WorkTimeCard({
           <Clock3 size={16} className="text-cyan-500" />
           <span>Waktu Pengerjaan</span>
         </div>
-        <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${activity?.status === "SELESAI" || activity?.status === "DITERIMA"
-          ? "bg-cyan-50 text-cyan-600"
-          : "bg-amber-50 text-amber-500"
-          }`}>
+        <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}>
           {statusLabel}
         </span>
       </div>

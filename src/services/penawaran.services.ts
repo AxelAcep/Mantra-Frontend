@@ -62,6 +62,7 @@ export interface PenawaranDokumen {
   namaFile: string;
   path: string;
   uploadedBy: string;
+  pegawai?: { id: string; nama: string; divisi?: string };
   createdAt: string;
 }
 

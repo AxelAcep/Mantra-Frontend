@@ -23,7 +23,7 @@ export interface Step2Props {
   mode: Mode;
   trackingId: string;
   data?: TrackingPenawaranDetail;
-  onChatClick: () => void;
+  onChatClick: (activityId: string, activityJudul: string) => void;
   financial?: FinancialSummary;
   workingTime?: WorkingTime;
 }
@@ -40,6 +40,7 @@ function SectionHeading({ title }: { title: string }) {
 function calculateWorkingTime(
   waktuMulaiStr: string,
   targetSelesaiStr: string,
+  activityStatus?: string,
 ): WorkingTime {
   const sekarang = new Date();
   const mulai = waktuMulaiStr ? new Date(waktuMulaiStr) : new Date();
@@ -80,7 +81,9 @@ function calculateWorkingTime(
   );
 
   let status = "On Progress";
-  if (sisaMilidetik <= 0) {
+  if (activityStatus === "DITERIMA" || activityStatus === "SELESAI") {
+    status = "Selesai";
+  } else if (sisaMilidetik <= 0) {
     status = "Overdue";
     percentage = 100;
   } else if (remainingHours <= 24) {
@@ -137,7 +140,7 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
   const rawWaktuMulai =
     boqData?.activity?.waktuMulai || boqData?.createdAt || "";
   const rawTargetSelesai = boqData?.activity?.targetSelesai || "";
-  const workingTimeData = calculateWorkingTime(rawWaktuMulai, rawTargetSelesai);
+  const workingTimeData = calculateWorkingTime(rawWaktuMulai, rawTargetSelesai, boqData?.activity?.status || boqData?.status);
 
   const mappedLogs: LogEntry[] =
     boqData?.logs?.map((log: any, index: number) => {
@@ -170,6 +173,8 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
       namaFile: doc.namaFile || "Dokumen Tanpa Nama",
       path: doc.path || "",
       createdAt: doc.createdAt || "",
+      uploadedBy: doc.uploadedBy || "",
+      pegawai: doc.pegawai,
     })) || [];
 
   return (
@@ -190,6 +195,7 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
           trackingId={trackingId}
           status={boqData?.status ?? "ON_PROGRESS"}
           dokumen={mappedDokumen}
+          onChatClick={onChatClick}
           onUpload={(file) => uploadMut.mutate({ file })}
           onDelete={(id) => deleteMut.mutate(id)}
           activity={
@@ -210,7 +216,6 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
         <ActivityLogSection
           logs={mappedLogs}
           onAddLog={() => {}}
-          onChatClick={onChatClick}
         />
       </div>
     </div>

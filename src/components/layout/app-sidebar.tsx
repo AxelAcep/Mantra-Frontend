@@ -125,7 +125,8 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
       const isActive =
         pathname === item.url ||
         pathname.startsWith(`${item.url}/`) ||
-        (item.url === "/dailyactivity" && pathname.includes("/kpi"));
+        (item.url === "/dailyactivity" && pathname.includes("/kpi")) ||
+        (item.url === "/pengadaan-barang" && pathname.startsWith("/penawaran"));
 
       if (hasChildren) {
         return (

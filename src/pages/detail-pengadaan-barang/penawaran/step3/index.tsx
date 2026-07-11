@@ -29,10 +29,9 @@ function SectionHeading({ title }: { title: string }) {
 
 interface Props {
   trackingId: string;
-  onChatClick: () => void;
 }
 
-export default function Step3({ trackingId, onChatClick }: Props) {
+export default function Step3({ trackingId }: Props) {
   const { data, loading, error, refetch } = useDetailReviewInternal(trackingId);
   const uploadMut = useUploadDokumenReviewInternal(trackingId);
   const deleteMut = useDeleteDokumenReviewInternal(trackingId);
@@ -177,7 +176,6 @@ export default function Step3({ trackingId, onChatClick }: Props) {
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSectionReviewInternal
           logs={mappedLogs}
-          onChatClick={onChatClick}
         />
       </div>
     </div>

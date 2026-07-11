@@ -35,17 +35,17 @@ export default function TrackingHeader({
 
           <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
             <span className="text-[16px] text-slate-500">{company}</span>
-            <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-sm font-medium rounded-xl border border-cyan-100">
+            <span className="px-3 py-1 bg-slate-200 text-slate-500 text-sm font-medium rounded-full border border-slate-100">
               {project}
             </span>
-            <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-sm font-medium rounded-xl border border-cyan-100">
+            <span className="px-3 py-1 bg-slate-200 text-slate-500 text-sm font-medium rounded-full border border-slate-100">
               {code}
             </span>
           </div>
         </div>
       </div>
 
-      <span className="self-start md:self-center px-6 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-full text-sm font-medium shadow-sm">
+      <span className="self-start md:self-center px-6 py-2 bg-yellow-50 text-yellow-700 border border-yellow-100 rounded-full text-sm font-medium shadow-sm">
         Status: {status}
       </span>
     </div>

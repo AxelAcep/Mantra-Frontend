@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   FileText,
@@ -9,10 +10,14 @@ import {
   X,
   Upload,
   Download,
+  ArrowRight,
+  MessageCircle,
 } from "lucide-react";
 import ActivityLogSection from "./ActivityLogSection";
 import type { LogEntry } from "./ActivityLogSection";
 import BarangSection from "./BarangSection";
+import { useDetailImplementasi, useUpdateDetailImplementasi } from "@/hooks/use-implementasi";
+import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -129,27 +134,86 @@ function OrderCard({
   );
 }
 
-// ─── Empty Logbook ─────────────────────────────────────────────────────────────
+// ─── Logbook Card ─────────────────────────────────────────────────────────────
 
-function EmptyLogbook({ title }: { title: string }) {
+interface LogbookCardProps {
+  title: string;
+  activity?: {
+    id: string;
+    judul: string;
+    targetSelesai?: string;
+    pegawai?: { nama?: string; divisi?: string };
+  };
+  onChatClick: (activityId: string, activityJudul: string) => void;
+}
+
+function LogbookCard({ title, activity, onChatClick }: LogbookCardProps) {
+  const navigate = useNavigate();
+  const { data: unreadChat = 0 } = useUnreadChatCount(activity?.id ?? "");
   return (
-    <div className="bg-white border border-gray-100 rounded-xl shadow-sm">
-      <div className="p-4 border-b border-gray-100/80">
+    <div className="bg-white border border-gray-100 rounded-xl shadow-sm text-left">
+      <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
           <FileText size={16} className="text-cyan-500" />
           {title}
         </div>
       </div>
-      <div className="p-8 flex flex-col items-center gap-3 text-center">
-        <div className="p-3 bg-slate-50 rounded-full">
-          <FileText size={24} className="text-slate-300" />
-        </div>
-        <p className="text-sm font-medium text-slate-400">
-          Belum ada logbook operasional
-        </p>
-        <p className="text-xs text-slate-400">
-          Logbook akan muncul setelah ada aktivitas pada tahap ini
-        </p>
+      <div className="p-6">
+        {activity ? (
+          <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                <FileText size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">
+                  {activity.judul}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
+                  {activity.targetSelesai
+                    ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "—"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => onChatClick(activity.id, activity.judul)}
+                className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
+              >
+                <MessageCircle size={13} /> Chat
+                {unreadChat > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                    {unreadChat > 9 ? "9+" : unreadChat}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => navigate(`/dailyactivity/${activity.id}`)}
+                className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
+              >
+                Lihat Detail <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-8 flex flex-col items-center gap-3 text-center">
+            <div className="p-3 bg-slate-50 rounded-full">
+              <FileText size={24} className="text-slate-300" />
+            </div>
+            <p className="text-sm font-medium text-slate-400">
+              Belum ada logbook operasional
+            </p>
+            <p className="text-xs text-slate-400">
+              Logbook akan muncul setelah ada aktivitas pada tahap ini
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -171,11 +235,10 @@ function TabButton({ value, label, activeTab, onClick }: TabButtonProps) {
   return (
     <button
       onClick={() => onClick(value)}
-      className={`py-4 text-sm whitespace-nowrap border-b-2 transition-all font-medium ${
-        isActive
+      className={`py-4 text-sm whitespace-nowrap border-b-2 transition-all font-medium ${isActive
           ? "border-cyan-500 text-cyan-500 font-bold"
           : "border-transparent text-gray-400 hover:text-gray-600"
-      }`}
+        }`}
     >
       {label}
     </button>
@@ -186,10 +249,10 @@ function TabButton({ value, label, activeTab, onClick }: TabButtonProps) {
 
 interface Step6Props {
   trackingId?: string;
-  onChatClick?: () => void;
+  onChatClick: (activityId: string, activityJudul: string) => void;
 }
 
-export default function Step6({ onChatClick }: Step6Props) {
+export default function Step6({ trackingId, onChatClick }: Step6Props) {
   const userInfo = getUserInfo();
   const canEditOrders =
     userInfo.role === "MASTER" ||
@@ -197,6 +260,10 @@ export default function Step6({ onChatClick }: Step6Props) {
 
   // ── Tab State ──
   const [activeTab, setActiveTab] = useState<Tab>("pembelian");
+
+  // ── Query & Mutation ──
+  const { data: implData, loading: implLoading } = useDetailImplementasi(trackingId);
+  const updateDetailMut = useUpdateDetailImplementasi(trackingId ?? "");
 
   // ── Order Info State ──
   const [orderInfo, setOrderInfo] = useState({
@@ -207,6 +274,19 @@ export default function Step6({ onChatClick }: Step6Props) {
     noDO: "",
     tanggalDO: "",
   });
+
+  useEffect(() => {
+    if (implData) {
+      setOrderInfo({
+        noPO: implData.noPO ?? "",
+        tanggalPO: implData.tanggalPO ? new Date(implData.tanggalPO).toISOString().slice(0, 10) : "",
+        noWO: implData.noWO ?? "",
+        tanggalWO: implData.tanggalWO ? new Date(implData.tanggalWO).toISOString().slice(0, 10) : "",
+        noDO: implData.noDO ?? "",
+        tanggalDO: implData.tanggalDO ? new Date(implData.tanggalDO).toISOString().slice(0, 10) : "",
+      });
+    }
+  }, [implData]);
 
   // ── Order Editing State ──
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -220,11 +300,21 @@ export default function Step6({ onChatClick }: Step6Props) {
   }
 
   function handleSaveField(noField: string, tanggalField: string) {
-    setOrderInfo((prev) => ({
-      ...prev,
+    const defaultDate = orderInfo[tanggalField as keyof typeof orderInfo] || new Date().toISOString().slice(0, 10);
+    const newOrderInfo = {
+      ...orderInfo,
       [noField]: editNoValue,
-      [tanggalField]: editTanggalValue,
-    }));
+      [tanggalField]: defaultDate,
+    };
+
+    updateDetailMut.mutate({
+      noPO: newOrderInfo.noPO,
+      tanggalPO: newOrderInfo.tanggalPO || undefined,
+      noWO: newOrderInfo.noWO,
+      tanggalWO: newOrderInfo.tanggalWO || undefined,
+      noDO: newOrderInfo.noDO,
+      tanggalDO: newOrderInfo.tanggalDO || undefined,
+    });
     setEditingField(null);
   }
 
@@ -232,11 +322,86 @@ export default function Step6({ onChatClick }: Step6Props) {
     setEditingField(null);
   }
 
-  // ── Logs (empty for now) ──
-  const logs: LogEntry[] = [];
+  // ── Logs mapping ──
+  const logs: LogEntry[] =
+    implData?.logs?.map((log, i) => {
+      const d = log.createdAt ? new Date(log.createdAt) : new Date();
+      return {
+        id: i + 1,
+        user: log.namaPegawai || "System",
+        action: log.keterangan ? `${log.aksi}: ${log.keterangan}` : log.aksi || "-",
+        time: d.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        date: d.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+        type: "system" as const,
+      };
+    }) ?? [];
 
-  // ── Dummy dokumen ──
-  const dokumen: { name: string; uploader: string; date: string }[] = [];
+  // ── Fetch Daily Activity Details for Documents ──
+  const { data: pembelianDetail } = useDetailActivity(implData?.activityPembelian?.id ?? "");
+  const { data: pengantaranDetail } = useDetailActivity(implData?.activityPengantaran?.id ?? "");
+  const { data: instalasiDetail } = useDetailActivity(implData?.activityInstalasi?.id ?? "");
+
+  const combinedDokumen = React.useMemo(() => {
+    const formatDateTime = (isoString: string) => {
+      if (!isoString) return "-";
+      const date = new Date(isoString);
+      const dateStr = date.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const timeStr = date.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }) + " WIB";
+      return `${dateStr} pukul ${timeStr}`;
+    };
+
+    const docs: { name: string; uploader: string; path: string }[] = [];
+
+    pembelianDetail?.data?.dokumen?.forEach((doc: any) => {
+      docs.push({
+        name: doc.namaFile,
+        uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPembelian?.judul || "Pembelian Barang"}`,
+        path: doc.path,
+      });
+    });
+
+    pengantaranDetail?.data?.dokumen?.forEach((doc: any) => {
+      docs.push({
+        name: doc.namaFile,
+        uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPengantaran?.judul || "Pengantaran"}`,
+        path: doc.path,
+      });
+    });
+
+    instalasiDetail?.data?.dokumen?.forEach((doc: any) => {
+      docs.push({
+        name: doc.namaFile,
+        uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityInstalasi?.judul || "Instalasi"}`,
+        path: doc.path,
+      });
+    });
+
+    // Deduplicate by path
+    const seenPaths = new Set<string>();
+    const result: typeof docs = [];
+    docs.forEach((d) => {
+      if (!seenPaths.has(d.path)) {
+        seenPaths.add(d.path);
+        result.push(d);
+      }
+    });
+
+    return result;
+  }, [pembelianDetail, pengantaranDetail, instalasiDetail, implData?.activityPembelian?.judul, implData?.activityPengantaran?.judul, implData?.activityInstalasi?.judul]);
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -256,9 +421,9 @@ export default function Step6({ onChatClick }: Step6Props) {
             tanggal={
               orderInfo.tanggalPO
                 ? `Terbit ${new Date(orderInfo.tanggalPO).toLocaleDateString(
-                    "id-ID",
-                    { day: "numeric", month: "short", year: "numeric" },
-                  )}`
+                  "id-ID",
+                  { day: "numeric", month: "short", year: "numeric" },
+                )}`
                 : undefined
             }
             canEdit={canEditOrders}
@@ -279,9 +444,9 @@ export default function Step6({ onChatClick }: Step6Props) {
             tanggal={
               orderInfo.tanggalWO
                 ? `Terbit ${new Date(orderInfo.tanggalWO).toLocaleDateString(
-                    "id-ID",
-                    { day: "numeric", month: "short", year: "numeric" },
-                  )}`
+                  "id-ID",
+                  { day: "numeric", month: "short", year: "numeric" },
+                )}`
                 : undefined
             }
             canEdit={canEditOrders}
@@ -302,9 +467,9 @@ export default function Step6({ onChatClick }: Step6Props) {
             tanggal={
               orderInfo.tanggalDO
                 ? `Terbit ${new Date(orderInfo.tanggalDO).toLocaleDateString(
-                    "id-ID",
-                    { day: "numeric", month: "short", year: "numeric" },
-                  )}`
+                  "id-ID",
+                  { day: "numeric", month: "short", year: "numeric" },
+                )}`
                 : undefined
             }
             canEdit={canEditOrders}
@@ -376,14 +541,28 @@ export default function Step6({ onChatClick }: Step6Props) {
 
           {/* Tab Content */}
           <div className="bg-slate-50/50 p-6 space-y-4">
-            {activeTab === "pembelian" && <BarangSection />}
+            {activeTab === "pembelian" && (
+              <BarangSection
+                trackingId={trackingId}
+                activityPembelian={implData?.activityPembelian}
+                onChatClick={onChatClick}
+              />
+            )}
 
             {activeTab === "pengantaran" && (
-              <EmptyLogbook title="Logbook Operasional Pengantaran" />
+              <LogbookCard
+                title="Logbook Operasional Pengantaran"
+                activity={implData?.activityPengantaran}
+                onChatClick={onChatClick}
+              />
             )}
 
             {activeTab === "instalasi" && (
-              <EmptyLogbook title="Logbook Operasional Instalasi" />
+              <LogbookCard
+                title="Logbook Operasional Instalasi"
+                activity={implData?.activityInstalasi}
+                onChatClick={onChatClick}
+              />
             )}
           </div>
         </div>
@@ -397,12 +576,9 @@ export default function Step6({ onChatClick }: Step6Props) {
                 <FileText size={16} className="text-cyan-500" />
                 Dokumen Pendukung
               </div>
-              <button className="text-cyan-500 text-xs font-bold flex items-center gap-1 hover:underline">
-                <Upload size={14} /> Upload File
-              </button>
             </div>
 
-            {dokumen.length === 0 ? (
+            {combinedDokumen.length === 0 ? (
               <div className="p-8 flex flex-col items-center gap-3 text-center">
                 <div className="p-3 bg-slate-50 rounded-full">
                   <FileText size={24} className="text-slate-300" />
@@ -411,12 +587,12 @@ export default function Step6({ onChatClick }: Step6Props) {
                   Belum ada dokumen
                 </p>
                 <p className="text-xs text-slate-400">
-                  Upload dokumen pendukung untuk tahap implementasi
+                  Upload dokumen pendukung melalui daily activity terkait pembelian, pengantaran, atau instalasi
                 </p>
               </div>
             ) : (
               <div className="p-4 space-y-1">
-                {dokumen.map((doc, i) => (
+                {combinedDokumen.map((doc, i) => (
                   <div
                     key={i}
                     className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"
@@ -430,13 +606,18 @@ export default function Step6({ onChatClick }: Step6Props) {
                           {doc.name}
                         </p>
                         <p className="text-[10px] text-gray-400">
-                          Diunggah oleh {doc.uploader} · {doc.date}
+                          Diunggah oleh {doc.uploader}
                         </p>
                       </div>
                     </div>
-                    <button className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors">
+                    <a
+                      href={doc.path.startsWith("http") ? doc.path : `${import.meta.env.VITE_API_URL}${doc.path}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors"
+                    >
                       <Download size={18} />
-                    </button>
+                    </a>
                   </div>
                 ))}
               </div>
@@ -449,7 +630,6 @@ export default function Step6({ onChatClick }: Step6Props) {
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSection
           logs={logs}
-          onChatClick={onChatClick ?? (() => {})}
         />
       </div>
     </div>
