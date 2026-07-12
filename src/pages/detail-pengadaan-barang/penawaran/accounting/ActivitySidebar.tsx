@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageSquareText } from "lucide-react";
+
 
 interface LogItem {
   id: number;
@@ -15,31 +15,15 @@ interface LogSection {
 
 interface Props {
   logs: LogSection[];
-  onChatClick: () => void;
-  unreadCount?: number;
 }
 
 export default function ActivitySidebar({
   logs,
-  onChatClick,
-  unreadCount = 0,
 }: Props) {
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
         <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
-        <button
-          onClick={onChatClick}
-          className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold relative hover:bg-cyan-600 transition-all shadow-sm active:scale-95"
-        >
-          <MessageSquareText size={16} />
-          Chat
-          {unreadCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm font-bold">
-              {unreadCount}
-            </span>
-          )}
-        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">

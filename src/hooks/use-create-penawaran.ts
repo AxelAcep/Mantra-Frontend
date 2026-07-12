@@ -5,6 +5,7 @@ import {
   type CreateTrackingPenawaranPayload,
   getPenawaranList,
   type GetPenawaranListParams,
+  getPenawaranListAktif,
 } from "@/services/tracking-penawaran.service";
 
 type State = {
@@ -41,5 +42,12 @@ export function usePenawaranList(params: GetPenawaranListParams = {}) {
   return useQuery({
     queryKey: ["penawaran-list", params],
     queryFn: () => getPenawaranList(params),
+  });
+}
+
+export function usePenawaranListAktif(params: GetPenawaranListParams = {}) {
+  return useQuery({
+    queryKey: ["penawaran-list-aktif", params],
+    queryFn: () => getPenawaranListAktif(params),
   });
 }

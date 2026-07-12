@@ -29,7 +29,6 @@ function SectionHeading({ title }: { title: string }) {
 
 interface Props {
   trackingId: string;
-  onChatClick: () => void;
   // ✅ Tambahan: callback agar parent tahu status & aksi yang tersedia
   onStatusChange?: (info: {
     status: string;
@@ -44,7 +43,6 @@ interface Props {
 
 export default function Step4({
   trackingId,
-  onChatClick,
   onStatusChange,
 }: Props) {
   const { data, loading, error, refetch } =
@@ -191,7 +189,6 @@ export default function Step4({
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSectionPersetujuan
           logs={mappedLogs}
-          onChatClick={onChatClick}
         />
       </div>
     </div>

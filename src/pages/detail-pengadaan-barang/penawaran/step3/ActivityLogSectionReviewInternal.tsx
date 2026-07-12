@@ -1,5 +1,5 @@
-import React from "react";
-import { MessageSquareText } from "lucide-react";
+import { useState } from "react";
+import { Activity, ChevronDown } from "lucide-react";
 
 interface LogEntry {
   id: number;
@@ -11,75 +11,67 @@ interface LogEntry {
 
 interface Props {
   logs: LogEntry[];
-  onChatClick: () => void;
-}
-
-function groupByDate(logs: LogEntry[]): { title: string; items: LogEntry[] }[] {
-  const map: Record<string, LogEntry[]> = {};
-  for (const log of logs) {
-    if (!map[log.date]) map[log.date] = [];
-    map[log.date].push(log);
-  }
-  return Object.entries(map).map(([title, items]) => ({ title, items }));
 }
 
 export default function ActivityLogSectionReviewInternal({
   logs,
-  onChatClick,
 }: Props) {
-  const grouped = groupByDate(logs);
+  const [showAll, setShowAll] = useState(false);
+
+  const sorted = [...logs].reverse();
+  const LIMIT = 5;
+  const hasMore = sorted.length > LIMIT;
+  const displayed = showAll ? sorted : sorted.slice(0, LIMIT);
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl shadow-sm h-full flex flex-col overflow-hidden">
-      <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
-        <h3 className="font-bold text-slate-800 text-base">Log Aktivitas</h3>
-        <button
-          onClick={onChatClick}
-          className="flex items-center gap-2 bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-all shadow-sm active:scale-95"
-        >
-          <MessageSquareText size={16} /> Chat
-        </button>
+    <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 sticky top-20 z-10">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <Activity size={16} className="text-cyan-500" />
+          Log Aktivitas
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-8 scrollbar-thin">
-        {grouped.length === 0 ? (
-          <p className="text-center text-sm text-gray-400 py-6">
-            Belum ada aktivitas.
-          </p>
-        ) : (
-          grouped.map((section) => (
-            <div key={section.title} className="space-y-4">
-              <div className="flex">
-                <p className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                  {section.title}
-                </p>
+      {sorted.length === 0 ? (
+        <p className="text-xs text-slate-400 text-center py-4">
+          Belum ada aktivitas.
+        </p>
+      ) : (
+        <>
+          <div className="max-h-[70vh] space-y-4 overflow-y-auto transition-all">
+            {displayed.map((log) => (
+              <div key={log.id} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-2 h-2 rounded-full mt-1 shrink-0 bg-cyan-400" />
+                  <div className="w-px flex-1 bg-slate-100 mt-1" />
+                </div>
+                <div className="pb-4 min-w-0">
+                  <p className="text-xs font-semibold text-slate-700 leading-tight">
+                    {log.user}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                    {log.action}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    {log.date} · {log.time}
+                  </p>
+                </div>
               </div>
-              <div className="relative space-y-6 pl-5 ml-2.5 border-l-2 border-slate-50">
-                {section.items.map((item) => (
-                  <div key={item.id} className="relative">
-                    <div className="absolute -left-[30px] top-0 w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center border-2 border-white shadow-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#94a3b8]" />
-                    </div>
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs font-bold text-slate-800 leading-tight">
-                          {item.action}
-                        </p>
-                        <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                          {item.user}
-                        </p>
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-semibold shrink-0">
-                        {item.time}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+            ))}
+          </div>
+
+          {hasMore && !showAll && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="mt-2 w-full flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-cyan-600 hover:bg-slate-50 py-2 rounded-lg transition-colors"
+            >
+              <ChevronDown size={14} />
+              Tampilkan semua ({sorted.length})
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 }

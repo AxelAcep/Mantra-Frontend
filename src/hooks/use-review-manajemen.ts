@@ -62,7 +62,7 @@ export function useUpdateStatusPersetujuanManajemen(trackingId: string) {
       alasanPenolakan?: string;
     }) => updateStatusPersetujuanManajemen(trackingId, status, alasanPenolakan),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["penawaran", trackingId] });
+      qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
       qc.invalidateQueries({
         queryKey: ["persetujuan-manajemen-detail", trackingId],
       });

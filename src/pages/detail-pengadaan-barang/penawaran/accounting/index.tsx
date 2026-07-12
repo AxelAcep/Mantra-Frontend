@@ -27,10 +27,9 @@ function SectionHeading({ title }: { title: string }) {
 
 interface Props {
   trackingId: string;
-  onChatClick: () => void;
 }
 
-export default function Step8({ trackingId, onChatClick }: Props) {
+export default function Step8({ trackingId }: Props) {
   const { data, isLoading, isError } = useAccounting(trackingId);
 
   const { divisi } = getUserInfo();
@@ -81,7 +80,7 @@ export default function Step8({ trackingId, onChatClick }: Props) {
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivitySidebar logs={[]} onChatClick={onChatClick} unreadCount={0} />
+        <ActivitySidebar logs={[]} />
       </div>
     </div>
   );

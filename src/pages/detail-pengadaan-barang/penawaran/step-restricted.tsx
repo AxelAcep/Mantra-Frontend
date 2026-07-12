@@ -1,7 +1,11 @@
 import React from 'react';
-import { ShieldAlert, Lock, AlertCircle } from 'lucide-react';
+import { ShieldAlert, Lock } from 'lucide-react';
 
-export default function StepRestricted() {
+interface StepRestrictedProps {
+  currentStepName?: string;
+}
+
+export default function StepRestricted({ currentStepName }: StepRestrictedProps) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 bg-white border border-dashed border-gray-200 rounded-3xl shadow-sm">
       <div className="relative mb-6">
@@ -14,12 +18,12 @@ export default function StepRestricted() {
       </div>
 
       <h2 className="text-2xl font-bold text-slate-800 mb-3 text-center">
-        Akses Terbatas
+        Tahap Tidak Dapat Diakses
       </h2>
 
-      <p className="text-slate-500 text-center max-w-md leading-relaxed">
-        Maaf, Anda tidak memiliki izin untuk melihat detail dari tahapan ini.
-        Akses ini dibatasi berdasarkan peran (role) Anda dalam sistem.
+      <p className="text-slate-500 text-center max-w-md leading-relaxed font-medium">
+        Maaf, Anda belum bisa mengakses detail dari tahapan ini.
+        Saat ini proses pengadaan barang masih berada di <span className="text-cyan-600 font-bold">{currentStepName || "Tahap Sebelumnya"}</span>.
       </p>
     </div>
   );

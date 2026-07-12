@@ -13,7 +13,7 @@ interface Props {
   logs: LogEntry[];
 }
 
-export default function ActivityLogSectionPersetujuan({
+export default function ActivityLogSectionFollowUp({
   logs,
 }: Props) {
   const [showAll, setShowAll] = useState(false);

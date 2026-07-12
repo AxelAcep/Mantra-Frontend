@@ -11,12 +11,12 @@ import {
   CheckCheck,
 } from "lucide-react";
 import {
-  usePenawaranChat as useChat,
-  useKirimPenawaranChat as useKirimChat,
-  useReadPenawaranChat as useReadChat,
-  useUpdatePenawaranChat as useUpdateChat,
-} from "@/hooks/use-penawaran";
-import type { PenawaranChat as Chat } from "@/services/penawaran.services";
+  useChat,
+  useKirimChat,
+  useReadChat,
+  useUpdateChat,
+} from "@/hooks/use-activity";
+import type { Chat } from "@/services/activity.services";
 
 function HighlightText({ text, query }: { text: string; query: string }) {
   if (!query) return <>{text}</>;

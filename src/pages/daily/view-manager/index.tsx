@@ -290,7 +290,7 @@ function DetailContent({ id }: { id: string }) {
                 </div>
 
                 {/* Kolom Kanan */}
-                <div className="w-full lg:w-80 shrink-0 space-y-6 sticky top-6">
+                <div className="w-full lg:w-80 shrink-0 space-y-6 sticky top-20 z-10">
                     <RiwayatRescheduleCard reschedule={activity.reschedule ?? []} />
                     <ChatPanel
                         activityId={activity.id}

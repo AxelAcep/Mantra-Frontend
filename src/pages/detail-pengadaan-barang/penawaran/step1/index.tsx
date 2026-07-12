@@ -22,7 +22,7 @@ interface Step1Props {
   mode: Mode;
   trackingId: string;
   data?: TrackingPenawaranDetail;
-  onChatClick: () => void;
+  onChatClick: (activityId: string, activityJudul: string) => void;
 }
 
 function SectionHeading({ title }: { title: string }) {
@@ -42,6 +42,7 @@ export default function Step1({
 }: Step1Props) {
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const isAdmin = mode === "master" || mode === "admin";
+  const isMasterOnly = mode === "master";
 
   const logs = usePenawaranLogs(data);
 
@@ -53,7 +54,7 @@ export default function Step1({
           mode={mode}
           trackingId={trackingId}
           data={data}
-          canAssignPreSales={isAdmin}
+          canAssignPreSales={isMasterOnly}
         />
         <RequestDetailSection
           mode={mode}
@@ -69,13 +70,16 @@ export default function Step1({
           trackingId={trackingId}
           permintaanMasukId={data?.permintaanMasuk?.id}
           dokumen={data?.permintaanMasuk?.dokumen ?? []}
+          onChatClick={onChatClick}
           activity={
             data?.permintaanMasuk?.activity
               ? {
-                  id: data.permintaanMasuk.activity.id,
-                  judul: data.permintaanMasuk.activity.judul,
-                  createdAt: data.permintaanMasuk.activity.waktuMulai,
-                }
+                id: data.permintaanMasuk.activity.id,
+                judul: data.permintaanMasuk.activity.judul,
+                createdAt: data.permintaanMasuk.activity.waktuMulai,
+                targetSelesai: data.permintaanMasuk.activity.targetSelesai,
+                pegawai: data.permintaanMasuk.activity.pegawai,
+              }
               : undefined
           }
         />
@@ -84,8 +88,7 @@ export default function Step1({
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSection
           logs={logs}
-          onAddLog={() => {}}
-          onChatClick={onChatClick}
+          onAddLog={() => { }}
         />
       </div>
 

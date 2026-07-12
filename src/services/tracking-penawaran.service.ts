@@ -68,6 +68,12 @@ export type PenawaranListItem = {
   estimasiHarga: number | null;
   stepSaatIni: string;
   status: string;
+  perusahaanName?: string;
+  lokasiProyek?: string;
+  jenisPenawaran?: string[];
+  tanggalTerbit?: string;
+  totalTermin?: number;
+  terminDibayar?: number;
 };
 
 export type PaginationMeta = {
@@ -104,5 +110,23 @@ export async function getPenawaranList(
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message ?? "Gagal mengambil data penawaran.");
+  return data;
+}
+
+export async function getPenawaranListAktif(
+  params: GetPenawaranListParams = {},
+): Promise<PenawaranListResponse> {
+  const query = new URLSearchParams();
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
+  if (params.search) query.set("search", params.search);
+  if (params.step) query.set("step", params.step);
+
+  const res = await fetchClient(`/tracking-penawaran/aktif?${query.toString()}`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.message ?? "Gagal mengambil data penawaran aktif.");
   return data;
 }

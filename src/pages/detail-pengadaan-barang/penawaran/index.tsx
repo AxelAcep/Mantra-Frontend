@@ -6,11 +6,12 @@ import Step1 from "./step1/index";
 import Step2 from "./step2/index";
 import Step3 from "./step3/index";
 import Step4 from "./step4/index";
-import Step5 from "./step5";
-import Step6 from "./step6";
+import Step5 from "./step5/index";
+import Step6 from "./step6/index";
 import Step7 from "./step7";
 import Step8 from "./accounting/index";
 import Step9 from "./step9";
+import StepRestricted from "./step-restricted";
 import { PenawaranChatPanel } from "@/components/penawaranChatPanel";
 import { Button } from "@/components/ui/button";
 import RevisionModal from "../penawaran/step1/RevisionModal";
@@ -58,7 +59,70 @@ function getNextButtonLabel(
   return "Selanjutnya";
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────
+function getStepNumber(step: string | undefined): number {
+  switch (step) {
+    case "PERMINTAAN_MASUK":
+      return 1;
+    case "PENYUSUNAN_BOQ":
+      return 2;
+    case "REVIEW_INTERNAL":
+      return 3;
+    case "PERSETUJUAN_MANAJEMEN":
+      return 4;
+    case "FOLLOW_UP":
+      return 5;
+    case "IMPLEMENTASI":
+      return 6;
+    case "BAST":
+      return 7;
+    case "PEMBAYARAN":
+      return 8;
+    case "GARANSI":
+      return 9;
+    default:
+      return 1;
+  }
+}
+
+function getStepName(step: string | undefined): string {
+  switch (step) {
+    case "PERMINTAAN_MASUK":
+      return "Tahap 1 (Permintaan Masuk)";
+    case "PENYUSUNAN_BOQ":
+      return "Tahap 2 (Penyusunan BoQ)";
+    case "REVIEW_INTERNAL":
+      return "Tahap 3 (Review Internal)";
+    case "PERSETUJUAN_MANAJEMEN":
+      return "Tahap 4 (Persetujuan Manajemen)";
+    case "FOLLOW_UP":
+      return "Tahap 5 (Follow Up Klien)";
+    case "IMPLEMENTASI":
+      return "Tahap 6 (Implementasi)";
+    case "BAST":
+      return "Tahap 7 (BAST)";
+    case "PEMBAYARAN":
+      return "Tahap 8 (Accounting)";
+    case "GARANSI":
+      return "Tahap 9 (Garansi)";
+    default:
+      return "Tahap 1 (Permintaan Masuk)";
+  }
+}
+
+const STEP_LABELS: Record<number, string> = {
+  1: "Permintaan Masuk",
+  2: "Penyusunan BoQ",
+  3: "Review Internal",
+  4: "Persetujuan Manajemen",
+  5: "Follow Up Klien",
+  6: "Implementasi",
+  7: "BAST",
+  8: "Accounting",
+  9: "Garansi",
+};
+
+
+// ─── Main Component ─────────────────────────────────────────────────────────
 export default function PenawaranPage() {
   const { id } = useParams<{ id: string }>();
   const trackingId = id ?? "";
@@ -67,12 +131,30 @@ export default function PenawaranPage() {
 
   const [activeStep, setActiveStep] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [activeChatJudul, setActiveChatJudul] = useState<string>("");
+
+  function handleOpenChat(activityId: string, judul: string) {
+    setActiveChatId(activityId);
+    setActiveChatJudul(judul);
+    setIsChatOpen(true);
+  }
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [revisionTarget, setRevisionTarget] = useState<
-    "step1" | "step2" | "step4"
+    "step1" | "step2" | "step4" | "step5"
   >("step1");
 
   const [step4Info, setStep4Info] = useState<{
+    status: string;
+    canAcc: boolean;
+    canKonfirmasiUlang: boolean;
+    isUpdating: boolean;
+    onAcc: () => void;
+    onPerluTindakan: (alasan: string) => void;
+    onKonfirmasiUlang: () => void;
+  } | null>(null);
+
+  const [step5Info, setStep5Info] = useState<{
     status: string;
     canAcc: boolean;
     canKonfirmasiUlang: boolean;
@@ -134,6 +216,9 @@ export default function PenawaranPage() {
   // Step 4
   const isStep4Selesai = step4Info?.status === "SELESAI";
 
+  // Step 5
+  const isStep5Selesai = getStepNumber(penawaran?.stepSaatIni) > 5;
+
   //Accounting
   const canAccessAccounting =
     [
@@ -141,15 +226,16 @@ export default function PenawaranPage() {
       "DIREKTUR",
       "MANAGER_OPERASIONAL",
       "FINANCE_ACCOUNTING",
-    ].includes(userInfo.divisi) && isStep4Selesai;
+    ].includes(userInfo.divisi) && getStepNumber(penawaran?.stepSaatIni) >= 5;
 
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
     (activeStep === 1 && !isPermintaanSelesai) ||
     (activeStep === 2 && !isBoQSelesai) ||
     (activeStep === 3 && !isReviewInternalSelesai) ||
-    (activeStep === 4 && !isStep4Selesai) || // ✅ tambah ini
-    activeStep >= 5; // ✅ ubah dari >= 4 ke >= 5
+    (activeStep === 4 && !isStep4Selesai) ||
+    (activeStep === 5 && !isStep5Selesai) ||
+    activeStep >= 6;
 
   // ── Handlers ───────────────────────────────────────────────────────────
   function handleKonfirmasiStep1() {
@@ -179,7 +265,7 @@ export default function PenawaranPage() {
     updateStatusBoQ({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan });
   }
 
-  function openRevisionModal(target: "step1" | "step2" | "step4") {
+  function openRevisionModal(target: "step1" | "step2" | "step4" | "step5") {
     setRevisionTarget(target);
     setIsRevisionModalOpen(true);
   }
@@ -187,7 +273,8 @@ export default function PenawaranPage() {
   function handleRevisionConfirm(alasan: string) {
     if (revisionTarget === "step1") handleTolakStep1(alasan);
     else if (revisionTarget === "step2") handleTolakStep2(alasan);
-    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan); // ✅ bukan handleTolakStep4
+    else if (revisionTarget === "step4") step4Info?.onPerluTindakan(alasan);
+    else if (revisionTarget === "step5") step5Info?.onPerluTindakan(alasan);
     setIsRevisionModalOpen(false);
   }
 
@@ -196,8 +283,8 @@ export default function PenawaranPage() {
   const isUpdating = isUpdatingPermintaan || isUpdatingBoQ;
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-6 flex flex-col">
-      <div className="max-w-[1440px] mx-auto w-full flex-1 space-y-6">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      <div className="max-w-[1440px] mx-auto w-full flex-1 p-6 pb-0 space-y-6">
         {/* Header */}
         <TrackingHeader
           title="Tracking Penawaran"
@@ -214,7 +301,7 @@ export default function PenawaranPage() {
 
             return {
               n,
-              label: isAccounting ? "Accounting" : `Tahap ${n}`,
+              label: STEP_LABELS[n] || `Tahap ${n}`,
               status:
                 n === activeStep
                   ? "active"
@@ -232,49 +319,65 @@ export default function PenawaranPage() {
 
         {/* Step Content */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          {activeStep === 1 && (
-            <Step1
-              mode={mode}
-              trackingId={trackingId}
-              data={penawaran}
-              onChatClick={() => setIsChatOpen(true)}
-            />
-          )}
-          {activeStep === 2 && (
-            <Step2
-              mode={mode}
-              trackingId={trackingId}
-              data={penawaran}
-              onChatClick={() => setIsChatOpen(true)}
-            />
-          )}
-          {activeStep === 3 && (
-            <Step3
-              trackingId={trackingId}
-              onChatClick={() => setIsChatOpen(true)}
-            />
-          )}
-          {activeStep === 4 && (
-            <Step4
-              trackingId={trackingId}
-              onChatClick={() => setIsChatOpen(true)}
-              onStatusChange={setStep4Info} // ✅
-            />
-          )}
-          {activeStep === 5 && <Step5 />}
-          {activeStep === 6 && <Step6 />}
-          {activeStep === 7 && <Step7 />}
-          {activeStep === 8 && <Step9 />}
-          {activeStep === 9 && (
-            <Step8
-              trackingId={trackingId}
-              onChatClick={() => setIsChatOpen(true)}
-            />
+          {activeStep > getStepNumber(penawaran?.stepSaatIni) && !(activeStep === 8 && canAccessAccounting) ? (
+            <StepRestricted currentStepName={getStepName(penawaran?.stepSaatIni)} />
+          ) : (
+            <>
+              {activeStep === 1 && (
+                <Step1
+                  mode={mode}
+                  trackingId={trackingId}
+                  data={penawaran}
+                  onChatClick={handleOpenChat}
+                />
+              )}
+              {activeStep === 2 && (
+                <Step2
+                  mode={mode}
+                  trackingId={trackingId}
+                  data={penawaran}
+                  onChatClick={handleOpenChat}
+                />
+              )}
+              {activeStep === 3 && (
+                <Step3
+                  trackingId={trackingId}
+                />
+              )}
+              {activeStep === 4 && (
+                <Step4
+                  trackingId={trackingId}
+                  onStatusChange={setStep4Info} // ✅
+                />
+              )}
+              {activeStep === 5 && (
+                <Step5
+                  trackingId={trackingId}
+                  onChatClick={handleOpenChat}
+                  onStatusChange={setStep5Info}
+                />
+              )}
+              {activeStep === 6 && (
+                <Step6
+                  trackingId={trackingId}
+                  onChatClick={handleOpenChat}
+                />
+              )}
+              {activeStep === 7 && <Step7 />}
+              {activeStep === 8 && (
+                <Step8
+                  trackingId={trackingId}
+                />
+              )}
+              {activeStep === 9 && <Step9 />}
+            </>
           )}
         </div>
+      </div>
 
-        {/* Bottom Action Bar */}
-        <div className="sticky bottom-0 bg-white/80 backdrop-blur-md border-t p-4 flex justify-end items-center gap-3 mt-8">
+      {/* Bottom Action Bar */}
+      <div className="sticky bottom-0 bg-white/80 backdrop-blur-md border-t py-4 z-50 mt-6">
+        <div className="max-w-[1440px] mx-auto w-full px-6 flex justify-end items-center gap-3">
           <Button
             variant="outline"
             onClick={() => setActiveStep((p) => Math.max(1, p - 1))}
@@ -378,6 +481,37 @@ export default function PenawaranPage() {
             </Button>
           )}
 
+          {activeStep === 5 && step5Info?.canAcc && (
+            <>
+              <Button
+                onClick={() => openRevisionModal("step5")}
+                disabled={step5Info.isUpdating}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+              >
+                Perlu Tindakan
+              </Button>
+              <Button
+                onClick={step5Info.onAcc}
+                disabled={step5Info.isUpdating}
+                className="bg-emerald-400 hover:bg-emerald-600"
+              >
+                {step5Info.isUpdating ? "Memproses..." : "Approve"}
+              </Button>
+            </>
+          )}
+
+          {/* Step 5: Sales — Konfirmasi Ulang */}
+          {activeStep === 5 && step5Info?.canKonfirmasiUlang && (
+            <Button
+              onClick={step5Info.onKonfirmasiUlang}
+              disabled={step5Info.isUpdating}
+              className="bg-emerald-400 hover:bg-emerald-600"
+            >
+              {step5Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
+            </Button>
+          )}
+
           <Button
             onClick={() => setActiveStep((p) => Math.min(9, p + 1))}
             disabled={isNextBlocked}
@@ -401,13 +535,18 @@ export default function PenawaranPage() {
       />
 
       {/* Chat Panel */}
-      <PenawaranChatPanel
-        activityId={trackingId}
-        activityJudul={`Chat · ${penawaran?.nomorPenawaran ?? ""}`}
-        open={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        currentPegawaiId={userInfo.pegawaiId}
-      />
+      {activeChatId && (
+        <PenawaranChatPanel
+          activityId={activeChatId}
+          activityJudul={activeChatJudul}
+          open={isChatOpen}
+          onClose={() => {
+            setIsChatOpen(false);
+            setActiveChatId(null);
+          }}
+          currentPegawaiId={userInfo.pegawaiId}
+        />
+      )}
     </div>
   );
 }

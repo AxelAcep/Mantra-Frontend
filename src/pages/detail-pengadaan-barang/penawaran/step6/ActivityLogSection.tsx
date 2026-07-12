@@ -1,23 +1,23 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Activity, ChevronDown } from "lucide-react";
 
-interface LogEntry {
+export interface LogEntry {
   id: number;
   user: string;
   action: string;
   time: string;
   date: string;
+  type: "system" | "user";
 }
 
-interface Props {
+interface ActivityLogSectionProps {
   logs: LogEntry[];
 }
 
-export default function ActivityLogSectionPersetujuan({
+export default function ActivityLogSection({
   logs,
-}: Props) {
+}: ActivityLogSectionProps) {
   const [showAll, setShowAll] = useState(false);
-
   const sorted = [...logs].reverse();
   const LIMIT = 5;
   const hasMore = sorted.length > LIMIT;
@@ -25,7 +25,6 @@ export default function ActivityLogSectionPersetujuan({
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 sticky top-20 z-10">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
           <Activity size={16} className="text-cyan-500" />
@@ -39,7 +38,7 @@ export default function ActivityLogSectionPersetujuan({
         </p>
       ) : (
         <>
-          <div className="max-h-[70vh] space-y-4 overflow-y-auto transition-all">
+          <div className="space-y-4">
             {displayed.map((log) => (
               <div key={log.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
@@ -60,7 +59,6 @@ export default function ActivityLogSectionPersetujuan({
               </div>
             ))}
           </div>
-
           {hasMore && !showAll && (
             <button
               onClick={() => setShowAll(true)}

@@ -112,7 +112,7 @@ export default function TablePermintaanPenawaran() {
             {isLoading && (
               <tr>
                 <td
-                  colSpan={isMaster ? 7 : 6}
+                  colSpan={isMaster ? 8 : 7}
                   className="px-6 py-10 text-center text-gray-400 text-sm"
                 >
                   Memuat data...
@@ -122,7 +122,7 @@ export default function TablePermintaanPenawaran() {
             {isError && (
               <tr>
                 <td
-                  colSpan={isMaster ? 7 : 6}
+                  colSpan={isMaster ? 8 : 7}
                   className="px-6 py-10 text-center text-red-400 text-sm"
                 >
                   Gagal memuat data.
@@ -132,23 +132,22 @@ export default function TablePermintaanPenawaran() {
             {!isLoading && !isError && data?.data.length === 0 && (
               <tr>
                 <td
-                  colSpan={isMaster ? 7 : 6}
+                  colSpan={isMaster ? 8 : 7}
                   className="px-6 py-10 text-center text-gray-300 text-sm"
                 >
                   Tidak ada data penawaran.
                 </td>
               </tr>
             )}
-            {data?.data.map((item) => {
+            {!isError && data?.data.map((item) => {
               const status = (item.status ?? "ON_PROGRESS") as StatusType;
               return (
                 <tr
                   key={item.id}
-                  className={`transition-colors ${
-                    status === "PERLU_TINDAKAN"
-                      ? "bg-[#fffbeb]"
-                      : "hover:bg-gray-50/50"
-                  }`}
+                  className={`transition-colors ${status === "PERLU_TINDAKAN"
+                    ? "bg-[#fffbeb]"
+                    : "hover:bg-gray-50/50"
+                    }`}
                 >
                   <td className="px-6 py-5 text-gray-500">
                     {formatTanggal(item.tanggalMasuk)}
@@ -174,8 +173,8 @@ export default function TablePermintaanPenawaran() {
                       <StatusBadge status={status} />
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-gray-400 font-medium">
-                    {item.stepSaatIni ?? "—"}
+                  <td className="px-6 py-5 text-gray-400 font-medium text-center">
+                    {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
                   </td>
                   <td className="px-6 py-5 text-right">
                     <Link
