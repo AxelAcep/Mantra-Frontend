@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useDetailReviewInternal } from "@/hooks/use-review-internal";
 import {
   useUploadDokumenReviewInternal,
@@ -36,6 +37,7 @@ export default function Step3({ trackingId }: Props) {
   const uploadMut = useUploadDokumenReviewInternal(trackingId);
   const deleteMut = useDeleteDokumenReviewInternal(trackingId);
   const updateStatusMut = useUpdateStatusReviewInternal(trackingId);
+  const navigate = useNavigate();
 
   const { divisi, role } = getUserInfo();
 
@@ -45,53 +47,6 @@ export default function Step3({ trackingId }: Props) {
     divisi === "SALES" ||
     divisi === "PRESALES" ||
     (role === "SUPERVISI" && divisi === "SALES");
-
-  if (error || !data) {
-    return (
-      <div className="flex min-h-[300px] items-center justify-center">
-        <div className="w-full max-w-md rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-              <span className="text-2xl text-red-600">!</span>
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-red-700">
-                Gagal Memuat Data
-              </h2>
-
-              <p className="text-sm leading-relaxed text-red-600">
-                Terjadi kesalahan saat mengambil data Review Internal. Silakan
-                coba beberapa saat lagi.
-              </p>
-
-              {error && (
-                <p className="rounded-lg bg-white/70 px-3 py-2 text-xs text-red-500 border border-red-100">
-                  {String(error)}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  const isPerluTindakan = data.status === "PERLU_TINDAKAN";
-  const isOnProgress = data.status === "ON_PROGRESS";
-
-  // Admin Sekertariat: bisa ACC/Tolak hanya kalau ON_PROGRESS & belum acc & status bukan PERLU_TINDAKAN
-  const canAdminAcc =
-    isAdminSekertariat && !data.accAdminDirektur && isOnProgress;
-
-  // Manajer Ops: bisa ACC/Tolak hanya kalau Admin sudah acc & Manajer belum acc & ON_PROGRESS
-  const canManajerAcc =
-    isManajerOps &&
-    data.accAdminDirektur &&
-    !data.accManajerOps &&
-    isOnProgress;
-
-  // Sales/Presales/Supervisi: konfirmasi ulang hanya kalau PERLU_TINDAKAN
-  const canKonfirmasiUlang = isSalesPresalesSupervisi && isPerluTindakan;
 
   if (loading) {
     return (
@@ -114,6 +69,33 @@ export default function Step3({ trackingId }: Props) {
       </div>
     );
   }
+
+  const isPerluTindakan = data.status === "PERLU_TINDAKAN";
+  const isOnProgress = data.status === "ON_PROGRESS";
+
+  // Status daily Admin
+  const adminDailyStatus = data.activityAdmin?.status;
+  const adminDailySelesai =
+    adminDailyStatus === "KONFIRMASI_SELESAI" ||
+    adminDailyStatus === "SELESAI" ||
+    adminDailyStatus === "DITERIMA";
+
+  // Admin Sekertariat: bisa ACC/Tolak hanya kalau ON_PROGRESS & daily selesai & belum acc
+  const canAdminAcc =
+    isAdminSekertariat &&
+    !data.accAdminDirektur &&
+    isOnProgress &&
+    adminDailySelesai;
+
+  // Manajer Ops: bisa ACC/Tolak hanya kalau Admin sudah acc & Manajer belum acc & ON_PROGRESS
+  const canManajerAcc =
+    isManajerOps &&
+    data.accAdminDirektur &&
+    !data.accManajerOps &&
+    isOnProgress;
+
+  // Sales/Presales/Supervisi: konfirmasi ulang hanya kalau PERLU_TINDAKAN
+  const canKonfirmasiUlang = isSalesPresalesSupervisi && isPerluTindakan;
 
   const mappedLogs =
     data.logs?.map((log, i) => {
@@ -154,6 +136,7 @@ export default function Step3({ trackingId }: Props) {
           canManajerAcc={canManajerAcc}
           canKonfirmasiUlang={canKonfirmasiUlang}
           isUpdating={isUpdating}
+          adminDailySelesai={adminDailySelesai}
           onAcc={() => updateStatusMut.mutate({ status: "ACC" })}
           onPerluTindakan={(alasan) =>
             updateStatusMut.mutate({
@@ -162,6 +145,11 @@ export default function Step3({ trackingId }: Props) {
             })
           }
           onOnProgress={() => updateStatusMut.mutate({ status: "ON_PROGRESS" })}
+          onLihatDaily={() => {
+            if (data.activityAdmin?.id) {
+              navigate(`/dailyactivity/${data.activityAdmin.id}`);
+            }
+          }}
         />
 
         <SectionHeading title="Dokumen" />
@@ -174,9 +162,7 @@ export default function Step3({ trackingId }: Props) {
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSectionReviewInternal
-          logs={mappedLogs}
-        />
+        <ActivityLogSectionReviewInternal logs={mappedLogs} />
       </div>
     </div>
   );

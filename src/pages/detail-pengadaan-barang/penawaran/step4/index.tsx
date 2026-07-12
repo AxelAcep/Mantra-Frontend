@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDetailPersetujuanManajemen } from "@/hooks/use-review-manajemen";
 import {
   useUploadDokumenPersetujuanManajemen,
@@ -29,7 +29,6 @@ function SectionHeading({ title }: { title: string }) {
 
 interface Props {
   trackingId: string;
-  // ✅ Tambahan: callback agar parent tahu status & aksi yang tersedia
   onStatusChange?: (info: {
     status: string;
     canAcc: boolean;
@@ -41,10 +40,7 @@ interface Props {
   }) => void;
 }
 
-export default function Step4({
-  trackingId,
-  onStatusChange,
-}: Props) {
+export default function Step4({ trackingId, onStatusChange }: Props) {
   const { data, loading, error, refetch } =
     useDetailPersetujuanManajemen(trackingId);
   const uploadMut = useUploadDokumenPersetujuanManajemen(trackingId);
@@ -68,25 +64,27 @@ export default function Step4({
   const canKonfirmasiUlang = isSalesPresalesSupervisiManajer && isPerluTindakan;
   const isUpdating = updateStatusMut.isPending;
 
-  const handlers = {
-    status: data?.status ?? "",
-    canAcc,
-    canKonfirmasiUlang,
-    isUpdating,
-    onAcc: () => updateStatusMut.mutate({ status: "SELESAI" }),
-    onPerluTindakan: (alasan: string) =>
-      updateStatusMut.mutate({
-        status: "PERLU_TINDAKAN",
-        alasanPenolakan: alasan,
-      }),
-    onKonfirmasiUlang: () => updateStatusMut.mutate({ status: "ON_PROGRESS" }),
-  };
+  const handlers = useMemo(
+    () => ({
+      status: data?.status ?? "",
+      canAcc,
+      canKonfirmasiUlang,
+      isUpdating,
+      onAcc: () => updateStatusMut.mutate({ status: "SELESAI" }),
+      onPerluTindakan: (alasan: string) =>
+        updateStatusMut.mutate({
+          status: "PERLU_TINDAKAN",
+          alasanPenolakan: alasan,
+        }),
+      onKonfirmasiUlang: () =>
+        updateStatusMut.mutate({ status: "ON_PROGRESS" }),
+    }),
+    [data?.status, canAcc, canKonfirmasiUlang, isUpdating, updateStatusMut],
+  );
 
-  // ✅ Beritahu parent setiap kali info berubah
-  React.useEffect(() => {
+  useEffect(() => {
     if (data) onStatusChange?.(handlers);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.status, canAcc, canKonfirmasiUlang, isUpdating]);
+  }, [data, handlers, onStatusChange]);
 
   if (loading) {
     return (
@@ -148,48 +146,49 @@ export default function Step4({
       };
     }) ?? [];
 
+  // Dokumen dari Activity Admin (daily)
   const mappedDokumen =
-    data.dokumen?.map((doc) => ({
+    data.activityAdmin?.dokumen?.map((doc) => ({
       id: doc.id,
-      namaFile: doc.namaFile,
-      path: doc.path,
-      createdAt: doc.createdAt,
+      namaFile: doc.namaFile || "Dokumen",
+      path: doc.path || "",
+      createdAt: doc.createdAt || "",
     })) ?? [];
+
+  const isApproved = data.accDirekturKomisaris === true;
 
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
         <SectionHeading title="Detail" />
+        {/* ApprovalSection TIDAK BERUBAH */}
         <ApprovalSectionPersetujuan
           data={data}
           canAcc={canAcc}
           canKonfirmasiUlang={canKonfirmasiUlang}
           isUpdating={isUpdating}
-          onAcc={() => updateStatusMut.mutate({ status: "SELESAI" })}
-          onPerluTindakan={(alasan) =>
-            updateStatusMut.mutate({
-              status: "PERLU_TINDAKAN",
-              alasanPenolakan: alasan,
-            })
-          }
-          onKonfirmasiUlang={() =>
-            updateStatusMut.mutate({ status: "ON_PROGRESS" })
-          }
+          onAcc={handlers.onAcc}
+          onPerluTindakan={handlers.onPerluTindakan}
+          onKonfirmasiUlang={handlers.onKonfirmasiUlang}
         />
 
-        <SectionHeading title="Dokumen" />
-        <DocumentSectionPersetujuan
-          dokumen={mappedDokumen}
-          onUpload={(file) => uploadMut.mutate({ file })}
-          onDelete={(id) => deleteMut.mutate(id)}
-          isUploading={uploadMut.isPending}
-        />
+        {/* Hanya tampilkan dokumen & card daily setelah approve */}
+        {isApproved && (
+          <>
+            <SectionHeading title="Dokumen" />
+            <DocumentSectionPersetujuan
+              dokumen={mappedDokumen}
+              onUpload={(file) => uploadMut.mutate({ file })}
+              onDelete={(id) => deleteMut.mutate(id)}
+              isUploading={uploadMut.isPending}
+              activityAdmin={data.activityAdmin} // kirim data daily
+            />
+          </>
+        )}
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSectionPersetujuan
-          logs={mappedLogs}
-        />
+        <ActivityLogSectionPersetujuan logs={mappedLogs} />
       </div>
     </div>
   );

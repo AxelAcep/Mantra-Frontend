@@ -29,7 +29,18 @@ interface DetailSectionBoQProps {
     harga3?: number;
   }) => void;
   isSaving?: boolean;
+  // PROPS BARU
+  isFinanceEditable?: boolean;
+  boqActivityStatus?: string;
+  userDivisi?: string;
 }
+
+const ALLOWED_DIVISI = [
+  "DIREKTUR",
+  "KOMISARIS",
+  "MANAGER_OPERASIONAL",
+  "ADMIN_SEKERTARIAT",
+];
 
 function formatRupiah(value: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -42,12 +53,35 @@ function formatRupiah(value: number) {
 export default function DetailSectionBoQ({
   financial,
   workingTime,
-  mode,
   onSave,
   isSaving,
+  isFinanceEditable: isFinanceEditableProp,
+  boqActivityStatus,
+  userDivisi,
 }: DetailSectionBoQProps) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
-  const isEditable = mode === "presales" || mode === "master";
+
+  // Tentukan apakah input finance bisa diedit
+  const isBoQActivitySelesai =
+    boqActivityStatus === "DITERIMA" || boqActivityStatus === "Selesai";
+
+  const isAllowedDivisi = userDivisi
+    ? ALLOWED_DIVISI.includes(userDivisi)
+    : false;
+
+  // Finance editable hanya jika activity BoQ selesai DAN user divisi yang diizinkan
+  const isFinanceEditable =
+    isFinanceEditableProp ?? (isBoQActivitySelesai && isAllowedDivisi);
+
+  console.log("=== DEBUG DetailSectionBoQ ===");
+  console.log("boqActivityStatus:", boqActivityStatus);
+  console.log("isBoQActivitySelesai:", isBoQActivitySelesai);
+  console.log("userDivisi:", userDivisi);
+  console.log("isAllowedDivisi:", isAllowedDivisi);
+  console.log("ALLOWED_DIVISI:", ALLOWED_DIVISI);
+  console.log("isFinanceEditableProp:", isFinanceEditableProp);
+  console.log("isFinanceEditable (final):", isFinanceEditable);
+  console.log("================================");
 
   const [harga1, setHarga1] = useState(financial?.harga1 ?? 0);
   const [harga2, setHarga2] = useState(financial?.harga2 ?? 0);
@@ -84,7 +118,12 @@ export default function DetailSectionBoQ({
 
   const statusColor = (() => {
     const s = workingTime?.status;
-    if (s === "Selesai" || s === "Diterima" || s === "DITERIMA" || s === "SELESAI") {
+    if (
+      s === "Selesai" ||
+      s === "Diterima" ||
+      s === "DITERIMA" ||
+      s === "SELESAI"
+    ) {
       return "bg-green-50 text-green-600";
     }
     if (s === "Overdue" || s === "OVERDUE") {
@@ -102,7 +141,7 @@ export default function DetailSectionBoQ({
             <Wallet size={16} className="text-cyan-500" />
             <span>Ringkasan Finansial</span>
           </div>
-          {isEditable && (
+          {isFinanceEditable && (
             <button
               onClick={() => onSave?.({ harga1, harga2, harga3 })}
               disabled={isSaving}
@@ -160,12 +199,12 @@ export default function DetailSectionBoQ({
                   <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">
                     {item.label}
                   </p>
-                  {isEditable ? (
+                  {isFinanceEditable ? (
                     <input
                       type="number"
                       value={item.value}
                       onChange={(e) =>
-                      item.setValue(parseFloat(e.target.value) || 0)
+                        item.setValue(parseFloat(e.target.value) || 0)
                       }
                       className="w-full text-sm font-bold text-slate-700 bg-white border border-cyan-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     />
@@ -188,7 +227,9 @@ export default function DetailSectionBoQ({
             <Clock3 size={16} className="text-cyan-500" />
             <span>Waktu Pengerjaan</span>
           </div>
-          <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}>
+          <span
+            className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
+          >
             {workingTime?.status ?? "-"}
           </span>
         </div>

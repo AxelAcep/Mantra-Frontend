@@ -21,6 +21,7 @@ export interface LogEntry {
 
 export interface Step2Props {
   mode: Mode;
+  userDivisi;
   trackingId: string;
   data?: TrackingPenawaranDetail;
   onChatClick: (activityId: string, activityJudul: string) => void;
@@ -100,7 +101,12 @@ function calculateWorkingTime(
   };
 }
 
-export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
+export default function Step2({
+  trackingId,
+  onChatClick,
+  mode,
+  userDivisi,
+}: Step2Props) {
   const { data: boqData, loading, error, refetch } = usePreloadBoQ(trackingId);
 
   //  2. INISIALISASI FUNGSI MUTASI UPLOAD & DELETE
@@ -140,7 +146,11 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
   const rawWaktuMulai =
     boqData?.activity?.waktuMulai || boqData?.createdAt || "";
   const rawTargetSelesai = boqData?.activity?.targetSelesai || "";
-  const workingTimeData = calculateWorkingTime(rawWaktuMulai, rawTargetSelesai, boqData?.activity?.status || boqData?.status);
+  const workingTimeData = calculateWorkingTime(
+    rawWaktuMulai,
+    rawTargetSelesai,
+    boqData?.activity?.status || boqData?.status,
+  );
 
   const mappedLogs: LogEntry[] =
     boqData?.logs?.map((log: any, index: number) => {
@@ -168,7 +178,7 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
 
   //  3. SINKRONISASI TOTAL: Map properti langsung ke namaFile dan path sesuai komponen kontrak baru
   const mappedDokumen =
-    boqData?.dokumen?.map((doc: any) => ({
+    boqData?.activity?.dokumen?.map((doc: any) => ({
       id: doc.id,
       namaFile: doc.namaFile || "Dokumen Tanpa Nama",
       path: doc.path || "",
@@ -187,6 +197,8 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
           workingTime={workingTimeData}
           onSave={(body) => updateSubTotalMut.mutate(body)} // ← tambahin ini
           isSaving={updateSubTotalMut.isPending} // ← tambahin ini
+          userDivisi={userDivisi} // ← oper ke sini
+          boqActivityStatus={workingTimeData.status}
         />
 
         <SectionHeading title="Dokumen" />
@@ -213,10 +225,7 @@ export default function Step2({ trackingId, onChatClick, mode }: Step2Props) {
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSection
-          logs={mappedLogs}
-          onAddLog={() => {}}
-        />
+        <ActivityLogSection logs={mappedLogs} onAddLog={() => {}} />
       </div>
     </div>
   );

@@ -69,27 +69,24 @@ export default function Step1({
           status={data?.permintaanMasuk?.activity?.status ?? ""}
           trackingId={trackingId}
           permintaanMasukId={data?.permintaanMasuk?.id}
-          dokumen={data?.permintaanMasuk?.dokumen ?? []}
+          dokumen={data?.permintaanMasuk?.activity?.dokumen ?? []}
           onChatClick={onChatClick}
           activity={
             data?.permintaanMasuk?.activity
               ? {
-                id: data.permintaanMasuk.activity.id,
-                judul: data.permintaanMasuk.activity.judul,
-                createdAt: data.permintaanMasuk.activity.waktuMulai,
-                targetSelesai: data.permintaanMasuk.activity.targetSelesai,
-                pegawai: data.permintaanMasuk.activity.pegawai,
-              }
+                  id: data.permintaanMasuk.activity.id,
+                  judul: data.permintaanMasuk.activity.judul,
+                  createdAt: data.permintaanMasuk.activity.waktuMulai,
+                  targetSelesai: data.permintaanMasuk.activity.targetSelesai,
+                  pegawai: data.permintaanMasuk.activity.pegawai,
+                }
               : undefined
           }
         />
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSection
-          logs={logs}
-          onAddLog={() => { }}
-        />
+        <ActivityLogSection logs={logs} onAddLog={() => {}} />
       </div>
 
       <RevisionModal

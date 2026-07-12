@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { ShieldCheck, ChevronDown, CheckCircle2, Clock3 } from "lucide-react";
+import {
+  ShieldCheck,
+  ChevronDown,
+  CheckCircle2,
+  Clock3,
+  ExternalLink,
+} from "lucide-react";
 import type { ReviewInternalResponse } from "@/services/review.internal.services";
 
 interface Props {
@@ -8,51 +14,11 @@ interface Props {
   canManajerAcc: boolean;
   canKonfirmasiUlang: boolean;
   isUpdating: boolean;
+  adminDailySelesai: boolean;
   onAcc: () => void;
   onPerluTindakan: (alasan: string) => void;
   onOnProgress: () => void;
-}
-
-function ApprovalCard({
-  initials,
-  title,
-  name,
-  approved,
-  waiting,
-  action,
-}: {
-  initials: string;
-  title: string;
-  name: string;
-  approved: boolean;
-  waiting: boolean;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
-            {initials}
-          </div>
-          <div>
-            <p className="text-lg font-bold text-slate-800">{title}</p>
-            <p className="text-sm text-gray-400 font-medium mt-1">{name}</p>
-          </div>
-        </div>
-        {approved ? (
-          <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-2 rounded-xl text-sm font-semibold">
-            <CheckCircle2 size={14} /> Disetujui
-          </span>
-        ) : waiting ? (
-          <div className="flex items-center gap-2 text-amber-500 text-sm font-semibold">
-            <Clock3 size={14} /> Menunggu Persetujuan
-          </div>
-        ) : null}
-      </div>
-      {action && <div className="mt-5 ml-16">{action}</div>}
-    </div>
-  );
+  onLihatDaily: () => void;
 }
 
 function RevisionInlineModal({
@@ -88,9 +54,7 @@ function RevisionInlineModal({
           </button>
           <button
             disabled={!reason.trim()}
-            onClick={() => {
-              onConfirm(reason);
-            }}
+            onClick={() => onConfirm(reason)}
             className={`px-8 py-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${reason.trim() ? "bg-cyan-500 text-white hover:bg-cyan-600" : "bg-gray-100 text-gray-300 cursor-not-allowed"}`}
           >
             Konfirmasi
@@ -101,21 +65,44 @@ function RevisionInlineModal({
   );
 }
 
+function getStatusBadge(status: string | undefined) {
+  if (!status) return null;
+  const colors: Record<string, string> = {
+    ON_PROGRESS: "bg-amber-50 text-amber-600 border-amber-100",
+    PENDING: "bg-gray-50 text-gray-500 border-gray-100",
+    KONFIRMASI_SELESAI: "bg-green-50 text-green-600 border-green-100",
+    SELESAI: "bg-green-50 text-green-600 border-green-100",
+    DITERIMA: "bg-green-50 text-green-600 border-green-100",
+    DITOLAK: "bg-red-50 text-red-600 border-red-100",
+    PERLU_TINDAKAN: "bg-red-50 text-red-600 border-red-100",
+  };
+  return (
+    <span
+      className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${colors[status] || "bg-gray-50 text-gray-500 border-gray-100"}`}
+    >
+      {status.replace(/_/g, " ")}
+    </span>
+  );
+}
+
 export default function ApprovalSectionReviewInternal({
   data,
-  canAdminAcc,
-  canManajerAcc,
-  canKonfirmasiUlang,
-  isUpdating,
-  onAcc,
   onPerluTindakan,
-  onOnProgress,
+  onLihatDaily,
 }: Props) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
 
+  const adminDailyStatus = data.activityAdmin?.status;
+
+  const AccAdminDirektur =
+    data.activityAdmin?.status == "DITERIMA" ||
+    data.activityAdmin?.status == "KONFIRMASI_SELESAI";
+
+  const AccManagerOperasinal = data.activityAdmin?.status == "DITERIMA";
+
   const approvedCount =
-    (data.accAdminDirektur ? 1 : 0) + (data.accManajerOps ? 1 : 0);
+    (AccAdminDirektur ? 1 : 0) + (AccManagerOperasinal ? 1 : 0);
   const boq = data.trackingPenawaran;
 
   return (
@@ -178,60 +165,124 @@ export default function ApprovalSectionReviewInternal({
           </div>
 
           {/* Admin Direktur */}
-          <ApprovalCard
-            initials="AD"
-            title="Admin Direktur"
-            name="Admin Sekertariat"
-            approved={data.accAdminDirektur}
-            waiting={!data.accAdminDirektur}
-            action={
-              canAdminAcc ? (
-                <div className="flex gap-3">
-                  <button
-                    onClick={onAcc}
-                    disabled={isUpdating}
-                    className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
-                  >
-                    {isUpdating ? "Memproses..." : "Setujui"}
-                  </button>
-                  <button
-                    onClick={() => setShowRevisionModal(true)}
-                    disabled={isUpdating}
-                    className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
-                  >
-                    Perlu Tindakan
-                  </button>
+          <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
+                  AD
                 </div>
-              ) : undefined
-            }
-          />
+                <div>
+                  <p className="text-lg font-bold text-slate-800">
+                    Admin Direktur
+                  </p>
+                  <p className="text-sm text-gray-400 font-medium mt-1">
+                    {data.activityAdmin?.pegawai?.nama || "Admin Sekertariat"}
+                  </p>
+                </div>
+              </div>
+              {AccAdminDirektur ? (
+                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-2 rounded-xl text-sm font-semibold">
+                  <CheckCircle2 size={14} /> Disetujui
+                </span>
+              ) : (
+                <div className="flex items-center gap-3">
+                  {getStatusBadge(adminDailyStatus)}
+                  <div className="flex items-center gap-2 text-amber-500 text-sm font-semibold">
+                    <Clock3 size={14} /> Menunggu Persetujuan
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Info Daily */}
+            {data.activityAdmin && (
+              <div className="mt-3 ml-16 flex items-center gap-2">
+                <span className="text-xs text-gray-400">
+                  Daily: {data.activityAdmin.judul}
+                </span>
+                <button
+                  onClick={onLihatDaily}
+                  className="flex items-center gap-1 text-xs text-cyan-500 hover:text-cyan-600 font-medium"
+                >
+                  <ExternalLink size={12} /> Lihat Detail
+                </button>
+              </div>
+            )}
+
+            {/* {canAdminAcc && (
+              <div className="mt-5 ml-16 flex gap-3">
+                <button
+                  onClick={onAcc}
+                  disabled={isUpdating}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
+                >
+                  {isUpdating ? "Memproses..." : "Setujui"}
+                </button>
+                <button
+                  onClick={() => {
+                    setRevisionTarget("admin");
+                    setShowRevisionModal(true);
+                  }}
+                  disabled={isUpdating}
+                  className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
+                >
+                  Perlu Tindakan
+                </button>
+              </div>
+            )} */}
+          </div>
 
           {/* Manajer Operasional */}
-          <ApprovalCard
-            initials="MO"
-            title="Manager Operasional"
-            name="Manajer Ops"
-            approved={data.accManajerOps}
-            waiting={!data.accManajerOps}
-            action={
-              canManajerAcc ? (
-                <div className="flex gap-3">
-                  <button
-                    onClick={onAcc}
-                    disabled={isUpdating}
-                    className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
-                  >
-                    {isUpdating ? "Memproses..." : "Setujui"}
-                  </button>
-                  <button
-                    onClick={() => setShowRevisionModal(true)}
-                    disabled={isUpdating}
-                    className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
-                  >
-                    Perlu Tindakan
-                  </button>
+          <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
+                  MO
                 </div>
-              ) : canKonfirmasiUlang ? (
+                <div>
+                  <p className="text-lg font-bold text-slate-800">
+                    Manager Operasional
+                  </p>
+                  <p className="text-sm text-gray-400 font-medium mt-1">
+                    Manajer Ops
+                  </p>
+                </div>
+              </div>
+              {AccManagerOperasinal ? (
+                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-2 rounded-xl text-sm font-semibold">
+                  <CheckCircle2 size={14} /> Disetujui
+                </span>
+              ) : (
+                <div className="flex items-center gap-2 text-amber-500 text-sm font-semibold">
+                  <Clock3 size={14} /> Menunggu Persetujuan
+                </div>
+              )}
+            </div>
+
+            {/* {canManajerAcc && (
+              <div className="mt-5 ml-16 flex gap-3">
+                <button
+                  onClick={onAcc}
+                  disabled={isUpdating}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
+                >
+                  {isUpdating ? "Memproses..." : "Setujui"}
+                </button>
+                <button
+                  onClick={() => {
+                    setRevisionTarget("manajer");
+                    setShowRevisionModal(true);
+                  }}
+                  disabled={isUpdating}
+                  className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
+                >
+                  Perlu Tindakan
+                </button>
+              </div>
+            )} */}
+
+            {/* {canKonfirmasiUlang && !canManajerAcc && (
+              <div className="mt-5 ml-16">
                 <button
                   onClick={onOnProgress}
                   disabled={isUpdating}
@@ -239,9 +290,9 @@ export default function ApprovalSectionReviewInternal({
                 >
                   {isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
                 </button>
-              ) : undefined
-            }
-          />
+              </div>
+            )} */}
+          </div>
         </div>
       </div>
 

@@ -62,6 +62,21 @@ export interface ReviewInternalResponse {
   id: string;
   trackingPenawaranId: string;
   trackingPenawaran: TrackingPenawaran;
+  activityAdminId: string | null; // ← tambahkan
+  activityAdmin: {
+    // ← tambahkan
+    id: string;
+    pegawaiId: string;
+    pegawai?: {
+      id: string;
+      nama: string;
+      divisi: string;
+    };
+    judul: string;
+    status: string;
+    targetSelesai: string;
+    createdAt: string;
+  } | null;
   accAdminDirektur: boolean;
   accManajerOps: boolean;
   status: string;

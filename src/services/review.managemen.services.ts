@@ -65,7 +65,29 @@ export interface PersetujuanManajemenResponse {
   accDirekturKomisaris: boolean;
   status: string;
   logAktivitas: LogPersetujuanManajemen[];
-  dokumen: PersetujuanManajemenDokumen[] | null;
+  dokumen: PersetujuanManajemenDokumen[] | null; // tetap ada untuk backward compatibility, tapi tidak dipakai di Step4
+  activityAdminId?: string | null;
+  activityAdmin?: {
+    id: string;
+    pegawai?: {
+      id: string;
+      nama: string;
+      divisi: string;
+    };
+    judul: string;
+    status: string;
+    targetSelesai?: string;
+    dokumen?: Array<{
+      id: string;
+      namaFile: string;
+      path: string;
+      createdAt: string;
+      uploadedBy?: string;
+      pegawai?: {
+        nama?: string;
+      };
+    }>;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,17 +1,22 @@
 import React, { useRef } from "react";
-import { FileText, Upload, CheckCircle2, ArrowRight, MessageCircle } from "lucide-react";
+import {
+  FileText,
+  Upload,
+  CheckCircle2,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
-import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
+import { useUnreadChatCount } from "@/hooks/use-activity";
 
-// SINKRON: Tipe array dokumen disesuaikan dengan models.PenawaranDokumen dari backend Go
 interface DocumentSectionBoQProps {
   trackingId: string;
   status?: string;
   dokumen: Array<{
     id: string;
-    namaFile: string; // SINKRON: Menggantikan namaDokumen
-    path: string; // SINKRON: Menggantikan fileUrl
+    namaFile: string;
+    path: string;
     createdAt: string;
     uploadedBy?: string;
     pegawai?: { id: string; nama: string; divisi?: string };
@@ -26,6 +31,22 @@ interface DocumentSectionBoQProps {
   };
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
+}
+
+function formatDateTime(isoString: string) {
+  if (!isoString) return "-";
+  const date = new Date(isoString);
+  const dateStr = date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const timeStr =
+    date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }) + " WIB";
+  return `${dateStr} pukul ${timeStr}`;
 }
 
 export default function DocumentSectionBoQ({
@@ -49,71 +70,6 @@ export default function DocumentSectionBoQ({
   }, []);
 
   const { data: unreadChat = 0 } = useUnreadChatCount(activity?.id ?? "");
-  const { data: activityDetail } = useDetailActivity(activity?.id ?? "");
-
-  const combinedDokumen = React.useMemo(() => {
-    const formatDateTime = (isoString: string) => {
-      if (!isoString) return "-";
-      const date = new Date(isoString);
-      const dateStr = date.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
-      const timeStr = date.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }) + " WIB";
-      return `${dateStr} pukul ${timeStr}`;
-    };
-
-    const stepDocs = dokumen.map((doc) => ({
-      id: doc.id,
-      namaFile: doc.namaFile,
-      path: doc.path,
-      createdAt: doc.createdAt,
-      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "System"} pada ${formatDateTime(doc.createdAt)}`,
-      source: "step" as const,
-      uploadedBy: doc.uploadedBy || "",
-    }));
-
-    const activityDocs = activityDetail?.data?.dokumen?.map((doc: any) => ({
-      id: doc.id,
-      namaFile: doc.namaFile,
-      path: doc.path,
-      createdAt: doc.createdAt,
-      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${activity?.judul || "Daily Activity"}`,
-      source: "activity" as const,
-      uploadedBy: doc.uploadedBy || "",
-    })) ?? [];
-
-    const seenPaths = new Set<string>();
-    const result: Array<{
-      id: string;
-      namaFile: string;
-      path: string;
-      createdAt: string;
-      uploaderInfo: string;
-      source: "step" | "activity";
-      uploadedBy: string;
-    }> = [];
-
-    stepDocs.forEach((d) => {
-      if (!seenPaths.has(d.path)) {
-        seenPaths.add(d.path);
-        result.push(d);
-      }
-    });
-
-    activityDocs.forEach((d) => {
-      if (!seenPaths.has(d.path)) {
-        seenPaths.add(d.path);
-        result.push(d);
-      }
-    });
-
-    return result;
-  }, [dokumen, activityDetail, activity?.judul]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -126,7 +82,9 @@ export default function DocumentSectionBoQ({
     if (status === "DITERIMA" || status === "SELESAI") return false;
     if (status === "OVERDUE") return true;
     if (!activity?.targetSelesai) return false;
-    return new Date(activity.targetSelesai).getTime() - Date.now() <= 0;
+    const targetTime = new Date(activity.targetSelesai).getTime();
+    const nowTime = new Date().getTime();
+    return targetTime - nowTime <= 0;
   }, [status, activity?.targetSelesai]);
 
   const badgeColor = (() => {
@@ -141,7 +99,9 @@ export default function DocumentSectionBoQ({
 
   const badgeLabel =
     status === "ON_PROGRESS"
-      ? (isOverdue ? "Overdue" : "Proses")
+      ? isOverdue
+        ? "Overdue"
+        : "Proses"
       : status === "SELESAI"
         ? "Selesai"
         : (status ?? "-");
@@ -156,7 +116,9 @@ export default function DocumentSectionBoQ({
             Logbook Operasional
           </div>
           <div className="flex gap-2">
-            <button className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${badgeColor}`}>
+            <button
+              className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${badgeColor}`}
+            >
               <CheckCircle2 size={13} /> {badgeLabel}
             </button>
           </div>
@@ -174,13 +136,17 @@ export default function DocumentSectionBoQ({
                     {activity.judul}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {activity.pegawai?.nama ?? "—"} ·{" "}
+                    {activity.pegawai?.divisi ?? "—"} ·{" "}
                     {activity.targetSelesai
-                      ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })
+                      ? new Date(activity.targetSelesai).toLocaleDateString(
+                          "id-ID",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )
                       : "—"}
                   </p>
                 </div>
@@ -237,18 +203,18 @@ export default function DocumentSectionBoQ({
         </div>
 
         <div className="p-4 space-y-1">
-          {combinedDokumen.length === 0 ? (
+          {dokumen.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">
               Belum ada dokumen.
             </p>
           ) : (
-            combinedDokumen.map((item) => (
+            dokumen.map((item) => (
               <DocumentItem
                 key={item.id}
                 name={item.namaFile}
-                size={item.uploaderInfo}
+                size={`${item.pegawai?.nama || item.uploadedBy || "System"} pada ${formatDateTime(item.createdAt)}`}
                 path={item.path}
-                allowDelete={item.source === "step" && currentPegawaiId === item.uploadedBy}
+                allowDelete={currentPegawaiId === item.uploadedBy}
                 onDelete={() => onDelete(item.id)}
               />
             ))
