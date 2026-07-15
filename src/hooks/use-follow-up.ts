@@ -26,8 +26,8 @@ export function useUploadDokumenFollowUp(trackingId: string) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ file }: { file: File }) =>
-      uploadDokumenFollowUp(trackingId, file),
+    mutationFn: ({ file, kategori }: { file: File; kategori?: string }) =>
+      uploadDokumenFollowUp(trackingId, file, kategori),
     onSuccess: () => {
       qc.invalidateQueries({
         queryKey: ["follow-up-detail", trackingId],

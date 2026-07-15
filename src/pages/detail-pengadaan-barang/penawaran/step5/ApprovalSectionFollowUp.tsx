@@ -42,9 +42,10 @@ export default function ApprovalSectionFollowUp({
         ? "done"
         : "active"
       : stage > 2
-      ? "done"
-      : "locked";
-  const timelineStatus3 = stage === 3 ? "done" : "locked";
+        ? "done"
+        : "locked";
+  const timelineStatus3 = stage === 3 ? (status === "SELESAI" ? "done" : "active") : stage > 3 ? "done" : "locked";
+  const timelineStatus4 = status === "SELESAI" ? "done" : "locked";
 
   const followUpStages: FollowUpStage[] = [
     {
@@ -60,10 +61,16 @@ export default function ApprovalSectionFollowUp({
       status: timelineStatus2,
     },
     {
-      title: "PO Diterima",
-      description: "Feedback customer diterima dan disetujui oleh Manager Operasional",
+      title: "Upload Dokumen PO",
+      description: "Menunggu Admin Proyek mengunggah Dokumen PO untuk PGA dan Finance",
       date: "",
       status: timelineStatus3,
+    },
+    {
+      title: "Follow Up Selesai",
+      description: "Proses follow up penawaran telah diselesaikan. Penawaran beralih ke tahap implementasi.",
+      date: "",
+      status: timelineStatus4,
     },
   ];
 
@@ -92,13 +99,12 @@ export default function ApprovalSectionFollowUp({
                   <div key={item.title} className="flex gap-4">
                     <div className="flex flex-col items-center">
                       <div
-                        className={`w-8 h-8 rounded-full border flex items-center justify-center ${
-                          isActive
+                        className={`w-8 h-8 rounded-full border flex items-center justify-center ${isActive
                             ? "bg-amber-50 border-amber-200 text-amber-500"
                             : isDone
-                            ? "bg-green-50 border-green-200 text-green-500"
-                            : "bg-slate-100 border-slate-200 text-slate-300"
-                        }`}
+                              ? "bg-green-50 border-green-200 text-green-500"
+                              : "bg-slate-100 border-slate-200 text-slate-300"
+                          }`}
                       >
                         {isDone ? <CheckCircle2 size={14} /> : <Clock3 size={14} />}
                       </div>
@@ -131,19 +137,12 @@ export default function ApprovalSectionFollowUp({
             <div className="flex items-start gap-3">
               <AlertCircle size={20} className="text-amber-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-amber-800 text-sm">Persetujuan Kirim Penawaran</h4>
+                <h4 className="font-bold text-amber-800 text-sm">Menunggu Penyelesaian Tugas</h4>
                 <p className="text-xs text-amber-700 font-medium mt-0.5">
-                  Tugas pengiriman dokumen penawaran oleh Admin Sekretariat. Silakan klik tombol jika email penawaran sudah terkirim ke klien.
+                  Status pengiriman dokumen diatur melalui penyelesaian Daily Activity. Silakan ajukan selesai pada Daily Activity terkait Anda dan tunggu persetujuan Master/Supervisi untuk beralih ke tahap berikutnya.
                 </p>
               </div>
             </div>
-            <Button
-              onClick={() => onUpdateStage(2)}
-              disabled={isUpdating}
-              className="bg-amber-500 hover:bg-amber-600 font-bold shrink-0 shadow-sm"
-            >
-              {isUpdating ? "Memproses..." : "Tandai Penawaran Terkirim"}
-            </Button>
           </div>
         )}
 
@@ -152,58 +151,34 @@ export default function ApprovalSectionFollowUp({
             <div className="flex items-start gap-3">
               <AlertCircle size={20} className="text-cyan-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-cyan-800 text-sm">Menunggu Feedback & Negosiasi</h4>
+                <h4 className="font-bold text-cyan-800 text-sm">Menunggu Penyelesaian Tugas Sales</h4>
                 <p className="text-xs text-cyan-700 font-medium mt-0.5">
-                  Lakukan follow up ke customer untuk mendapatkan feedback / persetujuan PO. Setelah PO diterima atau disetujui, klik tombol di sebelah kanan.
+                  Lakukan follow up ke customer untuk mendapatkan feedback / persetujuan PO. Setelah selesai, silakan ajukan selesai pada Daily Activity Anda.
                 </p>
               </div>
             </div>
-            <Button
-              onClick={() => onUpdateStatus("KONFIRMASI_SELESAI")}
-              disabled={isUpdating}
-              className="bg-cyan-500 hover:bg-cyan-600 font-bold shrink-0 shadow-sm"
-            >
-              {isUpdating ? "Memproses..." : "Feedback Customer Diterima"}
-            </Button>
           </div>
         )}
 
-        {stage === 2 && status === "KONFIRMASI_SELESAI" && (
+        {stage === 2 && (status === "KONFIRMASI_SELESAI" || status === "PERLU_TINDAKAN") && (
           <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4 text-amber-800">
             <Clock3 size={20} className="text-amber-500 shrink-0" />
             <div>
-              <h4 className="font-bold text-sm">Menunggu Persetujuan Manager Operasional</h4>
+              <h4 className="font-bold text-sm">Menunggu Persetujuan Master/Supervisi</h4>
               <p className="text-xs text-amber-700 font-medium mt-0.5">
-                Feedback dari klien sudah dilaporkan oleh sales. Menunggu pemeriksaan dan persetujuan dari Manager Operasional untuk beralih ke tahap implementasi.
+                Tugas follow up telah dikerjakan oleh sales. Menunggu persetujuan pada Daily Activity untuk beralih ke tahap Admin Proyek.
               </p>
             </div>
           </div>
         )}
 
-        {stage === 2 && status === "PERLU_TINDAKAN" && (
-          <div className="bg-red-50 border border-red-100 rounded-xl p-4 space-y-2">
-            <div className="flex items-start gap-3 text-red-800">
-              <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-bold text-sm">Perlu Tindakan (Revisi Ditolak Manager)</h4>
-                <p className="text-xs text-red-700 font-medium mt-0.5">
-                  Laporan feedback customer memerlukan revisi atau belum lengkap. Harap periksa catatan di bawah ini dan ajukan konfirmasi ulang di bar bagian bawah.
-                </p>
-              </div>
-            </div>
-            <div className="bg-white border border-red-100 rounded-lg p-3 text-xs font-semibold text-red-600">
-              Catatan: {rejectionReason}
-            </div>
-          </div>
-        )}
-
-        {stage === 3 && (
+        {status === "SELESAI" && (
           <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-xl p-4 text-green-800">
             <CheckCircle2 size={20} className="text-green-500 shrink-0" />
             <div>
               <h4 className="font-bold text-sm">Follow Up Selesai</h4>
               <p className="text-xs text-green-700 font-medium mt-0.5">
-                Proses follow up penawaran telah diselesaikan dan disetujui oleh Manager Operasional. Penawaran beralih ke tahap implementasi.
+                Proses follow up penawaran telah diselesaikan. Penawaran beralih ke tahap implementasi.
               </p>
             </div>
           </div>

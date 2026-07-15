@@ -173,10 +173,10 @@ function LogbookCard({ title, activity, onChatClick }: LogbookCardProps) {
                   {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
                   {activity.targetSelesai
                     ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
                     : "—"}
                 </p>
               </div>
@@ -236,8 +236,8 @@ function TabButton({ value, label, activeTab, onClick }: TabButtonProps) {
     <button
       onClick={() => onClick(value)}
       className={`py-4 text-sm whitespace-nowrap border-b-2 transition-all font-medium ${isActive
-          ? "border-cyan-500 text-cyan-500 font-bold"
-          : "border-transparent text-gray-400 hover:text-gray-600"
+        ? "border-cyan-500 text-cyan-500 font-bold"
+        : "border-transparent text-gray-400 hover:text-gray-600"
         }`}
     >
       {label}
@@ -412,7 +412,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         <SectionHeading title="Detail" />
 
         {/* Order Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Purchase Order */}
           <OrderCard
             icon={<ShoppingCart size={16} strokeWidth={2.5} />}
@@ -460,7 +460,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           />
 
           {/* Deliver Order */}
-          <OrderCard
+          {/* <OrderCard
             icon={<Truck size={16} strokeWidth={2.5} />}
             label="No. Deliver Order"
             value={orderInfo.noDO}
@@ -480,7 +480,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
             onSave={() => handleSaveField("noDO", "tanggalDO")}
             onCancel={handleCancelEdit}
             emptyLabel="Belum tersedia"
-          />
+          /> */}
 
           {/* Waktu Pengerjaan */}
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:border-cyan-100 transition-all">

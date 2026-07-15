@@ -124,9 +124,13 @@ export async function updateStatusFollowUp(
 export async function uploadDokumenFollowUp(
   trackingId: string,
   file: File,
+  kategori?: string
 ): Promise<FollowUpDokumen> {
   const formData = new FormData();
   formData.append("file", file);
+  if (kategori) {
+    formData.append("kategori", kategori);
+  }
   const res = await fetch(
     `${BASE_URL}/tracking-penawaran/${trackingId}/follow-up/dokumen`,
     {

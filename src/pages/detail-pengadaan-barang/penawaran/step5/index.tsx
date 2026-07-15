@@ -4,6 +4,7 @@ import { useDetailFollowUp, useUpdateStatusFollowUp, useUploadDokumenFollowUp, u
 import ApprovalSectionFollowUp from "./ApprovalSectionFollowUp";
 import DocumentSectionFollowUp from "./DocumentSectionFollowUp";
 import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
+import AdminProyekUpload from "./AdminProyekUpload";
 
 interface Step5Props {
   trackingId: string;
@@ -176,7 +177,6 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
             </div>
           </div>
         </div>
-
         <ApprovalSectionFollowUp
           stage={data.stage}
           status={data.status}
@@ -189,6 +189,19 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
           onUpdateStage={(nextStage) => updateStatusMut.mutate({ stage: nextStage })}
           onUpdateStatus={(nextStatus) => updateStatusMut.mutate({ status: nextStatus })}
         />
+
+        {data.stage >= 3 && (
+          <>
+            <SectionHeading title="Upload Dokumen PO" />
+            <AdminProyekUpload
+              dokumen={mappedDokumen}
+              isUploading={uploadMut.isPending}
+              isAdminProyek={divisi === "MAINTENANCE_PAC" || divisi === "MAINTENANCE_FIRE" || role === "MASTER" || divisi === "MANAGER_OPERASIONAL"}
+              onUpload={(file, kategori) => uploadMut.mutate({ file, kategori })}
+              onDelete={(id) => deleteMut.mutate(id)}
+            />
+          </>
+        )}
 
         <SectionHeading title="Dokumen" />
         <DocumentSectionFollowUp
