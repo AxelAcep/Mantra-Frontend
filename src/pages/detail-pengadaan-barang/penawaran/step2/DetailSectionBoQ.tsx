@@ -132,6 +132,13 @@ export default function DetailSectionBoQ({
     return "bg-amber-50 text-amber-500";
   })();
 
+  const isDone = (() => {
+    const s = workingTime?.status?.toUpperCase();
+    return s === "SELESAI" || s === "DITERIMA";
+  })();
+  const displayedPercentage = isDone ? 100 : (workingTime?.percentage ?? 0);
+  const displayedRemaining = isDone ? 0 : (workingTime?.remainingHours ?? "-");
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
       {/* Ringkasan Finansial */}
@@ -237,16 +244,16 @@ export default function DetailSectionBoQ({
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">
-              Sisa waktu: {workingTime?.remainingHours ?? "-"} jam
+              Sisa waktu: {displayedRemaining} jam
             </span>
             <span className="text-slate-800 font-bold">
-              {workingTime?.percentage ?? 0}%
+              {displayedPercentage}%
             </span>
           </div>
           <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-yellow-400 rounded-full"
-              style={{ width: `${workingTime?.percentage ?? 0}%` }}
+              className={`h-full rounded-full transition-all duration-500 ${isDone ? "bg-green-500" : "bg-yellow-400"}`}
+              style={{ width: `${displayedPercentage}%` }}
             />
           </div>
           <p className="text-sm text-gray-400 font-medium pt-1">

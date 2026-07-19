@@ -6,6 +6,7 @@ import {
   addBarangImplementasi,
   updateBarangImplementasi,
   deleteBarangImplementasi,
+  assignPGAStaff,
 } from "@/services/implementasi.services";
 
 export function useDetailImplementasi(trackingId: string | undefined) {
@@ -34,6 +35,7 @@ export function useUpdateDetailImplementasi(trackingId: string) {
       tanggalWO?: string;
       noDO?: string;
       tanggalDO?: string;
+      waktuPengerjaan?: string;
     }) => updateDetailImplementasi(trackingId, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
@@ -41,6 +43,21 @@ export function useUpdateDetailImplementasi(trackingId: string) {
     },
     onError: (error: Error) => {
       console.error("Update detail implementasi failed:", error.message);
+    },
+  });
+}
+
+export function useAssignPGAStaff(trackingId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: { staffIds: string[]; phase: string }) => assignPGAStaff(trackingId, payload.staffIds, payload.phase),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["implementasi-detail", trackingId] });
+    },
+    onError: (error: Error) => {
+      console.error("Assign PGA Staff failed:", error.message);
+      alert("Gagal menugaskan staff: " + error.message);
     },
   });
 }

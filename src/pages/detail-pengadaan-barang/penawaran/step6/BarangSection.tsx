@@ -283,9 +283,10 @@ interface BarangSectionProps {
   trackingId?: string;
   activityPembelian?: any;
   onChatClick: (activityId: string, activityJudul: string) => void;
+  onAssignPGA?: () => void;
 }
 
-export default function BarangSection({ trackingId, activityPembelian, onChatClick }: BarangSectionProps) {
+export default function BarangSection({ trackingId, activityPembelian, onChatClick, onAssignPGA }: BarangSectionProps) {
   const navigate = useNavigate();
   const { data: implData } = useDetailImplementasi(trackingId);
   const { data: unreadChat = 0 } = useUnreadChatCount(activityPembelian?.id ?? "");
@@ -321,7 +322,7 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
       satuan: item.satuan,
       hargaSatuan: String(item.hargaSatuan),
       metode: item.metode,
-      estimasiKedatangan: item.estimasiKedatangan ?? "",
+      estimasiKedatangan: item.estimasiKedatangan ? item.estimasiKedatangan.split("T")[0] : "",
     });
   }
 
@@ -439,7 +440,7 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
             <div className="flex items-center gap-3 mt-1">
               <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-yellow-400 rounded-full transition-all"
+                  className={`h-full rounded-full transition-all ${progress === 100 ? "bg-green-500" : "bg-yellow-400"}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -542,8 +543,8 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                     <tr
                       key={item.id}
                       className={`border-b border-gray-50 last:border-0 transition-all ${editingId === item.id
-                          ? "bg-cyan-50/20"
-                          : "bg-white hover:bg-slate-50/30"
+                        ? "bg-cyan-50/20"
+                        : "bg-white hover:bg-slate-50/30"
                         }`}
                     >
                       <td className="px-4 py-4">
@@ -554,8 +555,8 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                       <td className="px-4 py-4 text-center">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.status === "Ready"
-                              ? "bg-green-50 text-green-500"
-                              : "bg-amber-50 text-amber-500"
+                            ? "bg-green-50 text-green-500"
+                            : "bg-amber-50 text-amber-500"
                             }`}
                         >
                           {item.status}
@@ -595,8 +596,8 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                           <button
                             onClick={() => handleOpenEdit(item)}
                             className={`transition-colors ${editingId === item.id
-                                ? "text-cyan-500"
-                                : "text-gray-400 hover:text-cyan-500"
+                              ? "text-cyan-500"
+                              : "text-gray-400 hover:text-cyan-500"
                               }`}
                             title="Edit"
                           >
@@ -634,49 +635,99 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
             <FileText size={16} className="text-cyan-500" />
             Logbook Operasional Pembelian Barang
           </div>
+          {onAssignPGA && (
+            <button
+              onClick={onAssignPGA}
+              className="flex items-center gap-1.5 text-xs font-bold text-cyan-600 bg-cyan-50 hover:bg-cyan-100 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Pilih Staff PGA
+            </button>
+          )}
         </div>
         <div className="p-6">
           {activityPembelian ? (
-            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
-                  <FileText size={18} />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                    <FileText size={18} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">
+                      {activityPembelian.judul}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {activityPembelian.pegawai?.nama ?? "—"} · {activityPembelian.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
+                      {activityPembelian.targetSelesai
+                        ? new Date(activityPembelian.targetSelesai).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                        : "—"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">
-                    {activityPembelian.judul}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {activityPembelian.pegawai?.nama ?? "—"} · {activityPembelian.pegawai?.divisi ?? "—"} ·{" "}
-                    {activityPembelian.targetSelesai
-                      ? new Date(activityPembelian.targetSelesai).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })
-                      : "—"}
-                  </p>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button
+                    onClick={() => onChatClick(activityPembelian.id, activityPembelian.judul)}
+                    className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
+                  >
+                    <MessageCircle size={13} /> Chat
+                  </button>
+                  <button
+                    onClick={() => navigate(`/dailyactivity/${activityPembelian.id}`)}
+                    className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                  >
+                    Lihat Detail <ArrowRight size={14} />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <button
-                  onClick={() => onChatClick(activityPembelian.id, activityPembelian.judul)}
-                  className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
-                >
-                  <MessageCircle size={13} /> Chat
-                  {unreadChat > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                      {unreadChat > 9 ? "9+" : unreadChat}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => navigate(`/dailyactivity/${activityPembelian.id}`)}
-                  className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
-                >
-                  Lihat Detail <ArrowRight size={14} />
-                </button>
-              </div>
+
+              {/* Render children (Staff PGA) */}
+              {activityPembelian.children && activityPembelian.children.length > 0 && (
+                <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penugasan Staff PGA</p>
+                  {activityPembelian.children.map((child: any) => (
+                    <div key={child.id} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
+                          <FileText size={16} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-700">
+                            {child.judul}
+                          </p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            {child.pegawai?.nama ?? "—"} · {child.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
+                            {child.targetSelesai
+                              ? new Date(child.targetSelesai).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                              : "—"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          onClick={() => onChatClick(child.id, child.judul)}
+                          className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
+                        >
+                          <MessageCircle size={12} /> Chat
+                        </button>
+                        <button
+                          onClick={() => navigate(`/dailyactivity/${child.id}`)}
+                          className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                        >
+                          Detail <ArrowRight size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <div className="p-8 flex flex-col items-center gap-3 text-center">

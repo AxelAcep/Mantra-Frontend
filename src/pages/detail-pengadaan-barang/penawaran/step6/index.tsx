@@ -16,8 +16,11 @@ import {
 import ActivityLogSection from "./ActivityLogSection";
 import type { LogEntry } from "./ActivityLogSection";
 import BarangSection from "./BarangSection";
-import { useDetailImplementasi, useUpdateDetailImplementasi } from "@/hooks/use-implementasi";
+import { useDetailImplementasi, useUpdateDetailImplementasi, useAssignPGAStaff } from "@/hooks/use-implementasi";
 import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
+import { usePegawaiByDivisi } from "@/hooks/use-penawaran";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -58,6 +61,7 @@ interface OrderCardProps {
   onSave: () => void;
   onCancel: () => void;
   emptyLabel?: string;
+  inputType?: string;
 }
 
 function OrderCard({
@@ -73,6 +77,7 @@ function OrderCard({
   onSave,
   onCancel,
   emptyLabel = "Belum tersedia",
+  inputType = "text",
 }: OrderCardProps) {
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm group hover:border-cyan-100 transition-all">
@@ -97,7 +102,7 @@ function OrderCard({
       {isEditing ? (
         <div className="space-y-2">
           <input
-            type="text"
+            type={inputType}
             value={editValue}
             onChange={(e) => onEditChange(e.target.value)}
             autoFocus
@@ -143,13 +148,14 @@ interface LogbookCardProps {
     judul: string;
     targetSelesai?: string;
     pegawai?: { nama?: string; divisi?: string };
+    children?: any[];
   };
   onChatClick: (activityId: string, activityJudul: string) => void;
+  onAssignPGA?: () => void;
 }
 
-function LogbookCard({ title, activity, onChatClick }: LogbookCardProps) {
+function LogbookCard({ title, activity, onChatClick, onAssignPGA }: LogbookCardProps) {
   const navigate = useNavigate();
-  const { data: unreadChat = 0 } = useUnreadChatCount(activity?.id ?? "");
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm text-left">
       <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
@@ -157,49 +163,99 @@ function LogbookCard({ title, activity, onChatClick }: LogbookCardProps) {
           <FileText size={16} className="text-cyan-500" />
           {title}
         </div>
+        {onAssignPGA && (
+          <button
+            onClick={onAssignPGA}
+            className="flex items-center gap-1.5 text-xs font-bold text-cyan-600 bg-cyan-50 hover:bg-cyan-100 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Pilih Staff PGA
+          </button>
+        )}
       </div>
       <div className="p-6">
         {activity ? (
-          <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
-                <FileText size={18} />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">
+                    {activity.judul}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {activity.targetSelesai
+                      ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                      : "—"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-800">
-                  {activity.judul}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {activity.pegawai?.nama ?? "—"} · {activity.pegawai?.divisi ?? "—"} ·{" "}
-                  {activity.targetSelesai
-                    ? new Date(activity.targetSelesai).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })
-                    : "—"}
-                </p>
+              <div className="flex items-center gap-3 shrink-0">
+                <button
+                  onClick={() => onChatClick(activity.id, activity.judul)}
+                  className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
+                >
+                  <MessageCircle size={13} /> Chat
+                </button>
+                <button
+                  onClick={() => navigate(`/dailyactivity/${activity.id}`)}
+                  className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
+                >
+                  Lihat Detail <ArrowRight size={14} />
+                </button>
               </div>
             </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                onClick={() => onChatClick(activity.id, activity.judul)}
-                className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
-              >
-                <MessageCircle size={13} /> Chat
-                {unreadChat > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                    {unreadChat > 9 ? "9+" : unreadChat}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => navigate(`/dailyactivity/${activity.id}`)}
-                className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
-              >
-                Lihat Detail <ArrowRight size={14} />
-              </button>
-            </div>
+
+            {/* Render children (Staff PGA) */}
+            {activity.children && activity.children.length > 0 && (
+              <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penugasan Staff PGA</p>
+                {activity.children.map((child: any) => (
+                  <div key={child.id} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
+                        <FileText size={16} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-700">
+                          {child.judul}
+                        </p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          {child.pegawai?.nama ?? "—"} · {child.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
+                          {child.targetSelesai
+                            ? new Date(child.targetSelesai).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                            : "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <button
+                        onClick={() => onChatClick(child.id, child.judul)}
+                        className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        <MessageCircle size={12} /> Chat
+                      </button>
+                      <button
+                        onClick={() => navigate(`/dailyactivity/${child.id}`)}
+                        className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                      >
+                        Detail <ArrowRight size={12} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="p-8 flex flex-col items-center gap-3 text-center">
@@ -254,16 +310,36 @@ interface Step6Props {
 
 export default function Step6({ trackingId, onChatClick }: Step6Props) {
   const userInfo = getUserInfo();
-  const canEditOrders =
-    userInfo.role === "MASTER" ||
-    userInfo.divisi === "MANAGER_OPERASIONAL";
+  const isMasterOrManager = userInfo.role === "MASTER" || userInfo.divisi === "MANAGER_OPERASIONAL";
+  const isAdminProyek = userInfo.divisi === "MAINTENANCE_PAC" || userInfo.divisi === "MAINTENANCE_FIRE";
+  const isKepalaPGA = userInfo.divisi === "PROCUREMENT_GA" && userInfo.role === "SUPERVISI";
 
+  const canEditPOAndWaktu = isMasterOrManager || isAdminProyek;
+  const canEditWO = isMasterOrManager || isKepalaPGA;
   // ── Tab State ──
   const [activeTab, setActiveTab] = useState<Tab>("pembelian");
 
   // ── Query & Mutation ──
   const { data: implData, loading: implLoading } = useDetailImplementasi(trackingId);
   const updateDetailMut = useUpdateDetailImplementasi(trackingId ?? "");
+
+  // ── Staff PGA Modal State ──
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedStaffs, setSelectedStaffs] = useState<string[]>([]);
+  const [assignPhase, setAssignPhase] = useState<"pembelian" | "pengantaran" | "instalasi">("pembelian");
+  const { data: pgaStaffs } = usePegawaiByDivisi("PROCUREMENT_GA");
+  const assignPgaMut = useAssignPGAStaff(trackingId ?? "");
+
+  function handleAssignSubmit() {
+    if (selectedStaffs.length === 0) return;
+    assignPgaMut.mutate({ staffIds: selectedStaffs, phase: assignPhase }, {
+      onSuccess: () => {
+        setIsAssignModalOpen(false);
+        setSelectedStaffs([]);
+        setAssignPhase("pembelian");
+      }
+    });
+  }
 
   // ── Order Info State ──
   const [orderInfo, setOrderInfo] = useState({
@@ -273,6 +349,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
     tanggalWO: "",
     noDO: "",
     tanggalDO: "",
+    waktuPengerjaan: "",
   });
 
   useEffect(() => {
@@ -284,6 +361,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         tanggalWO: implData.tanggalWO ? new Date(implData.tanggalWO).toISOString().slice(0, 10) : "",
         noDO: implData.noDO ?? "",
         tanggalDO: implData.tanggalDO ? new Date(implData.tanggalDO).toISOString().slice(0, 10) : "",
+        waktuPengerjaan: (implData as any).waktuPengerjaan ? new Date((implData as any).waktuPengerjaan).toISOString().slice(0, 10) : "",
       });
     }
   }, [implData]);
@@ -304,7 +382,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
     const newOrderInfo = {
       ...orderInfo,
       [noField]: editNoValue,
-      [tanggalField]: defaultDate,
+      [tanggalField]: noField === "waktuPengerjaan" ? editNoValue : defaultDate,
     };
 
     updateDetailMut.mutate({
@@ -314,6 +392,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
       tanggalWO: newOrderInfo.tanggalWO || undefined,
       noDO: newOrderInfo.noDO,
       tanggalDO: newOrderInfo.tanggalDO || undefined,
+      waktuPengerjaan: newOrderInfo.waktuPengerjaan || undefined,
     });
     setEditingField(null);
   }
@@ -426,7 +505,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 )}`
                 : undefined
             }
-            canEdit={canEditOrders}
+            canEdit={canEditPOAndWaktu}
             isEditing={editingField === "noPO"}
             editValue={editNoValue}
             onEditClick={() => handleEditField("noPO", "tanggalPO")}
@@ -449,7 +528,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 )}`
                 : undefined
             }
-            canEdit={canEditOrders}
+            canEdit={canEditWO}
             isEditing={editingField === "noWO"}
             editValue={editNoValue}
             onEditClick={() => handleEditField("noWO", "tanggalWO")}
@@ -483,34 +562,27 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           /> */}
 
           {/* Waktu Pengerjaan */}
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:border-cyan-100 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-cyan-600">
-                <Clock size={16} strokeWidth={2.5} />
-                <p className="text-[10px] font-bold uppercase tracking-tight">
-                  Waktu Pengerjaan
-                </p>
-              </div>
-              <span className="text-[9px] bg-amber-50 text-amber-500 font-bold px-1.5 py-0.5 rounded">
-                Menunggu
-              </span>
-            </div>
-            <div className="flex items-end justify-between mb-1.5">
-              <p className="text-[11px] text-gray-400 font-medium">
-                Sisa waktu —
-              </p>
-              <p className="text-sm font-bold text-slate-800">0%</p>
-            </div>
-            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-cyan-500 rounded-full"
-                style={{ width: "0%" }}
-              />
-            </div>
-            <p className="text-[10px] text-gray-400 mt-2">
-              Menunggu estimasi waktu
-            </p>
-          </div>
+          <OrderCard
+            icon={<Clock size={16} strokeWidth={2.5} />}
+            label="Waktu Pengerjaan"
+            value={
+              orderInfo.waktuPengerjaan
+                ? new Date(orderInfo.waktuPengerjaan).toLocaleDateString(
+                  "id-ID",
+                  { day: "numeric", month: "long", year: "numeric" },
+                )
+                : ""
+            }
+            canEdit={canEditPOAndWaktu}
+            isEditing={editingField === "waktuPengerjaan"}
+            editValue={editNoValue}
+            inputType="date"
+            onEditClick={() => handleEditField("waktuPengerjaan", "waktuPengerjaan")}
+            onEditChange={setEditNoValue}
+            onSave={() => handleSaveField("waktuPengerjaan", "waktuPengerjaan")}
+            onCancel={handleCancelEdit}
+            emptyLabel="Menunggu estimasi waktu"
+          />
         </div>
 
         {/* Tabs */}
@@ -530,12 +602,12 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 activeTab={activeTab}
                 onClick={setActiveTab}
               />
-              <TabButton
+              { /* <TabButton
                 value="instalasi"
                 label="Instalasi"
                 activeTab={activeTab}
                 onClick={setActiveTab}
-              />
+              /> */}
             </div>
           </div>
 
@@ -546,6 +618,10 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 trackingId={trackingId}
                 activityPembelian={implData?.activityPembelian}
                 onChatClick={onChatClick}
+                onAssignPGA={userInfo.divisi === "PROCUREMENT_GA" && userInfo.role === "SUPERVISI" && implData?.activityPembelian ? () => {
+                  setAssignPhase("pembelian");
+                  setIsAssignModalOpen(true);
+                } : undefined}
               />
             )}
 
@@ -554,6 +630,10 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 title="Logbook Operasional Pengantaran"
                 activity={implData?.activityPengantaran}
                 onChatClick={onChatClick}
+                onAssignPGA={userInfo.divisi === "PROCUREMENT_GA" && userInfo.role === "SUPERVISI" && implData?.activityPengantaran ? () => {
+                  setAssignPhase("pengantaran");
+                  setIsAssignModalOpen(true);
+                } : undefined}
               />
             )}
 
@@ -562,6 +642,10 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
                 title="Logbook Operasional Instalasi"
                 activity={implData?.activityInstalasi}
                 onChatClick={onChatClick}
+                onAssignPGA={userInfo.divisi === "PROCUREMENT_GA" && userInfo.role === "SUPERVISI" && implData?.activityInstalasi ? () => {
+                  setAssignPhase("instalasi");
+                  setIsAssignModalOpen(true);
+                } : undefined}
               />
             )}
           </div>
@@ -632,6 +716,79 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           logs={logs}
         />
       </div>
+
+      {/* ── Modal Pilih Staff PGA ── */}
+      <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-800">
+              Pilih Staff PGA
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p className="text-sm text-gray-500 mb-4">
+              Pilih staff PGA untuk ditugaskan mengecek barang. Mereka akan mendapatkan daily activity terpisah.
+            </p>
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+              {pgaStaffs?.filter((p: any) => p.role !== "SUPERVISI").map((staff: any) => {
+                let currentParent = implData?.activityPembelian;
+                if (assignPhase === "pengantaran") currentParent = implData?.activityPengantaran;
+                if (assignPhase === "instalasi") currentParent = implData?.activityInstalasi;
+
+                const isAlreadyAssigned = currentParent?.children?.some((child: any) => child.pegawaiId === staff.id);
+                if (isAlreadyAssigned) return null;
+                return (
+                  <label
+                    key={staff.id}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-slate-50 cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-cyan-500 border-gray-300 rounded focus:ring-cyan-500"
+                      checked={selectedStaffs.includes(staff.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedStaffs([...selectedStaffs, staff.id]);
+                        } else {
+                          setSelectedStaffs(selectedStaffs.filter((id) => id !== staff.id));
+                        }
+                      }}
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">{staff.nama}</p>
+                      <p className="text-xs text-gray-400">Divisi {staff.divisi.replace("_", " ")}</p>
+                    </div>
+                  </label>
+                );
+              })}
+              {(!pgaStaffs || pgaStaffs.filter((p: any) => {
+                let currentParent = implData?.activityPembelian;
+                if (assignPhase === "pengantaran") currentParent = implData?.activityPengantaran;
+                if (assignPhase === "instalasi") currentParent = implData?.activityInstalasi;
+                return p.role !== "SUPERVISI" && !currentParent?.children?.some((child: any) => child.pegawaiId === p.id);
+              }).length === 0) && (
+                  <p className="text-sm text-gray-400 text-center py-4">Tidak ada staff PGA tersedia atau semua staff sudah ditugaskan.</p>
+                )}
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsAssignModalOpen(false)}
+                className="font-bold border-gray-200 text-gray-600"
+              >
+                Batal
+              </Button>
+              <Button
+                onClick={handleAssignSubmit}
+                disabled={selectedStaffs.length === 0 || assignPgaMut.isPending}
+                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold"
+              >
+                {assignPgaMut.isPending ? "Menyimpan..." : "Tugaskan Staff"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

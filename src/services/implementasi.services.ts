@@ -107,6 +107,7 @@ export async function updateDetailImplementasi(
     tanggalWO?: string;
     noDO?: string;
     tanggalDO?: string;
+    waktuPengerjaan?: string;
   },
 ): Promise<ImplementasiResponse> {
   const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi`, {
@@ -117,6 +118,24 @@ export async function updateDetailImplementasi(
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal memperbarui detail Implementasi.");
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function assignPGAStaff(
+  trackingId: string,
+  staffIds: string[],
+  phase: string,
+): Promise<ImplementasiResponse> {
+  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi/assign-pga`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ staffIds, phase }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal menugaskan staff PGA.");
   }
   const json = await res.json();
   return json.data;
