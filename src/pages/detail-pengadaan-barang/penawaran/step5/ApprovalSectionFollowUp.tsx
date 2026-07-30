@@ -26,14 +26,10 @@ interface ApprovalSectionFollowUpProps {
 export default function ApprovalSectionFollowUp({
   stage,
   status,
-  logs,
   customerName,
   salesName,
   isAdminSekertariat,
   isSalesPIC,
-  isUpdating,
-  onUpdateStage,
-  onUpdateStatus,
 }: ApprovalSectionFollowUpProps) {
   // Map stages timeline representation
   const timelineStatus1 =
@@ -86,12 +82,6 @@ export default function ApprovalSectionFollowUp({
   ];
 
   // Get latest rejection reason
-  const rejectionLog = [...(logs || [])]
-    .reverse()
-    .find((l) => l.aksi?.startsWith("Feedback Customer Perlu Tindakan"));
-  const rejectionReason =
-    rejectionLog?.keterangan || "Tidak ada alasan spesifik.";
-
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="p-4 border-b border-gray-100/80 flex items-center gap-2 font-bold text-slate-800 text-sm">

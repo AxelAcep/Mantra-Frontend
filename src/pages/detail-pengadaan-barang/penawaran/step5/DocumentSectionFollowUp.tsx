@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef } from "react";
 import {
   FileText,
@@ -132,7 +133,6 @@ export default function DocumentSectionFollowUp({
   onUpload,
   onDelete,
 }: DocumentSectionFollowUpProps) {
-  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentPegawaiId = React.useMemo(() => {

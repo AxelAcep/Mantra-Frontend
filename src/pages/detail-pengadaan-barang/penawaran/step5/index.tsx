@@ -61,9 +61,6 @@ export default function Step5({
   const { pegawaiId, divisi, role } = getUserInfo();
 
   const isManagerOps = divisi === "MANAGER_OPERASIONAL" || role === "MASTER";
-  const isAdminProyek =
-    (divisi === "MAINTENANCE_PAC" || divisi === "MAINTENANCE_FIRE") &&
-    role == "SUPERVISI";
   const isSalesPIC = data
     ? pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIAT"
     : false;
