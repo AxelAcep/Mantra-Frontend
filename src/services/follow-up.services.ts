@@ -73,6 +73,7 @@ export interface FollowUpResponse {
   admin?: { id: string; nama: string };
   activityAdminId?: string;
   activityAdmin?: ActivityDetail;
+  activityAdminProyek?: ActivityDetail;
   salesId?: string;
   sales?: { id: string; nama: string };
   activitySalesId?: string;
@@ -104,15 +105,22 @@ export async function updateStatusFollowUp(
   trackingId: string,
   payload: {
     stage?: number;
-    status?: "ON_PROGRESS" | "KONFIRMASI_SELESAI" | "SELESAI" | "PERLU_TINDAKAN";
+    status?:
+      | "ON_PROGRESS"
+      | "KONFIRMASI_SELESAI"
+      | "SELESAI"
+      | "PERLU_TINDAKAN";
     alasanPenolakan?: string;
   },
 ): Promise<FollowUpResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/follow-up/status`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/follow-up/status`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal update status Follow Up.");
@@ -124,7 +132,7 @@ export async function updateStatusFollowUp(
 export async function uploadDokumenFollowUp(
   trackingId: string,
   file: File,
-  kategori?: string
+  kategori?: string,
 ): Promise<FollowUpDokumen> {
   const formData = new FormData();
   formData.append("file", file);
@@ -164,4 +172,46 @@ export async function deleteDokumenFollowUp(
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.message ?? "Gagal hapus dokumen Follow Up.");
   }
+}
+
+export interface PegawaiAdminProyekOption {
+  pegawaiId: string;
+  nama: string;
+}
+
+export interface AssignAdminProyekResult {
+  activityId: string;
+  followUpId: string;
+}
+
+export async function getPegawaiAdminProyek(): Promise<
+  PegawaiAdminProyekOption[]
+> {
+  const res = await fetchClient(`/tracking-penawaran/pegawai/admin-proyek`, {
+    method: "GET",
+    headers: authHeaders(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal mengambil data pegawai.");
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function assignAdminProyek(payload: {
+  followUpId: string;
+  pegawaiId: string;
+}): Promise<AssignAdminProyekResult> {
+  const res = await fetchClient(`/tracking-penawaran/follow-up/admin-proyek`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal menugaskan Admin Proyek.");
+  }
+  const json = await res.json();
+  return json.data;
 }

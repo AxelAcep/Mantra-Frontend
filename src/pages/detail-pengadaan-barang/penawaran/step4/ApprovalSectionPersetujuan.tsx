@@ -180,7 +180,7 @@ export default function ApprovalSectionPersetujuan({
                 <CheckCircle2 size={12} />
               </div>
               <p className="text-xs text-slate-700 font-semibold">
-                Admin Sekertariat
+                Admin Sekertaris
               </p>
             </div>
             <div className="flex items-center gap-1 text-[10px] text-gray-400">

@@ -1,5 +1,11 @@
 import React, { useRef } from "react";
-import { FileText, Upload, CheckCircle2, ArrowRight, MessageCircle } from "lucide-react";
+import {
+  FileText,
+  Upload,
+  CheckCircle2,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import type { FollowUpDokumen } from "@/services/follow-up.services";
@@ -29,10 +35,10 @@ function ActivityRow({ act, onChatClick }: ActivityRowProps) {
         <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500 shrink-0">
           <FileText size={18} />
         </div>
+
         <div>
-          <p className="text-lg font-bold text-slate-800">
-            {act.judul}
-          </p>
+          <p className="text-lg font-bold text-slate-800">{act.judul}</p>
+
           <p className="text-sm text-gray-400">
             {act.pegawai?.nama ?? "—"} · {act.role} ·{" "}
             {act.targetSelesai
@@ -45,18 +51,21 @@ function ActivityRow({ act, onChatClick }: ActivityRowProps) {
           </p>
         </div>
       </div>
+
       <div className="flex items-center gap-3 shrink-0">
         <button
           onClick={() => onChatClick(act.id, act.judul)}
           className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
         >
-          <MessageCircle size={13} /> Chat
+          <MessageCircle size={13} />
+          Chat
           {unreadChat > 0 && (
             <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
               {unreadChat > 9 ? "9+" : unreadChat}
             </span>
           )}
         </button>
+
         <button
           onClick={() => navigate(`/dailyactivity/${act.id}`)}
           className="text-cyan-500 font-bold text-sm flex items-center gap-1 hover:text-cyan-600"
@@ -71,8 +80,43 @@ function ActivityRow({ act, onChatClick }: ActivityRowProps) {
 interface DocumentSectionFollowUpProps {
   dokumen: FollowUpDokumen[];
   isUploading: boolean;
-  activityAdmin?: { id: string; judul: string; status: string; createdAt: string; targetSelesai?: string; pegawai?: { nama?: string; divisi?: string } };
-  activitySales?: { id: string; judul: string; status: string; createdAt: string; targetSelesai?: string; pegawai?: { nama?: string; divisi?: string } };
+
+  activityAdmin?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
+  activitySales?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
+  activityAdminProyek?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
   onChatClick: (activityId: string, activityJudul: string) => void;
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
@@ -83,6 +127,7 @@ export default function DocumentSectionFollowUp({
   isUploading,
   activityAdmin,
   activitySales,
+  activityAdminProyek,
   onChatClick,
   onUpload,
   onDelete,
@@ -99,22 +144,36 @@ export default function DocumentSectionFollowUp({
     }
   }, []);
 
-  const { data: adminActivityDetail } = useDetailActivity(activityAdmin?.id ?? "");
-  const { data: salesActivityDetail } = useDetailActivity(activitySales?.id ?? "");
+  const { data: adminActivityDetail } = useDetailActivity(
+    activityAdmin?.id ?? "",
+  );
+
+  const { data: salesActivityDetail } = useDetailActivity(
+    activitySales?.id ?? "",
+  );
+
+  const { data: adminProyekDetail } = useDetailActivity(
+    activityAdminProyek?.id ?? "",
+  );
 
   const combinedDokumen = React.useMemo(() => {
     const formatDateTime = (isoString: string) => {
       if (!isoString) return "-";
+
       const date = new Date(isoString);
+
       const dateStr = date.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "short",
         year: "numeric",
       });
-      const timeStr = date.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }) + " WIB";
+
+      const timeStr =
+        date.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }) + " WIB";
+
       return `${dateStr} pukul ${timeStr}`;
     };
 
@@ -123,32 +182,45 @@ export default function DocumentSectionFollowUp({
       namaFile: doc.namaFile,
       path: doc.path,
       createdAt: doc.createdAt,
-      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "System"} pada ${formatDateTime(doc.createdAt)}`,
+      uploaderInfo: `${
+        doc.pegawai?.nama || doc.uploadedBy || "System"
+      } pada ${formatDateTime(doc.createdAt)}`,
       source: "step" as const,
       uploadedBy: doc.uploadedBy || "",
     }));
 
-    const adminDocs = adminActivityDetail?.data?.dokumen?.map((doc: any) => ({
-      id: doc.id,
-      namaFile: doc.namaFile,
-      path: doc.path,
-      createdAt: doc.createdAt,
-      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${activityAdmin?.judul || "Admin Sekretariat"}`,
-      source: "activity" as const,
-      uploadedBy: doc.uploadedBy || "",
-    })) ?? [];
+    const adminDocs =
+      adminActivityDetail?.data?.dokumen?.map((doc: any) => ({
+        id: doc.id,
+        namaFile: doc.namaFile,
+        path: doc.path,
+        createdAt: doc.createdAt,
+        uploaderInfo: `${
+          doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
+        } pada ${formatDateTime(doc.createdAt)} - ${
+          activityAdmin?.judul || "Admin Sekretariat"
+        }`,
+        source: "activity" as const,
+        uploadedBy: doc.uploadedBy || "",
+      })) ?? [];
 
-    const salesDocs = salesActivityDetail?.data?.dokumen?.map((doc: any) => ({
-      id: doc.id,
-      namaFile: doc.namaFile,
-      path: doc.path,
-      createdAt: doc.createdAt,
-      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${activitySales?.judul || "Sales PIC"}`,
-      source: "activity" as const,
-      uploadedBy: doc.uploadedBy || "",
-    })) ?? [];
+    const salesDocs =
+      salesActivityDetail?.data?.dokumen?.map((doc: any) => ({
+        id: doc.id,
+        namaFile: doc.namaFile,
+        path: doc.path,
+        createdAt: doc.createdAt,
+        uploaderInfo: `${
+          doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
+        } pada ${formatDateTime(doc.createdAt)} - ${
+          activitySales?.judul || "Sales PIC"
+        }`,
+        source: "activity" as const,
+        uploadedBy: doc.uploadedBy || "",
+      })) ?? [];
 
     const seenPaths = new Set<string>();
+
     const result: Array<{
       id: string;
       namaFile: string;
@@ -181,30 +253,45 @@ export default function DocumentSectionFollowUp({
     });
 
     return result;
-  }, [dokumen, adminActivityDetail, salesActivityDetail, activityAdmin?.judul, activitySales?.judul]);
+  }, [
+    dokumen,
+    adminActivityDetail,
+    salesActivityDetail,
+    adminProyekDetail,
+    activityAdmin?.judul,
+    activitySales?.judul,
+  ]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+
     if (!file) return;
+
     onUpload(file);
     e.target.value = "";
   }
 
+  // Daily Activity:
+  // Admin Sekretariat -> Admin Proyek -> Sales PIC
   const activities = [
     ...(activityAdmin ? [{ ...activityAdmin, role: "Admin Sekretariat" }] : []),
+
+    ...(activityAdminProyek
+      ? [{ ...activityAdminProyek, role: "Admin Proyek" }]
+      : []),
+
     ...(activitySales ? [{ ...activitySales, role: "Sales PIC" }] : []),
   ];
 
-  const isSalesOverdue = React.useMemo(() => {
-    if (activitySales?.status === "DITERIMA" || activitySales?.status === "SELESAI") return false;
-    if (activitySales?.status === "OVERDUE") return true;
-    if (!activitySales?.targetSelesai) return false;
-    return new Date(activitySales.targetSelesai).getTime() - Date.now() <= 0;
-  }, [activitySales]);
-
   const followUpStatus = (() => {
-    if (activitySales?.status === "DITERIMA" || activitySales?.status === "SELESAI") return "SELESAI";
-    if (isSalesOverdue) return "OVERDUE";
+    if (
+      activitySales?.status === "DITERIMA" &&
+      activityAdmin?.status === "DITERIMA" &&
+      activityAdminProyek?.status === "DITERIMA"
+    ) {
+      return "SELESAI";
+    }
+
     return "ON_PROGRESS";
   })();
 
@@ -219,9 +306,7 @@ export default function DocumentSectionFollowUp({
     if (followUpStatus === "SELESAI") {
       return "bg-green-50 text-green-600 border-green-100 hover:bg-green-100";
     }
-    if (followUpStatus === "OVERDUE") {
-      return "bg-red-50 text-red-600 border-red-100 hover:bg-red-100";
-    }
+
     return "bg-amber-50 text-amber-500 border-amber-100 hover:bg-amber-100";
   })();
 
@@ -234,8 +319,11 @@ export default function DocumentSectionFollowUp({
             <FileText size={16} className="text-cyan-500" />
             Logbook Operasional
           </div>
+
           <div className="flex gap-2">
-            <button className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${followUpStatusColor}`}>
+            <button
+              className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${followUpStatusColor}`}
+            >
               <CheckCircle2 size={13} /> {followUpStatusLabel}
             </button>
           </div>
@@ -261,6 +349,7 @@ export default function DocumentSectionFollowUp({
             <FileText size={16} className="text-cyan-500" />
             Dokumen Pendukung
           </div>
+
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
@@ -269,6 +358,7 @@ export default function DocumentSectionFollowUp({
             <Upload size={14} />
             {isUploading ? "Mengupload..." : "Upload File"}
           </button>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -290,7 +380,9 @@ export default function DocumentSectionFollowUp({
                 name={item.namaFile}
                 size={item.uploaderInfo}
                 path={item.path}
-                allowDelete={item.source === "step" && currentPegawaiId === item.uploadedBy}
+                allowDelete={
+                  item.source === "step" && currentPegawaiId === item.uploadedBy
+                }
                 onDelete={() => onDelete(item.id)}
               />
             ))

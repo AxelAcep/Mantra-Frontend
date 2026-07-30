@@ -196,7 +196,7 @@ export default function ApprovalSectionReviewInternal({
 
             {/* Info Daily */}
             {data.activityAdmin && (
-              <div className="mt-3 ml-16 flex items-center gap-2">
+              <div className="mt-3 ml-16 flex items-center justify-between">
                 <span className="text-xs text-gray-400">
                   Daily: {data.activityAdmin.judul}
                 </span>
@@ -210,26 +210,26 @@ export default function ApprovalSectionReviewInternal({
             )}
 
             {/* {canAdminAcc && (
-              <div className="mt-5 ml-16 flex gap-3">
-                <button
-                  onClick={onAcc}
-                  disabled={isUpdating}
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
-                >
-                  {isUpdating ? "Memproses..." : "Setujui"}
-                </button>
-                <button
-                  onClick={() => {
-                    setRevisionTarget("admin");
-                    setShowRevisionModal(true);
-                  }}
-                  disabled={isUpdating}
-                  className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
-                >
-                  Perlu Tindakan
-                </button>
-              </div>
-            )} */}
+    <div className="mt-5 ml-16 flex gap-3">
+      <button
+        onClick={onAcc}
+        disabled={isUpdating}
+        className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
+      >
+        {isUpdating ? "Memproses..." : "Setujui"}
+      </button>
+      <button
+        onClick={() => {
+          setRevisionTarget("admin");
+          setShowRevisionModal(true);
+        }}
+        disabled={isUpdating}
+        className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors"
+      >
+        Perlu Tindakan
+      </button>
+    </div>
+  )} */}
           </div>
 
           {/* Manajer Operasional */}

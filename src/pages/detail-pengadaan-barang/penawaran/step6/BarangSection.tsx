@@ -18,7 +18,12 @@ import {
   useDeleteBarangImplementasi,
   useDetailImplementasi,
 } from "@/hooks/use-implementasi";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUnreadChatCount } from "@/hooks/use-activity";
 
@@ -27,7 +32,7 @@ import { useUnreadChatCount } from "@/hooks/use-activity";
 export type BarangItem = {
   id: string;
   namaBarang: string;
-  status: "Ready" | "Perlu Beli";
+  status: "Ready" | "Perlu Beli" | "Indent" | "PO" | "Pending" | "Pengiriman";
   qty: number;
   satuan: string;
   hargaSatuan: number;
@@ -37,7 +42,7 @@ export type BarangItem = {
 
 type FormDraft = {
   namaBarang: string;
-  status: "Ready" | "Perlu Beli";
+  status: "Ready" | "Perlu Beli" | "Indent" | "PO" | "Pending" | "Pengiriman";
   qty: string;
   satuan: string;
   hargaSatuan: string;
@@ -103,7 +108,13 @@ interface FormCardProps {
   onCancel: () => void;
 }
 
-function FormCard({ isEdit, draft, onUpdate, onSave, onCancel }: FormCardProps) {
+function FormCard({
+  isEdit,
+  draft,
+  onUpdate,
+  onSave,
+  onCancel,
+}: FormCardProps) {
   const canSave =
     draft.namaBarang.trim() !== "" &&
     draft.qty !== "" &&
@@ -151,12 +162,24 @@ function FormCard({ isEdit, draft, onUpdate, onSave, onCancel }: FormCardProps) 
           <select
             value={draft.status}
             onChange={(e) =>
-              onUpdate({ status: e.target.value as "Ready" | "Perlu Beli" })
+              onUpdate({
+                status: e.target.value as
+                  | "Ready"
+                  | "Perlu Beli"
+                  | "Indent"
+                  | "PO"
+                  | "Pending"
+                  | "Pengiriman",
+              })
             }
             className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
           >
             <option value="Ready">Ready</option>
             <option value="Perlu Beli">Perlu Beli</option>
+            <option value="Indent">Indent</option>
+            <option value="PO">PO</option>
+            <option value="Pending">Pending</option>
+            <option value="Pengiriman">Pengiriman</option>
           </select>
         </div>
 
@@ -250,7 +273,7 @@ function FormCard({ isEdit, draft, onUpdate, onSave, onCancel }: FormCardProps) 
           <span className="text-sm font-bold text-cyan-600">
             {formatCurrency(
               parseFloat(draft.qty || "0") *
-              parseFloat(draft.hargaSatuan || "0"),
+                parseFloat(draft.hargaSatuan || "0"),
             )}
           </span>
         </div>
@@ -286,10 +309,17 @@ interface BarangSectionProps {
   onAssignPGA?: () => void;
 }
 
-export default function BarangSection({ trackingId, activityPembelian, onChatClick, onAssignPGA }: BarangSectionProps) {
+export default function BarangSection({
+  trackingId,
+  activityPembelian,
+  onChatClick,
+  onAssignPGA,
+}: BarangSectionProps) {
   const navigate = useNavigate();
   const { data: implData } = useDetailImplementasi(trackingId);
-  const { data: unreadChat = 0 } = useUnreadChatCount(activityPembelian?.id ?? "");
+  const { data: unreadChat = 0 } = useUnreadChatCount(
+    activityPembelian?.id ?? "",
+  );
 
   const addBarangMut = useAddBarangImplementasi(trackingId ?? "");
   const updateBarangMut = useUpdateBarangImplementasi(trackingId ?? "");
@@ -322,7 +352,9 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
       satuan: item.satuan,
       hargaSatuan: String(item.hargaSatuan),
       metode: item.metode,
-      estimasiKedatangan: item.estimasiKedatangan ? item.estimasiKedatangan.split("T")[0] : "",
+      estimasiKedatangan: item.estimasiKedatangan
+        ? item.estimasiKedatangan.split("T")[0]
+        : "",
     });
   }
 
@@ -542,10 +574,11 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                   {filtered.map((item) => (
                     <tr
                       key={item.id}
-                      className={`border-b border-gray-50 last:border-0 transition-all ${editingId === item.id
-                        ? "bg-cyan-50/20"
-                        : "bg-white hover:bg-slate-50/30"
-                        }`}
+                      className={`border-b border-gray-50 last:border-0 transition-all ${
+                        editingId === item.id
+                          ? "bg-cyan-50/20"
+                          : "bg-white hover:bg-slate-50/30"
+                      }`}
                     >
                       <td className="px-4 py-4">
                         <p className="text-xs font-bold text-slate-800">
@@ -554,10 +587,11 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                       </td>
                       <td className="px-4 py-4 text-center">
                         <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.status === "Ready"
-                            ? "bg-green-50 text-green-500"
-                            : "bg-amber-50 text-amber-500"
-                            }`}
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            item.status === "Ready"
+                              ? "bg-green-50 text-green-500"
+                              : "bg-amber-50 text-amber-500"
+                          }`}
                         >
                           {item.status}
                         </span>
@@ -595,10 +629,11 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className={`transition-colors ${editingId === item.id
-                              ? "text-cyan-500"
-                              : "text-gray-400 hover:text-cyan-500"
-                              }`}
+                            className={`transition-colors ${
+                              editingId === item.id
+                                ? "text-cyan-500"
+                                : "text-gray-400 hover:text-cyan-500"
+                            }`}
                             title="Edit"
                           >
                             <Pencil size={14} />
@@ -657,26 +692,35 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
                       {activityPembelian.judul}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {activityPembelian.pegawai?.nama ?? "—"} · {activityPembelian.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
+                      {activityPembelian.pegawai?.nama ?? "—"} ·{" "}
+                      {activityPembelian.pegawai?.divisi?.replace("_", " ") ??
+                        "—"}{" "}
+                      ·{" "}
                       {activityPembelian.targetSelesai
-                        ? new Date(activityPembelian.targetSelesai).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })
+                        ? new Date(
+                            activityPembelian.targetSelesai,
+                          ).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
                         : "—"}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <button
-                    onClick={() => onChatClick(activityPembelian.id, activityPembelian.judul)}
+                    onClick={() =>
+                      onChatClick(activityPembelian.id, activityPembelian.judul)
+                    }
                     className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
                   >
                     <MessageCircle size={13} /> Chat
                   </button>
                   <button
-                    onClick={() => navigate(`/dailyactivity/${activityPembelian.id}`)}
+                    onClick={() =>
+                      navigate(`/dailyactivity/${activityPembelian.id}`)
+                    }
                     className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
                   >
                     Lihat Detail <ArrowRight size={14} />
@@ -685,49 +729,61 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
               </div>
 
               {/* Render children (Staff PGA) */}
-              {activityPembelian.children && activityPembelian.children.length > 0 && (
-                <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Penugasan Staff PGA</p>
-                  {activityPembelian.children.map((child: any) => (
-                    <div key={child.id} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
-                          <FileText size={16} />
+              {activityPembelian.children &&
+                activityPembelian.children.length > 0 && (
+                  <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                      Penugasan Staff PGA
+                    </p>
+                    {activityPembelian.children.map((child: any) => (
+                      <div
+                        key={child.id}
+                        className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
+                            <FileText size={16} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-700">
+                              {child.judul}
+                            </p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">
+                              {child.pegawai?.nama ?? "—"} ·{" "}
+                              {child.pegawai?.divisi?.replace("_", " ") ?? "—"}{" "}
+                              ·{" "}
+                              {child.targetSelesai
+                                ? new Date(
+                                    child.targetSelesai,
+                                  ).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })
+                                : "—"}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-700">
-                            {child.judul}
-                          </p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">
-                            {child.pegawai?.nama ?? "—"} · {child.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
-                            {child.targetSelesai
-                              ? new Date(child.targetSelesai).toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })
-                              : "—"}
-                          </p>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <button
+                            onClick={() => onChatClick(child.id, child.judul)}
+                            className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            <MessageCircle size={12} /> Chat
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/dailyactivity/${child.id}`)
+                            }
+                            className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                          >
+                            Detail <ArrowRight size={12} />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <button
-                          onClick={() => onChatClick(child.id, child.judul)}
-                          className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          <MessageCircle size={12} /> Chat
-                        </button>
-                        <button
-                          onClick={() => navigate(`/dailyactivity/${child.id}`)}
-                          className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
-                        >
-                          Detail <ArrowRight size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
             </div>
           ) : (
             <div className="p-8 flex flex-col items-center gap-3 text-center">
@@ -748,7 +804,9 @@ export default function BarangSection({ trackingId, activityPembelian, onChatCli
       {/* ── Dialog Konfirmasi Hapus ── */}
       <Dialog
         open={!!deleteTarget}
-        onOpenChange={(v) => { if (!v) setDeleteTarget(null) }}
+        onOpenChange={(v) => {
+          if (!v) setDeleteTarget(null);
+        }}
       >
         <DialogContent className="sm:max-w-[400px] bg-white rounded-2xl p-6 gap-0">
           <DialogHeader className="mb-3">

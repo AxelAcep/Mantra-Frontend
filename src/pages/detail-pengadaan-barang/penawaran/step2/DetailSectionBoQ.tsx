@@ -97,19 +97,19 @@ export default function DetailSectionBoQ({
 
   const fields = [
     {
-      label: "Sub Total I (Main Equipment)",
+      label: "Sub Total I (Barang)",
       value: harga1,
       setValue: setHarga1,
       key: "harga1",
     },
     {
-      label: "Sub Total II (Material Instalasi)",
+      label: "Sub Total II (Instalasi)",
       value: harga2,
       setValue: setHarga2,
       key: "harga2",
     },
     {
-      label: "Sub Total III (Biaya Jasa)",
+      label: "Sub Total III (Jasa)",
       value: harga3,
       setValue: setHarga3,
       key: "harga3",
@@ -208,11 +208,18 @@ export default function DetailSectionBoQ({
                   </p>
                   {isFinanceEditable ? (
                     <input
-                      type="number"
-                      value={item.value}
-                      onChange={(e) =>
-                        item.setValue(parseFloat(e.target.value) || 0)
+                      type="text"
+                      inputMode="numeric"
+                      value={
+                        item.value ? item.value.toLocaleString("id-ID") : ""
                       }
+                      onChange={(e) => {
+                        // hapus semua karakter selain angka
+                        const raw = e.target.value.replace(/\D/g, "");
+                        // hapus leading zero
+                        const cleaned = raw.replace(/^0+(?=\d)/, "");
+                        item.setValue(cleaned ? parseInt(cleaned, 10) : 0);
+                      }}
                       className="w-full text-sm font-bold text-slate-700 bg-white border border-cyan-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     />
                   ) : (

@@ -1,10 +1,16 @@
 import React from "react";
 import { User } from "lucide-react";
-import { useDetailFollowUp, useUpdateStatusFollowUp, useUploadDokumenFollowUp, useDeleteDokumenFollowUp } from "@/hooks/use-follow-up";
+import {
+  useDetailFollowUp,
+  useUpdateStatusFollowUp,
+  useUploadDokumenFollowUp,
+  useDeleteDokumenFollowUp,
+} from "@/hooks/use-follow-up";
 import ApprovalSectionFollowUp from "./ApprovalSectionFollowUp";
 import DocumentSectionFollowUp from "./DocumentSectionFollowUp";
 import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
 import AdminProyekUpload from "./AdminProyekUpload";
+import ManagerProyekCard from "./AssignAdminProyekCard";
 
 interface Step5Props {
   trackingId: string;
@@ -42,7 +48,11 @@ function SectionHeading({ title }: { title: string }) {
   );
 }
 
-export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5Props) {
+export default function Step5({
+  trackingId,
+  onChatClick,
+  onStatusChange,
+}: Step5Props) {
   const { data, loading, error, refetch } = useDetailFollowUp(trackingId);
   const updateStatusMut = useUpdateStatusFollowUp(trackingId);
   const uploadMut = useUploadDokumenFollowUp(trackingId);
@@ -51,7 +61,12 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
   const { pegawaiId, divisi, role } = getUserInfo();
 
   const isManagerOps = divisi === "MANAGER_OPERASIONAL" || role === "MASTER";
-  const isSalesPIC = data ? (pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIAT") : false;
+  const isAdminProyek =
+    (divisi === "MAINTENANCE_PAC" || divisi === "MAINTENANCE_FIRE") &&
+    role == "SUPERVISI";
+  const isSalesPIC = data
+    ? pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIAT"
+    : false;
 
   const isKonfirmasiSelesai = data?.status === "KONFIRMASI_SELESAI";
   const isPerluTindakan = data?.status === "PERLU_TINDAKAN";
@@ -67,7 +82,10 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
     isUpdating,
     onAcc: () => updateStatusMut.mutate({ status: "SELESAI" }),
     onPerluTindakan: (alasan: string) =>
-      updateStatusMut.mutate({ status: "PERLU_TINDAKAN", alasanPenolakan: alasan }),
+      updateStatusMut.mutate({
+        status: "PERLU_TINDAKAN",
+        alasanPenolakan: alasan,
+      }),
     onKonfirmasiUlang: () => updateStatusMut.mutate({ status: "ON_PROGRESS" }),
   };
 
@@ -89,7 +107,9 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
   if (error || !data) {
     return (
       <div className="p-6 text-center border border-red-100 bg-red-50 rounded-xl space-y-3">
-        <p className="text-red-600 font-medium">Gagal memuat data Follow Up: {error}</p>
+        <p className="text-red-600 font-medium">
+          Gagal memuat data Follow Up: {error}
+        </p>
         <button
           onClick={() => refetch()}
           className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
@@ -152,8 +172,12 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
                 {salesInitials}
               </div>
               <div>
-                <p className="text-xl font-bold text-slate-800 leading-tight">{salesName}</p>
-                <p className="text-sm text-gray-400 font-medium mt-1">Sales Marketing</p>
+                <p className="text-xl font-bold text-slate-800 leading-tight">
+                  {salesName}
+                </p>
+                <p className="text-sm text-gray-400 font-medium mt-1">
+                  Sales Marketing
+                </p>
               </div>
             </div>
           </div>
@@ -164,14 +188,20 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
             </div>
             <div className="grid grid-cols-2 gap-4 bg-slate-50/60 rounded-xl border border-gray-100 p-5">
               <div>
-                <p className="text-xs text-gray-400 font-medium mb-1">Customer Name</p>
-                <p className="text-base font-bold text-slate-800">{customerName}</p>
+                <p className="text-xs text-gray-400 font-medium mb-1">
+                  Customer Name
+                </p>
+                <p className="text-base font-bold text-slate-800">
+                  {customerName}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">Kontak</p>
                 <p className="text-sm font-bold text-slate-800 break-all">
                   {customerEmail} <br />
-                  <span className="text-xs text-gray-400 font-medium font-mono">{customerPhone}</span>
+                  <span className="text-xs text-gray-400 font-medium font-mono">
+                    {customerPhone}
+                  </span>
                 </p>
               </div>
             </div>
@@ -186,8 +216,19 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
           isAdminSekertariat={isAdminSekertariat}
           isSalesPIC={isSalesPIC}
           isUpdating={updateStatusMut.isPending}
-          onUpdateStage={(nextStage) => updateStatusMut.mutate({ stage: nextStage })}
-          onUpdateStatus={(nextStatus) => updateStatusMut.mutate({ status: nextStatus })}
+          onUpdateStage={(nextStage) =>
+            updateStatusMut.mutate({ stage: nextStage })
+          }
+          onUpdateStatus={(nextStatus) =>
+            updateStatusMut.mutate({ status: nextStatus })
+          }
+        />
+
+        <SectionHeading title="Admin Proyek" />
+        <ManagerProyekCard
+          followUpId={data.id}
+          currentNama={data.activityAdminProyek?.status}
+          onAssigned={refetch}
         />
 
         {data.stage >= 3 && (
@@ -196,19 +237,29 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
             <AdminProyekUpload
               dokumen={mappedDokumen}
               isUploading={uploadMut.isPending}
-              isAdminProyek={divisi === "MAINTENANCE_PAC" || divisi === "MAINTENANCE_FIRE" || role === "MASTER" || divisi === "MANAGER_OPERASIONAL"}
-              onUpload={(file, kategori) => uploadMut.mutate({ file, kategori })}
+              isAdminProyek={
+                ((divisi === "MAINTENANCE_PAC" ||
+                  divisi === "MAINTENANCE_FIRE") &&
+                  role === "SUPERVISI" &&
+                  data.activityAdminProyek?.status === "DITERIMA") ||
+                role === "MASTER" ||
+                divisi === "MANAGER_OPERASIONAL" ||
+                divisi === "MONITORING_CONTROL_ADVISOR"
+              }
+              onUpload={(file, kategori) =>
+                uploadMut.mutate({ file, kategori })
+              }
               onDelete={(id) => deleteMut.mutate(id)}
             />
           </>
         )}
 
-        <SectionHeading title="Dokumen" />
         <DocumentSectionFollowUp
           dokumen={mappedDokumen}
           isUploading={uploadMut.isPending}
           activityAdmin={data.activityAdmin}
           activitySales={data.activitySales}
+          activityAdminProyek={data.activityAdminProyek}
           onChatClick={onChatClick}
           onUpload={(file) => uploadMut.mutate({ file })}
           onDelete={(id) => deleteMut.mutate(id)}
@@ -216,9 +267,7 @@ export default function Step5({ trackingId, onChatClick, onStatusChange }: Step5
       </div>
 
       <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSectionFollowUp
-          logs={mappedLogs}
-        />
+        <ActivityLogSectionFollowUp logs={mappedLogs} />
       </div>
     </div>
   );
