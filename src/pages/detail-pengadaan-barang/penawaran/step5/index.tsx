@@ -224,7 +224,9 @@ export default function Step5({
         <SectionHeading title="Admin Proyek" />
         <ManagerProyekCard
           followUpId={data.id}
-          currentNama={data.activityAdminProyek?.status}
+          currentNama={
+            data.activityAdminProyek?.pegawai?.nama ?? "Pilih Admin Proyek"
+          }
           onAssigned={refetch}
         />
 

@@ -11,6 +11,7 @@ import {
   Package,
   ArrowRight,
   MessageCircle,
+  Loader2,
 } from "lucide-react";
 import {
   useAddBarangImplementasi,
@@ -50,6 +51,11 @@ type FormDraft = {
   estimasiKedatangan: string;
 };
 
+type ResultModalInfo = {
+  type: "success" | "error";
+  message: string;
+};
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const SATUAN_OPTIONS = [
@@ -74,10 +80,6 @@ const METODE_OPTIONS = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeid() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 function emptyDraft(): FormDraft {
   return {
     namaBarang: "",
@@ -98,10 +100,15 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+function getErrorMessage(err: any, fallback: string): string {
+  return err?.response?.data?.message || err?.message || fallback;
+}
+
 // ─── Form Card Component ───────────────────────────────────────────────────────
 
 interface FormCardProps {
   isEdit: boolean;
+  isSaving: boolean;
   draft: FormDraft;
   onUpdate: (patch: Partial<FormDraft>) => void;
   onSave: () => void;
@@ -110,12 +117,14 @@ interface FormCardProps {
 
 function FormCard({
   isEdit,
+  isSaving,
   draft,
   onUpdate,
   onSave,
   onCancel,
 }: FormCardProps) {
   const canSave =
+    !isSaving &&
     draft.namaBarang.trim() !== "" &&
     draft.qty !== "" &&
     parseFloat(draft.qty) > 0 &&
@@ -131,7 +140,8 @@ function FormCard({
         </span>
         <button
           onClick={onCancel}
-          className="text-gray-400 hover:text-red-500 transition-colors"
+          disabled={isSaving}
+          className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           title="Tutup"
         >
           <X size={16} />
@@ -148,9 +158,10 @@ function FormCard({
           <input
             type="text"
             value={draft.namaBarang}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ namaBarang: e.target.value })}
             placeholder="Masukkan nama barang..."
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           />
         </div>
 
@@ -161,6 +172,7 @@ function FormCard({
           </label>
           <select
             value={draft.status}
+            disabled={isSaving}
             onChange={(e) =>
               onUpdate({
                 status: e.target.value as
@@ -172,7 +184,7 @@ function FormCard({
                   | "Pengiriman",
               })
             }
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           >
             <option value="Ready">Ready</option>
             <option value="Perlu Beli">Perlu Beli</option>
@@ -190,8 +202,9 @@ function FormCard({
           </label>
           <select
             value={draft.metode}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ metode: e.target.value })}
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           >
             {METODE_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>
@@ -210,9 +223,10 @@ function FormCard({
             type="number"
             min={1}
             value={draft.qty}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ qty: e.target.value })}
             placeholder="0"
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           />
         </div>
 
@@ -223,8 +237,9 @@ function FormCard({
           </label>
           <select
             value={draft.satuan}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ satuan: e.target.value })}
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           >
             {SATUAN_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>
@@ -243,9 +258,10 @@ function FormCard({
             type="number"
             min={0}
             value={draft.hargaSatuan}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ hargaSatuan: e.target.value })}
             placeholder="0"
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           />
         </div>
 
@@ -257,9 +273,10 @@ function FormCard({
           <input
             type="date"
             value={draft.estimasiKedatangan}
+            disabled={isSaving}
             onChange={(e) => onUpdate({ estimasiKedatangan: e.target.value })}
             onClick={(e) => e.currentTarget.showPicker?.()}
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer"
+            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer disabled:opacity-60"
           />
         </div>
       </div>
@@ -283,20 +300,67 @@ function FormCard({
       <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
         <button
           onClick={onCancel}
-          className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          disabled={isSaving}
+          className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Batal
         </button>
         <button
           onClick={onSave}
           disabled={!canSave}
-          className="px-5 py-2 text-xs font-bold bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors disabled:opacity-40 flex items-center gap-1.5 shadow-sm"
+          className="px-5 py-2 text-xs font-bold bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
         >
-          <Check size={13} />
-          {isEdit ? "Simpan Perubahan" : "Tambah Barang"}
+          {isSaving ? (
+            <>
+              <Loader2 size={13} className="animate-spin" />
+              Menyimpan...
+            </>
+          ) : (
+            <>
+              <Check size={13} />
+              {isEdit ? "Simpan Perubahan" : "Tambah Barang"}
+            </>
+          )}
         </button>
       </div>
     </div>
+  );
+}
+
+// ─── Result Modal Component (Sukses / Gagal) ───────────────────────────────────
+
+interface ResultModalProps {
+  info: ResultModalInfo | null;
+  onClose: () => void;
+}
+
+function ResultModal({ info, onClose }: ResultModalProps) {
+  return (
+    <Dialog open={!!info} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-[380px] bg-white rounded-2xl p-6 gap-0 text-center">
+        <div
+          className={`mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
+            info?.type === "success"
+              ? "bg-green-50 text-green-500"
+              : "bg-red-50 text-red-500"
+          }`}
+        >
+          {info?.type === "success" ? <Check size={24} /> : <X size={24} />}
+        </div>
+        <DialogHeader>
+          <DialogTitle className="text-base font-bold text-slate-800 text-center">
+            {info?.type === "success" ? "Berhasil" : "Gagal"}
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-gray-500 mt-1 mb-5">{info?.message}</p>
+        <Button
+          onClick={onClose}
+          className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold w-full"
+        >
+          Tutup
+        </Button>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -331,18 +395,27 @@ export default function BarangSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<FormDraft>(emptyDraft());
   const [deleteTarget, setDeleteTarget] = useState<BarangItem | null>(null);
+  const [resultModalInfo, setResultModalInfo] =
+    useState<ResultModalInfo | null>(null);
+
+  // Satu flag global: true kalau ada mutation barang (add/edit/delete) yang lagi jalan.
+  // Dipakai buat nge-lock tombol-tombol lain biar gak bisa di-spam klik.
+  const isMutating =
+    addBarangMut.isPending ||
+    updateBarangMut.isPending ||
+    deleteBarangMut.isPending;
 
   function updateDraft(patch: Partial<FormDraft>) {
     setDraft((prev) => ({ ...prev, ...patch }));
   }
 
-  function handleOpenAdd() {
+  function onOpenAdd() {
     setFormMode("add");
     setEditingId(null);
     setDraft(emptyDraft());
   }
 
-  function handleOpenEdit(item: BarangItem) {
+  function onOpenEdit(item: BarangItem) {
     setFormMode("edit");
     setEditingId(item.id);
     setDraft({
@@ -358,12 +431,13 @@ export default function BarangSection({
     });
   }
 
-  function handleCancel() {
+  function onCancelForm() {
+    if (isMutating) return;
     setFormMode(null);
     setEditingId(null);
   }
 
-  function handleSaveAdd() {
+  function onSaveAdd() {
     const newItem = {
       namaBarang: draft.namaBarang.trim(),
       status: draft.status,
@@ -377,11 +451,24 @@ export default function BarangSection({
       onSuccess: () => {
         setFormMode(null);
         setDraft(emptyDraft());
+        setResultModalInfo({
+          type: "success",
+          message: "Barang berhasil ditambahkan.",
+        });
+      },
+      onError: (err: any) => {
+        setResultModalInfo({
+          type: "error",
+          message: getErrorMessage(
+            err,
+            "Gagal menambahkan barang. Silakan coba lagi.",
+          ),
+        });
       },
     });
   }
 
-  function handleSaveEdit() {
+  function onSaveEdit() {
     if (!editingId) return;
     const updatedItem = {
       namaBarang: draft.namaBarang.trim(),
@@ -401,17 +488,31 @@ export default function BarangSection({
         onSuccess: () => {
           setFormMode(null);
           setEditingId(null);
+          setResultModalInfo({
+            type: "success",
+            message: "Perubahan barang berhasil disimpan.",
+          });
+        },
+        onError: (err: any) => {
+          setResultModalInfo({
+            type: "error",
+            message: getErrorMessage(
+              err,
+              "Gagal menyimpan perubahan barang. Silakan coba lagi.",
+            ),
+          });
         },
       },
     );
   }
 
-  function handleDelete(item: BarangItem) {
+  function onDeleteClick(item: BarangItem) {
+    if (isMutating) return;
     setDeleteTarget(item);
   }
 
-  function handleConfirmDelete() {
-    if (!deleteTarget) return;
+  function onConfirmDelete() {
+    if (!deleteTarget || deleteBarangMut.isPending) return;
     deleteBarangMut.mutate(deleteTarget.id, {
       onSuccess: () => {
         if (editingId === deleteTarget.id) {
@@ -419,6 +520,20 @@ export default function BarangSection({
           setEditingId(null);
         }
         setDeleteTarget(null);
+        setResultModalInfo({
+          type: "success",
+          message: "Barang berhasil dihapus.",
+        });
+      },
+      onError: (err: any) => {
+        setDeleteTarget(null);
+        setResultModalInfo({
+          type: "error",
+          message: getErrorMessage(
+            err,
+            "Gagal menghapus barang. Silakan coba lagi.",
+          ),
+        });
       },
     });
   }
@@ -433,6 +548,9 @@ export default function BarangSection({
   const totalPerluBeli = items.filter((i) => i.status === "Perlu Beli").length;
   const progress =
     items.length > 0 ? Math.round((totalReady / items.length) * 100) : 0;
+
+  const isSavingForm =
+    formMode === "edit" ? updateBarangMut.isPending : addBarangMut.isPending;
 
   // ── Render ───────────────────────────────────────────────────────────────────
 
@@ -509,8 +627,9 @@ export default function BarangSection({
               />
             </div>
             <button
-              onClick={handleOpenAdd}
-              className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-1.5 shadow-sm"
+              onClick={onOpenAdd}
+              disabled={isMutating || formMode !== null}
+              className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Plus size={14} /> Tambah Barang
             </button>
@@ -521,10 +640,11 @@ export default function BarangSection({
         {formMode !== null && (
           <FormCard
             isEdit={formMode === "edit"}
+            isSaving={isSavingForm}
             draft={draft}
             onUpdate={updateDraft}
-            onSave={formMode === "edit" ? handleSaveEdit : handleSaveAdd}
-            onCancel={handleCancel}
+            onSave={formMode === "edit" ? onSaveEdit : onSaveAdd}
+            onCancel={onCancelForm}
           />
         )}
 
@@ -571,84 +691,96 @@ export default function BarangSection({
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((item) => (
-                    <tr
-                      key={item.id}
-                      className={`border-b border-gray-50 last:border-0 transition-all ${
-                        editingId === item.id
-                          ? "bg-cyan-50/20"
-                          : "bg-white hover:bg-slate-50/30"
-                      }`}
-                    >
-                      <td className="px-4 py-4">
-                        <p className="text-xs font-bold text-slate-800">
-                          {item.namaBarang}
-                        </p>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span
-                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            item.status === "Ready"
-                              ? "bg-green-50 text-green-500"
-                              : "bg-amber-50 text-amber-500"
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-xs text-slate-600 font-medium text-center">
-                        {item.qty} {item.satuan}
-                      </td>
-                      <td className="px-4 py-4 text-xs text-slate-600 font-medium text-center">
-                        {formatCurrency(item.hargaSatuan)}
-                      </td>
-                      <td className="px-4 py-4 text-xs font-bold text-slate-800 text-center">
-                        {formatCurrency(item.qty * item.hargaSatuan)}
-                      </td>
-                      <td className="px-4 py-4">
-                        <p className="text-xs font-bold text-slate-700">
-                          {item.metode}
-                        </p>
-                        {item.estimasiKedatangan ? (
-                          <p className="text-[10px] font-medium text-gray-400 mt-0.5">
-                            {new Date(
-                              item.estimasiKedatangan,
-                            ).toLocaleDateString("id-ID", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                  {filtered.map((item) => {
+                    const isRowDeleting =
+                      deleteBarangMut.isPending && deleteTarget?.id === item.id;
+                    const isRowDisabled = isMutating;
+
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`border-b border-gray-50 last:border-0 transition-all ${
+                          editingId === item.id
+                            ? "bg-cyan-50/20"
+                            : "bg-white hover:bg-slate-50/30"
+                        }`}
+                      >
+                        <td className="px-4 py-4">
+                          <p className="text-xs font-bold text-slate-800">
+                            {item.namaBarang}
                           </p>
-                        ) : (
-                          <span className="text-[10px] font-bold text-red-400 mt-0.5 block">
-                            Belum Tersedia
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleOpenEdit(item)}
-                            className={`transition-colors ${
-                              editingId === item.id
-                                ? "text-cyan-500"
-                                : "text-gray-400 hover:text-cyan-500"
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              item.status === "Ready"
+                                ? "bg-green-50 text-green-500"
+                                : "bg-amber-50 text-amber-500"
                             }`}
-                            title="Edit"
                           >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item)}
-                            className="text-gray-400 hover:text-red-500 transition-colors"
-                            title="Hapus"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-xs text-slate-600 font-medium text-center">
+                          {item.qty} {item.satuan}
+                        </td>
+                        <td className="px-4 py-4 text-xs text-slate-600 font-medium text-center">
+                          {formatCurrency(item.hargaSatuan)}
+                        </td>
+                        <td className="px-4 py-4 text-xs font-bold text-slate-800 text-center">
+                          {formatCurrency(item.qty * item.hargaSatuan)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <p className="text-xs font-bold text-slate-700">
+                            {item.metode}
+                          </p>
+                          {item.estimasiKedatangan ? (
+                            <p className="text-[10px] font-medium text-gray-400 mt-0.5">
+                              {new Date(
+                                item.estimasiKedatangan,
+                              ).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                          ) : (
+                            <span className="text-[10px] font-bold text-red-400 mt-0.5 block">
+                              Belum Tersedia
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => onOpenEdit(item)}
+                              disabled={isRowDisabled}
+                              className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                                editingId === item.id
+                                  ? "text-cyan-500"
+                                  : "text-gray-400 hover:text-cyan-500"
+                              }`}
+                              title="Edit"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            <button
+                              onClick={() => onDeleteClick(item)}
+                              disabled={isRowDisabled}
+                              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Hapus"
+                            >
+                              {isRowDeleting ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <Trash2 size={14} />
+                              )}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -805,7 +937,7 @@ export default function BarangSection({
       <Dialog
         open={!!deleteTarget}
         onOpenChange={(v) => {
-          if (!v) setDeleteTarget(null);
+          if (!v && !deleteBarangMut.isPending) setDeleteTarget(null);
         }}
       >
         <DialogContent className="sm:max-w-[400px] bg-white rounded-2xl p-6 gap-0">
@@ -826,19 +958,34 @@ export default function BarangSection({
             <Button
               variant="outline"
               onClick={() => setDeleteTarget(null)}
-              className="border-gray-200 text-gray-600 font-semibold"
+              disabled={deleteBarangMut.isPending}
+              className="border-gray-200 text-gray-600 font-semibold disabled:opacity-40"
             >
               Batal
             </Button>
             <Button
-              onClick={handleConfirmDelete}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold"
+              onClick={onConfirmDelete}
+              disabled={deleteBarangMut.isPending}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold disabled:opacity-60 flex items-center gap-1.5"
             >
-              Ya, hapus
+              {deleteBarangMut.isPending ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Menghapus...
+                </>
+              ) : (
+                "Ya, hapus"
+              )}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ── Modal Hasil (Sukses / Gagal) ── */}
+      <ResultModal
+        info={resultModalInfo}
+        onClose={() => setResultModalInfo(null)}
+      />
     </div>
   );
 }
