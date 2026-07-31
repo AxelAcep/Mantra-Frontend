@@ -8,7 +8,7 @@ import Step3 from "./step3/index";
 import Step4 from "./step4/index";
 import Step5 from "./step5/index";
 import Step6 from "./step6/index";
-import Step7 from "./step7";
+import Step7 from "./step7/index";
 import Step8 from "./accounting/index";
 import Step9 from "./step9";
 import StepRestricted from "./step-restricted";

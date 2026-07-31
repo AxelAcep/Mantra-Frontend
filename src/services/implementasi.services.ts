@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TrackingPenawaranDetail } from "./penawaran.services";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -87,10 +88,13 @@ export interface ImplementasiResponse {
 export async function getDetailImplementasi(
   trackingId: string,
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi`, {
-    method: "GET",
-    headers: authHeaders(),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi`,
+    {
+      method: "GET",
+      headers: authHeaders(),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal mengambil data Implementasi.");
@@ -110,14 +114,19 @@ export async function updateDetailImplementasi(
     waktuPengerjaan?: string;
   },
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error ?? "Gagal memperbarui detail Implementasi.");
+    throw new Error(
+      errorData.error ?? "Gagal memperbarui detail Implementasi.",
+    );
   }
   const json = await res.json();
   return json.data;
@@ -128,11 +137,14 @@ export async function assignPGAStaff(
   staffIds: string[],
   phase: string,
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi/assign-pga`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ staffIds, phase }),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi/assign-pga`,
+    {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ staffIds, phase }),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal menugaskan staff PGA.");
@@ -153,11 +165,14 @@ export async function addBarangImplementasi(
     estimasiKedatangan?: string;
   },
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi/barang`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi/barang`,
+    {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal menambahkan barang.");
@@ -179,11 +194,14 @@ export async function updateBarangImplementasi(
     estimasiKedatangan?: string;
   },
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi/barang/${barangId}`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi/barang/${barangId}`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal memperbarui barang.");
@@ -196,10 +214,13 @@ export async function deleteBarangImplementasi(
   trackingId: string,
   barangId: string,
 ): Promise<ImplementasiResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/implementasi/barang/${barangId}`, {
-    method: "DELETE",
-    headers: authHeaders(),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/implementasi/barang/${barangId}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal menghapus barang.");
