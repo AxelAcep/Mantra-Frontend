@@ -96,21 +96,21 @@ export function DocumentItem({
     : `${import.meta.env.VITE_API_URL}${path}`;
 
   return (
-    <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors">
+    <div className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg group transition-colors">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+        <div className="p-2 bg-slate-50 rounded-lg text-slate-500">
           <FileText size={18} />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-xs font-bold text-slate-700">{name}</p>
+            <p className="text-sm font-bold text-slate-700">{name}</p>
             {tag && (
               <span className="bg-green-100 text-green-600 text-[8px] font-bold px-1.5 py-0.5 rounded">
                 {tag}
               </span>
             )}
           </div>
-          <p className="text-[10px] text-gray-400">
+          <p className="text-sm text-gray-400">
             {typeof size === "string" && size.includes("Diunggah")
               ? size
               : `Diunggah oleh ${size}`}

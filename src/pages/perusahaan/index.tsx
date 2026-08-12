@@ -1,15 +1,62 @@
 import { useEffect, useState } from 'react';
-import { Search, Phone, Clock, ArrowRight, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Search, Phone, Clock, ArrowRight, ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { useHeaderTitle } from '@/components/layout/layout';
 import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DialogTambahPerusahaan } from './dialog-tambah-perusahaan';
 import { getPerusahaanList, createPerusahaan } from '@/services/perusahaan.services';
-import { getTimeAgo } from '@/lib/utils';
+import { getTimeAgo, cn } from '@/lib/utils';
 
 const truncate = (text: any, maxLength: number) => {
   const str = String(text || "");
   return str.length > maxLength ? `${str.slice(0, maxLength)}...` : str;
 };
+
+type SortDir = "asc" | "desc" | "";
+
+function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
+  if (!active || !dir) return <ChevronsUpDown className="w-3 h-3 text-slate-400" />
+  return dir === "asc"
+    ? <ChevronUp className="w-3 h-3 text-cyan-600" />
+    : <ChevronDown className="w-3 h-3 text-cyan-600" />
+}
+
+function SortableHeader({
+  label, field, sortField, sortOrder, onSort, title, className = "", center = false
+}: {
+  label: string; field: string; sortField: string; sortOrder: "asc" | "desc"
+  onSort: (field: string) => void
+  title?: string
+  className?: string
+  center?: boolean
+}) {
+  const isActive = sortField === field
+  return (
+    <TableHead
+      className={cn(
+        "cursor-pointer select-none group text-slate-600 text-xs",
+        center && "text-center",
+        className
+      )}
+      onClick={() => onSort(field)}
+      title={title}
+    >
+      <div className={cn("flex items-center gap-1", center && "justify-center")}>
+        <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+          {label}
+        </span>
+        <SortIcon active={isActive} dir={isActive ? sortOrder : ""} />
+      </div>
+    </TableHead>
+  )
+}
 
 export default function PerusahaanPage() {
   const { setTitle } = useHeaderTitle();
@@ -63,13 +110,6 @@ export default function PerusahaanPage() {
       setSortField(field);
       setSortOrder("asc");
     }
-  };
-
-  const getSortIcon = (field: string) => {
-    if (sortField === field) {
-      return sortOrder === "asc" ? " ↑" : " ↓";
-    }
-    return " ↕";
   };
 
   const filteredCompanies = companyList.filter(c =>
@@ -154,24 +194,22 @@ export default function PerusahaanPage() {
   }
 
   return (
-    <div className="m-6 flex-1 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="m-6 flex-1 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col space-y-2">
 
       {/* Search Bar */}
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
         <div className="relative w-full max-w-xs">
-          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-            <Search size={18} />
-          </span>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
             placeholder="Cari perusahaan..."
           />
         </div>
         <DialogTambahPerusahaan onAddCompany={handleAddCompany}>
-          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-lg px-4 shadow-none">
+          <Button className="bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-lg px-4 shadow-none">
             <Plus className="w-4 h-4 mr-2" />
             Tambah Perusahaan
           </Button>
@@ -179,89 +217,87 @@ export default function PerusahaanPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
-          <thead>
-            <tr className="bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500 font-semibold border-b border-gray-100">
-              <th className="px-6 py-4 w-[22%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("name")}>
-                Nama Perusahaan{getSortIcon("name")}
-              </th>
-              <th className="px-6 py-4 w-[18%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("address")}>
-                Alamat{getSortIcon("address")}
-              </th>
-              <th className="px-6 py-4 w-[14%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("phone")}>
-                Nomor Telepon{getSortIcon("phone")}
-              </th>
-              <th className="px-6 py-4 w-[16%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("activity")}>
-                Aktivitas Terakhir{getSortIcon("activity")}
-              </th>
-              <th className="px-6 py-4 text-center w-[12%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("pengadaan")}>
-                Pengadaan Barang{getSortIcon("pengadaan")}
-              </th>
-              <th className="px-6 py-4 text-center w-[9%] cursor-pointer select-none hover:bg-gray-100/50 transition-colors" onClick={() => handleSort("total")}>
-                Total Proyek{getSortIcon("total")}
-              </th>
-              <th className="px-6 py-4 text-right w-[9%]">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {paginatedCompanies.map((item, idx) => (
-              <tr key={idx} className="hover:bg-gray-50/80 transition-colors text-sm text-gray-700">
-                <td className="px-6 py-4 font-md text-slate-800 truncate" title={item.name}>
-                  {truncate(item.name, 30)}
-                </td>
-                <td className="px-6 py-4 text-gray-500 truncate" title={item.address}>
-                  {truncate(item.address, 30)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap" title={item.phone}>
-                  <div className="flex items-center gap-2">
-                    <Phone size={14} className="text-gray-400 shrink-0" />
-                    <span className="truncate">{truncate(item.phone, 20)}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap" title={item.activity}>
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <Clock size={14} className="text-gray-400 shrink-0" />
-                    <span className="truncate">{truncate(item.activity, 25)}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-center">
-                  {item.pengadaan > 0 ? (
-                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-md text-xs font-semibold border border-blue-100">
-                      {item.pengadaan} Aktif
-                    </span>
-                  ) : (
-                    <span className="text-slate-800">0</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-center">
-                  {item.total > 0 ? (
-                    <span className="font-bold text-slate-800">{item.total}</span>
-                  ) : (
-                    <span className="text-slate-800">0</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-right whitespace-nowrap">
-                  <a className="inline-flex items-center gap-1 text-cyan-500 font-semibold hover:text-cyan-600 transition-colors" href={`/perusahaan/${item.id}`}>
-                    Lihat Detail <ArrowRight size={14} />
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="w-full overflow-x-auto px-6 pb-4">
+        <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5">
+                <SortableHeader label="NAMA PERUSAHAAN" field="name" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[22%]" />
+                <SortableHeader label="ALAMAT" field="address" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[20%]" />
+                <SortableHeader label="NOMOR TELEPON" field="phone" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[15%]" />
+                <SortableHeader label="AKTIVITAS TERAKHIR" field="activity" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[15%]" />
+                <SortableHeader label="PENGADAAN BARANG" field="pengadaan" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[12%]" />
+                <SortableHeader label="TOTAL PROYEK" field="total" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[10%]" />
+                <TableHead className="text-right text-slate-600 text-xs w-[6%]">AKSI</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedCompanies.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-16 text-slate-400">
+                    Tidak ada perusahaan yang ditemukan.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedCompanies.map((item, idx) => (
+                  <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors [&_td]:py-4">
+                    <TableCell className="max-w-[200px]" title={item.name}>
+                      <p className="font-medium text-slate-800 truncate">{item.name}</p>
+                    </TableCell>
+                    <TableCell className="max-w-[200px]" title={item.address}>
+                      <p className="text-sm text-slate-500 truncate">{item.address}</p>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap" title={item.phone}>
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-sm text-slate-600 truncate">{truncate(item.phone, 15)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap" title={item.activity}>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-sm text-slate-600 truncate">{item.activity}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.pengadaan > 0 ? (
+                        <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[11px] font-semibold border border-blue-100">
+                          {item.pengadaan} Aktif
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 text-sm">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {item.total > 0 ? (
+                        <span className="font-bold text-slate-800 text-sm">{item.total}</span>
+                      ) : (
+                        <span className="text-slate-400 text-sm">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <a className="text-cyan-600 text-sm font-medium hover:underline inline-flex items-center" href={`/perusahaan/${item.id}`}>
+                        Lihat Detail
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Footer / Pagination */}
-      <div className="p-4 flex items-center justify-between border-t border-gray-100 text-xs text-gray-500">
+      <div className="p-4 flex items-center justify-between border-t border-slate-100 text-xs text-slate-500 bg-white">
         <div>
-          Menampilkan <span className="font-semibold text-gray-700">{filteredCompanies.length === 0 ? 0 : startIndex + 1}</span> sampai <span className="font-semibold text-gray-700">{Math.min(startIndex + ITEMS_PER_PAGE, filteredCompanies.length)}</span> dari <span className="font-semibold text-gray-700">{filteredCompanies.length}</span> perusahaan
+          Menampilkan <span className="font-semibold text-slate-700">{filteredCompanies.length === 0 ? 0 : startIndex + 1}</span> sampai <span className="font-semibold text-slate-700">{Math.min(startIndex + ITEMS_PER_PAGE, filteredCompanies.length)}</span> dari <span className="font-semibold text-slate-700">{filteredCompanies.length}</span> perusahaan
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
           >
             <ChevronLeft size={16} />
           </button>
@@ -274,8 +310,8 @@ export default function PerusahaanPage() {
                 key={idx}
                 onClick={() => setCurrentPage(Number(page))}
                 className={`w-7 h-7 flex items-center justify-center rounded font-bold text-xs transition-all ${currentPage === page
-                  ? "bg-cyan-500 text-white shadow-sm"
-                  : "hover:bg-gray-100 text-gray-600"
+                  ? "bg-cyan-600 text-white shadow-sm"
+                  : "hover:bg-slate-100 text-slate-600"
                   }`}
               >
                 {page}
@@ -285,7 +321,7 @@ export default function PerusahaanPage() {
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages || totalPages === 0}
-            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            className="p-1.5 rounded hover:bg-slate-100 text-slate-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
           >
             <ChevronRight size={16} />
           </button>

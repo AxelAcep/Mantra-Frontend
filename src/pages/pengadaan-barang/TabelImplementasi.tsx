@@ -12,11 +12,30 @@ function formatTanggal(iso: string | null | undefined) {
   });
 }
 
-function formatStatus(status: string) {
-  if (status === "PERLU_TINDAKAN") return "⚠️ Perlu Tindakan";
-  if (status === "KONFIRMASI_SELESAI") return "Menunggu Konfirmasi";
-  if (status === "SELESAI") return "✓ Selesai";
-  return "On Progress";
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, string> = {
+    ON_PROGRESS: "bg-orange-100 text-orange-700",
+    PERLU_TINDAKAN: "bg-red-100 text-red-700",
+    KONFIRMASI_SELESAI: "bg-amber-100 text-amber-700",
+    SELESAI: "bg-emerald-100 text-emerald-700",
+  };
+
+  const label: Record<string, string> = {
+    ON_PROGRESS: "On Progress",
+    PERLU_TINDAKAN: "Perlu Tindakan",
+    KONFIRMASI_SELESAI: "Menunggu Konfirmasi",
+    SELESAI: "Selesai",
+  };
+
+  const safeStatus = config[status] ? status : "ON_PROGRESS";
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeStatus]}`}
+    >
+      {label[safeStatus]}
+    </span>
+  );
 }
 
 export default function TableImplementasi() {
@@ -46,10 +65,11 @@ export default function TableImplementasi() {
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50/50 border-y border-gray-100">
-            <tr className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+      <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
+        <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Nomor PO</th>
               <th className="px-6 py-4">Nama Perusahaan</th>
               <th className="px-6 py-4">Lokasi Proyek</th>
@@ -82,20 +102,20 @@ export default function TableImplementasi() {
               </tr>
             )}
             {!isError && data?.data.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-6 py-5 font-bold text-slate-700 uppercase">
+              <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
+                <td className="px-6 font-semibold text-slate-600 uppercase">
                   {item.nomorPenawaran}
                 </td>
-                <td className="px-6 py-5 font-bold text-slate-700">
+                <td className="px-6 font-semibold text-slate-600">
                   {item.perusahaanName || "—"}
                 </td>
-                <td className="px-6 py-5 text-gray-500">
+                <td className="px-6 text-gray-500">
                   {item.lokasiProyek || "—"}
                 </td>
-                <td className="px-6 py-5 text-gray-500">
+                <td className="px-6 text-gray-500">
                   {formatTanggal(item.tanggalTerbit || item.tanggalMasuk)}
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-6">
                   <div className="flex flex-wrap gap-1">
                     {item.jenisPenawaran?.map((jenis) => (
                       <span
@@ -107,21 +127,13 @@ export default function TableImplementasi() {
                     )) || "—"}
                   </div>
                 </td>
-                <td className="px-6 py-5 text-center">
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                    item.status === "SELESAI"
-                      ? "bg-green-50 text-green-600 border border-green-100"
-                      : item.status === "PERLU_TINDAKAN"
-                      ? "bg-red-50 text-red-600 border border-red-100"
-                      : "bg-blue-50 text-blue-600 border border-blue-100"
-                  }`}>
-                    {formatStatus(item.status)}
-                  </span>
+                <td className="px-6 text-center">
+                  <StatusBadge status={item.status || "ON_PROGRESS"} />
                 </td>
-                <td className="px-6 py-5 text-right">
+                <td className="px-6 text-right">
                   <Link
                     to={`/penawaran/${item.id}`}
-                    className="inline-flex items-center gap-1 text-cyan-500 font-bold hover:text-cyan-600 transition-colors"
+                    className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
                   >
                     Lihat Detail <ArrowRight size={14} />
                   </Link>
@@ -130,6 +142,7 @@ export default function TableImplementasi() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}

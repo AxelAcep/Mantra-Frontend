@@ -22,7 +22,7 @@ export default function ActivityLogSection({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <Activity size={16} className="text-cyan-500" />
+          <Activity size={16} className="text-gray-500" />
           Log Aktivitas
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function ActivityLogSection({
             {displayed.map((log) => (
               <div key={log.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
-                  <div className="w-2 h-2 rounded-full mt-1 shrink-0 bg-cyan-400" />
+                  <div className="w-2 h-2 rounded-full mt-1 shrink-0 bg-gray-400" />
                   <div className="w-px flex-1 bg-slate-100 mt-1" />
                 </div>
                 <div className="pb-4 min-w-0">

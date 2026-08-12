@@ -55,10 +55,11 @@ export default function TablePembayaran() {
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50/50 border-y border-gray-100">
-            <tr className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+      <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
+        <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Nomor PO</th>
               <th className="px-6 py-4">Nama Perusahaan</th>
               <th className="px-6 py-4">Jenis Pengadaan</th>
@@ -99,14 +100,14 @@ export default function TablePembayaran() {
               }
 
               return (
-                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-5 font-bold text-slate-700 uppercase">
+                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
+                  <td className="px-6 font-semibold text-slate-600 uppercase">
                     {item.nomorPenawaran}
                   </td>
-                  <td className="px-6 py-5 font-bold text-slate-700">
+                  <td className="px-6 font-semibold text-slate-600">
                     {item.perusahaanName || "—"}
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-6">
                     <div className="flex flex-wrap gap-1">
                       {item.jenisPenawaran?.map((jenis) => (
                         <span
@@ -118,10 +119,10 @@ export default function TablePembayaran() {
                       )) || "—"}
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-right font-bold text-slate-700">
+                  <td className="px-6 text-right font-semibold text-slate-600">
                     {formatRupiah(item.estimasiHarga)}
                   </td>
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-6 text-center">
                     {total > 0 ? (
                       <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
                         {paid} DARI {total}
@@ -130,13 +131,13 @@ export default function TablePembayaran() {
                       <span className="text-gray-300">—</span>
                     )}
                   </td>
-                  <td className="px-6 py-5 text-center">
+                  <td className="px-6 text-center">
                     <StatusBadgePembayaran status={paymentStatus} />
                   </td>
-                  <td className="px-6 py-5 text-right">
+                  <td className="px-6 text-right">
                     <Link
                       to={`/penawaran/${item.id}`}
-                      className="inline-flex items-center gap-1 text-cyan-500 font-bold hover:text-cyan-600 transition-colors"
+                      className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
                     >
                       Lihat Detail <ArrowRight size={14} />
                     </Link>
@@ -146,6 +147,7 @@ export default function TablePembayaran() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}

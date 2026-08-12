@@ -63,9 +63,8 @@ function DetailField({
         </div>
       ) : (
         <p
-          className={`text-lg leading-snug ${
-            strong ? "font-bold text-slate-800" : "font-medium text-slate-700"
-          }`}
+          className={`text-sm leading-snug ${strong ? "font-bold text-slate-800" : "font-medium text-slate-700"
+            }`}
         >
           {value ?? "-"}
         </p>
@@ -140,8 +139,8 @@ export default function RequestDetailSection({
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-gray-100/80 flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <FileText size={16} className="text-cyan-500" />
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+          <FileText size={16} className="text-gray-500" />
           Detail Permintaan Masuk
         </div>
         {!isEditing && (
@@ -159,7 +158,7 @@ export default function RequestDetailSection({
         <DetailField
           label="Nomor Penawaran"
           value={tracking?.nomorPenawaran ? `#${tracking.nomorPenawaran}` : "-"}
-          // Nomor penawaran tidak bisa diedit
+        // Nomor penawaran tidak bisa diedit
         />
         <DetailField
           label="Customer Name"
@@ -182,7 +181,6 @@ export default function RequestDetailSection({
         <DetailField
           label="Customer E-Mail"
           value={tracking?.customerEmail}
-          strong={false}
           editing={isEditing}
           inputValue={form.customerEmail}
           onInputChange={(val) =>
@@ -192,7 +190,6 @@ export default function RequestDetailSection({
         <DetailField
           label="Lokasi Proyek"
           value={tracking?.lokasiProyek}
-          strong={false}
           editing={isEditing}
           inputValue={form.lokasiProyek}
           onInputChange={(val) =>
@@ -206,7 +203,7 @@ export default function RequestDetailSection({
               ? tracking.jenisPenawaran.map((j) => JENIS_LABEL[j] ?? j)
               : []
           }
-          // Jenis penawaran tidak diedit di sini
+        // Jenis penawaran tidak diedit di sini
         />
       </div>
 

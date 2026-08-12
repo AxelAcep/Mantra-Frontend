@@ -221,21 +221,21 @@ function ActivityTable({
     const isSorted = sortBy === field
     return (
       <TableHead
-        className={`py-4 text-slate-500 text-xs font-bold uppercase tracking-wider ${widthClass || "px-6"} cursor-pointer hover:bg-slate-100/30 hover:text-slate-800 transition-colors select-none`}
+        className={`py-4 text-slate-600 text-xs font-medium uppercase tracking-wider ${widthClass || "px-6"} cursor-pointer group hover:text-cyan-600 transition-colors select-none`}
         onClick={() => onSort(field)}
       >
         <div className={`flex items-center gap-1.5 ${center ? "justify-center" : ""}`}>
-          <span>{label}</span>
+          <span className={`${isSorted ? "text-cyan-600" : ""}`}>{label}</span>
           <span className="flex flex-col text-[8px] gap-[2px] opacity-70">
             <svg
-              className={`w-2.5 h-2.5 -mb-1 ${isSorted && sortDir === "asc" ? "text-cyan-500" : "text-slate-300"}`}
+              className={`w-2.5 h-2.5 -mb-1 ${isSorted && sortDir === "asc" ? "text-cyan-600" : "text-slate-400 group-hover:text-cyan-600/50"}`}
               fill="currentColor"
               viewBox="0 0 24 24"
             >
               <path d="M12 4l-8 8h16z" />
             </svg>
             <svg
-              className={`w-2.5 h-2.5 ${isSorted && sortDir === "desc" ? "text-cyan-500" : "text-slate-300"}`}
+              className={`w-2.5 h-2.5 ${isSorted && sortDir === "desc" ? "text-cyan-600" : "text-slate-400 group-hover:text-cyan-600/50"}`}
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -358,7 +358,7 @@ function ActivityTable({
                     <SortableHeader label="Status" field="status" widthClass="px-4 w-[15%]" center />
                   </>
                 )}
-                <TableHead className="px-4 py-4 text-slate-500 text-xs font-bold uppercase tracking-wider text-right w-[14%]">Aksi</TableHead>
+                <TableHead className="px-4 py-4 text-slate-600 text-xs font-medium uppercase tracking-wider text-right w-[14%]">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-50">

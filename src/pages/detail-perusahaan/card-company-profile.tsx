@@ -81,7 +81,7 @@ export default function CardCompanyProfileDetail() {
   function truncateText(text: string, maxLength: number = 100): string {
     if (!text) return "";
     if (text.length > maxLength) {
-      return text.slice(0, 200) + "...";
+      return text.slice(0, maxLength) + "...";
     }
     return text;
   }
@@ -100,11 +100,11 @@ export default function CardCompanyProfileDetail() {
             <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-500">
               <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.address}>
                 <img src={Icons.Location} className="w-4 h-4 opacity-70 shrink-0" />
-                <span>{truncateText(companyInfo.address)}</span>
+                <span className="break-all">{truncateText(companyInfo.address, 250)}</span>
               </div>
               <div className="flex items-center gap-1.5 min-w-0" title={companyInfo.phone}>
                 <img src={Icons.Phone} className="w-4 h-4 opacity-70 shrink-0" />
-                <span>{truncateText(companyInfo.phone)}</span>
+                <span className="break-all">{truncateText(companyInfo.phone, 15)}</span>
               </div>
             </div>
           </div>

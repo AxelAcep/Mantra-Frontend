@@ -87,6 +87,7 @@ export function DialogEditPerusahaan({ children, company, onEditCompany, onDelet
                             placeholder="Masukkan alamat perusahaan"
                             value={form.alamat}
                             onChange={handleChange}
+                            maxLength={250}
                             className="border-slate-200 text-slate-700 focus-visible:ring-4 focus-visible:ring-cyan-500/10 focus-visible:border-cyan-500 font-medium rounded-lg shadow-none resize-none"
                             rows={3}
                         />
@@ -99,6 +100,7 @@ export function DialogEditPerusahaan({ children, company, onEditCompany, onDelet
                             placeholder="Masukkan nomor telepon perusahaan"
                             value={form.telepon}
                             onChange={handleChange}
+                            maxLength={15}
                             className="h-11 border-slate-200 text-slate-700 focus-visible:ring-4 focus-visible:ring-cyan-500/10 focus-visible:border-cyan-500 font-medium rounded-lg shadow-none"
                         />
                     </div>

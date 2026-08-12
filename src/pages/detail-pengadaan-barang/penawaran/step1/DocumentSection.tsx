@@ -113,8 +113,8 @@ export default function DocumentSection({
       {/* ── Logbook Operasional ── */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Logbook Operasional
           </div>
           <div className="flex gap-2">
@@ -126,29 +126,29 @@ export default function DocumentSection({
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-2">
           {activity ? (
-            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+            <div className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                   <FileText size={18} />
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-slate-800">
+                  <p className="text-sm font-bold text-slate-800">
                     {activity.judul}
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-xs text-gray-400">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
                     {activity.pegawai?.divisi ?? "—"} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
-                          "id-ID",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          },
-                        )
+                        "id-ID",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )
                       : "—"}
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export default function DocumentSection({
                   onClick={() => onChatClick(activity.id, activity.judul)}
                   className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
                 >
-                  <MessageCircle size={13} /> Chat
+                  <MessageCircle size={12} /> Chat
                   {unreadChat > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                       {unreadChat > 9 ? "9+" : unreadChat}
@@ -167,7 +167,7 @@ export default function DocumentSection({
                 </button>
                 <button
                   onClick={() => navigate(`/dailyactivity/${activity.id}`)}
-                  className="text-cyan-500 font-bold text-sm flex items-center gap-1 hover:text-cyan-600"
+                  className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
                 >
                   Lihat Detail <ArrowRight size={14} />
                 </button>
@@ -184,8 +184,8 @@ export default function DocumentSection({
       {/* ── Dokumen Pendukung ── */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen Pendukung
           </div>
           <button
@@ -205,7 +205,7 @@ export default function DocumentSection({
           />
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-2 space-y-1">
           {dokumen.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">
               Belum ada dokumen.

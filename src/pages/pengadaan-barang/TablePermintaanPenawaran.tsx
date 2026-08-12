@@ -41,25 +41,24 @@ type StatusType =
 
 function StatusBadge({ status }: { status: StatusType }) {
   const config: Record<StatusType, string> = {
-    ON_PROGRESS: "bg-[#f8fafc] text-[#64748b] border-[#f1f5f9]",
-    PERLU_TINDAKAN:
-      "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5] ring-1 ring-[#fed7aa]",
-    KONFIRMASI_SELESAI: "bg-[#fefce8] text-[#ca8a04] border-[#fef9c3]",
-    SELESAI: "bg-[#f0fdf4] text-[#16a34a] border-[#dcfce7]",
+    ON_PROGRESS: "bg-orange-100 text-orange-700",
+    PERLU_TINDAKAN: "bg-red-100 text-red-700",
+    KONFIRMASI_SELESAI: "bg-amber-100 text-amber-700",
+    SELESAI: "bg-emerald-100 text-emerald-700",
   };
 
   const label: Record<StatusType, string> = {
     ON_PROGRESS: "On Progress",
-    PERLU_TINDAKAN: "⚠️ Perlu Tindakan",
+    PERLU_TINDAKAN: "Perlu Tindakan",
     KONFIRMASI_SELESAI: "Menunggu Konfirmasi",
-    SELESAI: "✓ Selesai",
+    SELESAI: "Selesai",
   };
 
   const safeStatus: StatusType = config[status] ? status : "ON_PROGRESS";
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border shadow-sm ${config[safeStatus]}`}
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeStatus]}`}
     >
       {label[safeStatus]}
     </span>
@@ -94,10 +93,11 @@ export default function TablePermintaanPenawaran() {
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50/50 border-y border-gray-100">
-            <tr className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+      <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
+        <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Tanggal Permintaan</th>
               <th className="px-6 py-4">No. Penawaran</th>
               <th className="px-6 py-4">PIC Req</th>
@@ -144,41 +144,41 @@ export default function TablePermintaanPenawaran() {
               return (
                 <tr
                   key={item.id}
-                  className={`transition-colors ${status === "PERLU_TINDAKAN"
+                  className={`transition-colors border-b ${status === "PERLU_TINDAKAN"
                     ? "bg-[#fffbeb]"
-                    : "hover:bg-gray-50/50"
-                    }`}
+                    : "hover:bg-slate-50/50"
+                    } [&_td]:py-4`}
                 >
-                  <td className="px-6 py-5 text-gray-500">
+                  <td className="px-6 text-gray-500">
                     {formatTanggal(item.tanggalMasuk)}
                   </td>
-                  <td className="px-6 py-5 font-bold text-slate-700">
+                  <td className="px-6 font-semibold text-slate-600">
                     {item.nomorPenawaran}
                   </td>
-                  <td className="px-6 py-5 font-bold text-slate-700">
+                  <td className="px-6 font-semibold text-slate-600">
                     {item.picReq?.nama ?? "—"}
                   </td>
-                  <td className="px-6 py-5 text-gray-400 font-medium">
+                  <td className="px-6 text-gray-500 font-medium">
                     {item.pembuatPenawaran?.nama ?? "—"}
                   </td>
                   {isMaster && (
-                    <td className="px-6 py-5 font-semibold text-gray-400">
+                    <td className="px-6 font-medium text-gray-500">
                       {formatRupiah(item.estimasiHarga) ?? (
                         <span className="text-gray-300">Belum Tersedia</span>
                       )}
                     </td>
                   )}
-                  <td className="px-6 py-5">
+                  <td className="px-6">
                     <div className="flex justify-center">
                       <StatusBadge status={status} />
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-gray-400 font-medium text-center">
+                  <td className="px-6 text-gray-500 font-medium text-center">
                     {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
                   </td>
-                  <td className="px-6 py-5 text-right">
+                  <td className="px-6 text-right">
                     <Link
-                      className="inline-flex items-center gap-1 text-cyan-500 font-bold hover:text-cyan-600 transition-colors"
+                      className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
                       to={`/penawaran/${item.id}`}
                     >
                       Lihat Detail <ArrowRight size={14} />
@@ -189,6 +189,7 @@ export default function TablePermintaanPenawaran() {
             })}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}

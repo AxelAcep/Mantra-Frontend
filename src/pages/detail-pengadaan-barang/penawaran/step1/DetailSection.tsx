@@ -33,7 +33,7 @@ function InfoCard({
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
       <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
-        <span className="text-cyan-500">{icon}</span>
+        <span className="text-gray-500">{icon}</span>
         <span>{title}</span>
       </div>
       <div className="flex items-center gap-4">
@@ -41,7 +41,7 @@ function InfoCard({
           {initials}
         </div>
         <div>
-          <p className="text-lg font-bold text-slate-800 leading-tight">
+          <p className="text-sm font-bold text-slate-800 leading-tight">
             {name}
           </p>
           <p className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-tight">
@@ -111,20 +111,20 @@ function AssignCard({
   if (!isEditing && currentPegawai) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
-          <span className="text-cyan-500">{icon}</span>
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] uppercase tracking-tight mb-5">
+          <span className="text-gray-500">{icon}</span>
           <span>{title}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
               {getInitials(currentPegawai.nama)}
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-800 leading-tight">
+              <p className="text-[0.75rem] font-bold text-slate-800 leading-tight">
                 {currentPegawai.nama}
               </p>
-              <p className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-tight">
+              <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight">
                 {currentPegawai.divisi ?? divisi}
               </p>
             </div>
@@ -134,7 +134,7 @@ function AssignCard({
               setSelectedId(currentPegawai.id);
               setIsEditing(true);
             }}
-            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-sm font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95"
+            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-xs font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95"
           >
             Ubah
           </button>
@@ -146,7 +146,7 @@ function AssignCard({
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full flex flex-col">
       <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
-        <span className="text-cyan-500">{icon}</span>
+        <span className="text-gray-500">{icon}</span>
         <span>{title}</span>
       </div>
       <PegawaiSelect
@@ -257,7 +257,7 @@ function WorkTimeCard({
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight">
-          <Clock3 size={16} className="text-cyan-500" />
+          <Clock3 size={16} className="text-gray-500" />
           <span>Waktu Pengerjaan</span>
         </div>
         <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}>
@@ -269,7 +269,7 @@ function WorkTimeCard({
           <span className="text-gray-400 font-medium text-xs">
             Sisa waktu: {sisaWaktu}
           </span>
-          <span className="text-lg font-bold text-slate-800">{progress}%</span>
+          <span className="text-sm font-bold text-slate-800">{progress}%</span>
         </div>
         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
           <div
@@ -277,7 +277,7 @@ function WorkTimeCard({
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-gray-400 font-medium pt-1">
+        <p className="text-xs text-gray-400 font-medium pt-1">
           Batas waktu: {batasWaktu}
         </p>
       </div>
