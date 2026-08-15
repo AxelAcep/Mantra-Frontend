@@ -118,11 +118,17 @@ export default function DocumentSection({
             Logbook Operasional
           </div>
           <div className="flex gap-2">
-            <button
-              className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${badgeColor}`}
-            >
-              <CheckCircle2 size={13} /> {badgeLabel}
-            </button>
+            {status === "DITERIMA" || status === "SELESAI" ? (
+              <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <CheckCircle2 size={13} /> Diterima
+              </span>
+            ) : (
+              <button
+                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors uppercase ${badgeColor}`}
+              >
+                <CheckCircle2 size={13} /> {badgeLabel}
+              </button>
+            )}
           </div>
         </div>
 

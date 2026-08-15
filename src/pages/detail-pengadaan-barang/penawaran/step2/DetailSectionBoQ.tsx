@@ -144,8 +144,8 @@ export default function DetailSectionBoQ({
       {/* Ringkasan Finansial */}
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
         <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-            <Wallet size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+            <Wallet size={16} className="text-gray-500" />
             <span>Ringkasan Finansial</span>
           </div>
           {isFinanceEditable && (
@@ -163,33 +163,29 @@ export default function DetailSectionBoQ({
         <div className="space-y-4">
           <button
             onClick={() => setIsFinancialExpanded(!isFinancialExpanded)}
-            className={`w-full text-left transition-all rounded-xl border p-5 group ${
-              isFinancialExpanded
-                ? "bg-cyan-50/50 border-cyan-100 shadow-sm"
-                : "bg-slate-50/50 border-gray-100 hover:bg-slate-50"
-            }`}
+            className={`w-full text-left transition-all rounded-xl border p-5 group ${isFinancialExpanded
+              ? "bg-cyan-50/50 border-cyan-100 shadow-sm"
+              : "bg-slate-50/50 border-gray-100 hover:bg-slate-50"
+              }`}
           >
             <p
-              className={`text-xs font-bold mb-2 uppercase tracking-tight transition-colors ${
-                isFinancialExpanded ? "text-cyan-600" : "text-slate-400"
-              }`}
+              className={`text-xs font-bold mb-2 uppercase tracking-tight transition-colors ${isFinancialExpanded ? "text-cyan-600" : "text-slate-400"
+                }`}
             >
               Sub Total I + II + III
             </p>
             <div className="flex items-center justify-between">
               <span
-                className={`text-xl md:text-2xl font-bold transition-colors ${
-                  isFinancialExpanded ? "text-cyan-700" : "text-slate-800"
-                }`}
+                className={`text-xl md:text-xl font-bold transition-colors ${isFinancialExpanded ? "text-cyan-700" : "text-slate-800"
+                  }`}
               >
                 {formatRupiah(total)}
               </span>
               <div
-                className={`p-1 rounded-lg transition-all ${
-                  isFinancialExpanded
-                    ? "bg-white/50 text-cyan-500 rotate-180"
-                    : "text-slate-400"
-                }`}
+                className={`p-1 rounded-lg transition-all ${isFinancialExpanded
+                  ? "bg-white/50 text-cyan-500 rotate-180"
+                  : "text-slate-400"
+                  }`}
               >
                 <ChevronDown size={20} />
               </div>
@@ -237,8 +233,8 @@ export default function DetailSectionBoQ({
       {/* Waktu Pengerjaan */}
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
         <div className="flex justify-between items-center mb-5">
-          <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-            <Clock3 size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+            <Clock3 size={16} className="text-gray-500" />
             <span>Waktu Pengerjaan</span>
           </div>
           <span
@@ -249,11 +245,11 @@ export default function DetailSectionBoQ({
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500 font-medium">
-              Sisa waktu: {displayedRemaining} jam
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400 font-medium text-xs">
+              Sisa waktu: {isDone ? "Selesai" : `${displayedRemaining} jam`}
             </span>
-            <span className="text-slate-800 font-bold">
+            <span className="text-sm font-bold text-slate-800">
               {displayedPercentage}%
             </span>
           </div>
@@ -263,7 +259,7 @@ export default function DetailSectionBoQ({
               style={{ width: `${displayedPercentage}%` }}
             />
           </div>
-          <p className="text-sm text-gray-400 font-medium pt-1">
+          <p className="text-xs text-gray-400 font-medium pt-1">
             Batas Waktu {workingTime?.deadline ?? "-"}
           </p>
         </div>

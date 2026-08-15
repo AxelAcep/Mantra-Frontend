@@ -39,16 +39,16 @@ export default function OrderCard({
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm group hover:border-cyan-100 transition-all">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-cyan-600">
+        <div className="flex items-center gap-2 text-gray-500">
           {icon}
-          <p className="text-[10px] font-bold uppercase tracking-tight">
+          <p className="text-[13px] font-bold tracking-tight text-slate-800">
             {label}
           </p>
         </div>
         {canEdit && !isEditing && (
           <button
             onClick={onEditClick}
-            className="text-gray-300 hover:text-cyan-500 transition-colors opacity-0 group-hover:opacity-100"
+            className="text-cyan-500 hover:text-cyan-600 transition-colors"
             title={`Edit ${label}`}
           >
             <Pencil size={13} />
@@ -83,12 +83,12 @@ export default function OrderCard({
         </div>
       ) : value ? (
         <>
-          <h3 className="text-lg font-bold text-slate-800 mb-1">{value}</h3>
+          <h3 className="text-sm font-bold text-slate-800 mb-1">{value}</h3>
           {tanggal && <p className="text-xs text-gray-400">{tanggal}</p>}
         </>
       ) : (
         <>
-          <h3 className="text-lg font-bold text-slate-400 mb-1">—</h3>
+          <h3 className="text-sm font-bold text-slate-400 mb-1">—</h3>
           <p className="text-xs text-gray-400">{emptyLabel}</p>
         </>
       )}

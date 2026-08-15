@@ -76,6 +76,7 @@ export interface ReviewInternalResponse {
     status: string;
     targetSelesai: string;
     createdAt: string;
+    dokumen?: ReviewInternalDokumen[];
   } | null;
   accAdminDirektur: boolean;
   accManajerOps: boolean;

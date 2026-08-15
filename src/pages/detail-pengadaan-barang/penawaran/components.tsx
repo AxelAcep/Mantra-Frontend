@@ -110,7 +110,7 @@ export function DocumentItem({
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-xs text-gray-400">
             {typeof size === "string" && size.includes("Diunggah")
               ? size
               : `Diunggah oleh ${size}`}

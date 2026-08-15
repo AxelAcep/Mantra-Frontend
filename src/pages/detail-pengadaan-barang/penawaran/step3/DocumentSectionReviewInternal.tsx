@@ -26,8 +26,8 @@ export default function DocumentSectionReviewInternal({
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
       <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <FolderOpen size={16} className="text-cyan-500" /> Dokumen Pendukung
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+          <FolderOpen size={16} className="text-gray-500" /> Dokumen Pendukung
         </div>
         <button
           onClick={() => fileRef.current?.click()}
@@ -47,7 +47,7 @@ export default function DocumentSectionReviewInternal({
         />
       </div>
 
-      <div className="p-4 space-y-1">
+      <div className="p-2 space-y-1">
         {dokumen.length === 0 ? (
           <p className="text-center text-sm text-gray-400 py-6">
             Belum ada dokumen.
@@ -59,7 +59,7 @@ export default function DocumentSectionReviewInternal({
               className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                   <FileText size={18} />
                 </div>
                 <div>

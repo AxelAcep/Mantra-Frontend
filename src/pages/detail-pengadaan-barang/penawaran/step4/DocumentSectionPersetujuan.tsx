@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { FileText, Upload, Download, Trash2, ArrowRight } from "lucide-react";
+import { FileText, Upload, Download, Trash2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface DokumenItem {
@@ -49,20 +49,26 @@ export default function DocumentSectionPersetujuan({
       {activityAdmin && (
         <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-            <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-              <FileText size={16} className="text-cyan-500" />
+            <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+              <FileText size={16} className="text-gray-500" />
               Logbook Operasional
             </div>
             <div className="flex gap-2">
-              <span className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border bg-amber-50 text-amber-600 border-amber-100">
-                {activityAdmin.status}
-              </span>
+              {activityAdmin.status === "DITERIMA" || activityAdmin.status === "Diterima" ? (
+                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                  <CheckCircle2 size={13} /> Diterima
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border bg-amber-50 text-amber-600 border-amber-100">
+                  {activityAdmin.status.replace(/_/g, " ")}
+                </span>
+              )}
             </div>
           </div>
-          <div className="p-6">
-            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+          <div className="p-2">
+            <div className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                   <FileText size={18} />
                 </div>
                 <div>
@@ -74,23 +80,23 @@ export default function DocumentSectionPersetujuan({
                     {activityAdmin.pegawai?.divisi ?? "—"} ·{" "}
                     {activityAdmin.targetSelesai
                       ? new Date(
-                          activityAdmin.targetSelesai,
-                        ).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })
+                        activityAdmin.targetSelesai,
+                      ).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
                       : "—"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <a
-                  href={`/dailyactivity/${activityAdmin.id}`}
-                  className="text-cyan-500 font-bold text-sm flex items-center gap-1 hover:text-cyan-600"
+                <button
+                  onClick={() => navigate(`/dailyactivity/${activityAdmin.id}`)}
+                  className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
                 >
                   Lihat Detail <ArrowRight size={14} />
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -100,8 +106,8 @@ export default function DocumentSectionPersetujuan({
       {/* Dokumen Pendukung */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen Pendukung
           </div>
           <button
@@ -120,7 +126,7 @@ export default function DocumentSectionPersetujuan({
           />
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-2">
           {dokumen.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-6">
               Belum ada dokumen diunggah.
@@ -129,10 +135,10 @@ export default function DocumentSectionPersetujuan({
             dokumen.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"
+                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                     <FileText size={18} />
                   </div>
                   <div>

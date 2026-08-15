@@ -84,8 +84,8 @@ export default function ApprovalSectionFollowUp({
   // Get latest rejection reason
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-gray-100/80 flex items-center gap-2 font-bold text-slate-800 text-sm">
-        <Clock3 size={16} className="text-cyan-500" />
+      <div className="p-4 border-b border-gray-100/80 flex items-center gap-2 font-bold text-slate-800 text-[13px] tracking-tight">
+        <Clock3 size={16} className="text-gray-500" />
         Status Follow Up
       </div>
       <div className="p-6 pt-4 space-y-6">

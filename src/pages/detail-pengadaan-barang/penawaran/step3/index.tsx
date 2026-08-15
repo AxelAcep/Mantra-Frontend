@@ -116,13 +116,20 @@ export default function Step3({ trackingId }: Props) {
       };
     }) ?? [];
 
-  const mappedDokumen =
-    data.dokumen?.map((doc) => ({
+  const mappedDokumen = [
+    ...(data.activityAdmin?.dokumen?.map((doc) => ({
       id: doc.id,
       namaFile: doc.namaFile,
       path: doc.path,
       createdAt: doc.createdAt,
-    })) ?? [];
+    })) ?? []),
+    ...(data.dokumen?.map((doc) => ({
+      id: doc.id,
+      namaFile: doc.namaFile,
+      path: doc.path,
+      createdAt: doc.createdAt,
+    })) ?? []),
+  ];
 
   const isUpdating = updateStatusMut.isPending;
 

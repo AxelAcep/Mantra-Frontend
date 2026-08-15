@@ -290,7 +290,7 @@ function FormCard({
           <span className="text-sm font-bold text-cyan-600">
             {formatCurrency(
               parseFloat(draft.qty || "0") *
-                parseFloat(draft.hargaSatuan || "0"),
+              parseFloat(draft.hargaSatuan || "0"),
             )}
           </span>
         </div>
@@ -335,24 +335,34 @@ interface ResultModalProps {
 }
 
 function ResultModal({ info, onClose }: ResultModalProps) {
+  const [cachedInfo, setCachedInfo] = React.useState<ResultModalInfo | null>(info);
+
+  React.useEffect(() => {
+    if (info) {
+      setCachedInfo(info);
+    }
+  }, [info]);
+
+  const displayInfo = info || cachedInfo;
+
   return (
     <Dialog open={!!info} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-[380px] bg-white rounded-2xl p-6 gap-0 text-center">
         <div
           className={`mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center ${
-            info?.type === "success"
+            displayInfo?.type === "success"
               ? "bg-green-50 text-green-500"
               : "bg-red-50 text-red-500"
           }`}
         >
-          {info?.type === "success" ? <Check size={24} /> : <X size={24} />}
+          {displayInfo?.type === "success" ? <Check size={24} /> : <X size={24} />}
         </div>
         <DialogHeader>
           <DialogTitle className="text-base font-bold text-slate-800 text-center">
-            {info?.type === "success" ? "Berhasil" : "Gagal"}
+            {displayInfo?.type === "success" ? "Berhasil" : "Gagal"}
           </DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-gray-500 mt-1 mb-5">{info?.message}</p>
+        <p className="text-sm text-gray-500 mt-1 mb-5">{displayInfo?.message}</p>
         <Button
           onClick={onClose}
           className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold w-full"
@@ -607,8 +617,8 @@ export default function BarangSection({
         {/* Header bar */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <FileText size={16} className="text-cyan-500" />
-            <h3 className="font-bold text-slate-800 text-sm">
+            <FileText size={16} className="text-gray-500" />
+            <h3 className="font-bold text-slate-800 text-[13px] tracking-tight">
               Daftar Barang Pembelian
             </h3>
           </div>
@@ -699,11 +709,10 @@ export default function BarangSection({
                     return (
                       <tr
                         key={item.id}
-                        className={`border-b border-gray-50 last:border-0 transition-all ${
-                          editingId === item.id
+                        className={`border-b border-gray-50 last:border-0 transition-all ${editingId === item.id
                             ? "bg-cyan-50/20"
                             : "bg-white hover:bg-slate-50/30"
-                        }`}
+                          }`}
                       >
                         <td className="px-4 py-4">
                           <p className="text-xs font-bold text-slate-800">
@@ -712,11 +721,10 @@ export default function BarangSection({
                         </td>
                         <td className="px-4 py-4 text-center">
                           <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              item.status === "Ready"
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${item.status === "Ready"
                                 ? "bg-green-50 text-green-500"
                                 : "bg-amber-50 text-amber-500"
-                            }`}
+                              }`}
                           >
                             {item.status}
                           </span>
@@ -755,11 +763,10 @@ export default function BarangSection({
                             <button
                               onClick={() => onOpenEdit(item)}
                               disabled={isRowDisabled}
-                              className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
-                                editingId === item.id
+                              className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${editingId === item.id
                                   ? "text-cyan-500"
-                                  : "text-gray-400 hover:text-cyan-500"
-                              }`}
+                                  : "text-cyan-500 hover:text-cyan-600"
+                                }`}
                               title="Edit"
                             >
                               <Pencil size={14} />
@@ -767,7 +774,7 @@ export default function BarangSection({
                             <button
                               onClick={() => onDeleteClick(item)}
                               disabled={isRowDisabled}
-                              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Hapus"
                             >
                               {isRowDeleting ? (
@@ -798,8 +805,8 @@ export default function BarangSection({
       {/* Logbook Operasional */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm text-left">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Logbook Operasional Pembelian Barang
           </div>
           {onAssignPGA && (
@@ -811,12 +818,12 @@ export default function BarangSection({
             </button>
           )}
         </div>
-        <div className="p-6">
+        <div className="p-2">
           {activityPembelian ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+            <div className="">
+              <div className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                     <FileText size={18} />
                   </div>
                   <div>
@@ -830,12 +837,12 @@ export default function BarangSection({
                       ·{" "}
                       {activityPembelian.targetSelesai
                         ? new Date(
-                            activityPembelian.targetSelesai,
-                          ).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
+                          activityPembelian.targetSelesai,
+                        ).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
                         : "—"}
                     </p>
                   </div>
@@ -863,35 +870,32 @@ export default function BarangSection({
               {/* Render children (Staff PGA) */}
               {activityPembelian.children &&
                 activityPembelian.children.length > 0 && (
-                  <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                      Penugasan Staff PGA
-                    </p>
+                  <>
                     {activityPembelian.children.map((child: any) => (
                       <div
                         key={child.id}
-                        className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors"
+                        className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
-                            <FileText size={16} />
+                          <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                            <FileText size={18} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-700">
+                            <p className="text-sm font-bold text-slate-800">
                               {child.judul}
                             </p>
-                            <p className="text-[11px] text-gray-400 mt-0.5">
+                            <p className="text-xs text-gray-400 mt-1">
                               {child.pegawai?.nama ?? "—"} ·{" "}
                               {child.pegawai?.divisi?.replace("_", " ") ?? "—"}{" "}
                               ·{" "}
                               {child.targetSelesai
                                 ? new Date(
-                                    child.targetSelesai,
-                                  ).toLocaleDateString("id-ID", {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  })
+                                  child.targetSelesai,
+                                ).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })
                                 : "—"}
                             </p>
                           </div>
@@ -899,22 +903,22 @@ export default function BarangSection({
                         <div className="flex items-center gap-3 shrink-0">
                           <button
                             onClick={() => onChatClick(child.id, child.judul)}
-                            className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
                           >
-                            <MessageCircle size={12} /> Chat
+                            <MessageCircle size={13} /> Chat
                           </button>
                           <button
                             onClick={() =>
                               navigate(`/dailyactivity/${child.id}`)
                             }
-                            className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                            className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
                           >
-                            Detail <ArrowRight size={12} />
+                            Lihat Detail <ArrowRight size={14} />
                           </button>
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </>
                 )}
             </div>
           ) : (

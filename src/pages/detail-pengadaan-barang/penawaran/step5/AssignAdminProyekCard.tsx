@@ -38,13 +38,13 @@ export default function ManagerProyekCard({
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
       <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
-          <User size={16} className="text-cyan-500" /> Manager Proyek
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+          <User size={16} className="text-gray-500" /> Manager Proyek
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="text-slate-400 hover:text-cyan-500 transition-colors"
+            className="text-cyan-400 transition-colors"
             title="Edit Manager Proyek"
           >
             <Pencil size={15} />

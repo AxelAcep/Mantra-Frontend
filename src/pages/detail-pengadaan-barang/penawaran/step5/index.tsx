@@ -146,59 +146,51 @@ export default function Step5({
 
   const mappedDokumen = data.dokumen ?? [];
 
-  // Generate initials for Sales Avatar
-  const salesInitials = salesName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
         <SectionHeading title="Detail" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm mb-5">
-              <User size={16} className="text-cyan-500" /> PIC Follow Up
+        <div className="flex flex-wrap justify-end gap-4 lg:gap-6">
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm w-fit">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
+              <User size={16} className="text-gray-500" /> PIC Follow Up
             </div>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
-                {salesInitials}
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-800 leading-tight">
-                  {salesName}
-                </p>
-                <p className="text-sm text-gray-400 font-medium mt-1">
-                  Sales Marketing
-                </p>
-              </div>
+            <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3">
+              <p className="text-xs text-gray-400 font-medium mb-1">
+                Sales Marketing
+              </p>
+              <p className="text-sm font-bold text-slate-800">
+                {salesName}
+              </p>
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm mb-5">
-              <User size={16} className="text-cyan-500" /> Kontak Klien
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex-1">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
+              <User size={16} className="text-gray-500" /> Kontak Klien
             </div>
-            <div className="grid grid-cols-2 gap-4 bg-slate-50/60 rounded-xl border border-gray-100 p-5">
-              <div>
+            <div className="flex flex-wrap gap-4 w-full">
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
                 <p className="text-xs text-gray-400 font-medium mb-1">
                   Customer Name
                 </p>
-                <p className="text-base font-bold text-slate-800">
+                <p className="text-sm font-bold text-slate-800">
                   {customerName}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-400 font-medium mb-1">Kontak</p>
-                <p className="text-sm font-bold text-slate-800 break-all">
-                  {customerEmail} <br />
-                  <span className="text-xs text-gray-400 font-medium font-mono">
-                    {customerPhone}
-                  </span>
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
+                <p className="text-xs text-gray-400 font-medium mb-1">
+                  No. Telepon
+                </p>
+                <p className="text-sm font-bold text-slate-800">
+                  {customerPhone}
+                </p>
+              </div>
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
+                <p className="text-xs text-gray-400 font-medium mb-1">Email</p>
+                <p className="text-sm font-bold text-slate-800">
+                  {customerEmail}
                 </p>
               </div>
             </div>

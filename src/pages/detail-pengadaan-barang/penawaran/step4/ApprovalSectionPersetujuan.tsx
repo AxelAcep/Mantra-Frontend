@@ -44,11 +44,16 @@ export default function ApprovalSectionPersetujuan({
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <ShieldCheck size={18} className="text-cyan-500" />
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-[13px] tracking-tight">
+          <ShieldCheck size={16} className="text-gray-500" />
           Persetujuan Manajemen
         </div>
-        <span className="bg-cyan-50 text-cyan-600 px-3 py-1 rounded-full text-[10px] font-bold border border-cyan-100">
+        <span
+          className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${totalAcc === 3
+              ? "bg-green-50 text-green-600 border-green-100"
+              : "bg-amber-50 text-amber-600 border-amber-100"
+            }`}
+        >
           {totalAcc} dari 3 menyetujui
         </span>
       </div>
@@ -87,14 +92,14 @@ export default function ApprovalSectionPersetujuan({
         {!isSelesai && !isPerluTindakan && (
           <div className="bg-slate-50/70 p-5 rounded-2xl border border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
+              <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
                 DK
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-800">
                   Direktur / Komisaris
                 </p>
-                <p className="text-[11px] text-gray-400">
+                <p className="text-xs text-gray-400 mt-0.5">
                   Menunggu persetujuan
                 </p>
               </div>
@@ -183,8 +188,10 @@ export default function ApprovalSectionPersetujuan({
                 Admin Sekertaris
               </p>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-400">
-              Sudah Approve <ChevronDown size={14} />
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <CheckCircle2 size={13} /> Disetujui
+              </span>
             </div>
           </div>
 
@@ -198,8 +205,10 @@ export default function ApprovalSectionPersetujuan({
                 Manager Operasional
               </p>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-400">
-              Sudah Approve <ChevronDown size={14} />
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <CheckCircle2 size={13} /> Disetujui
+              </span>
             </div>
           </div>
 
@@ -225,9 +234,16 @@ export default function ApprovalSectionPersetujuan({
                 )}
               </p>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-gray-400">
-              {data.accDirekturKomisaris ? "Approved" : "Menunggu"}
-              <ChevronDown size={14} />
+            <div className="flex items-center gap-2">
+              {data.accDirekturKomisaris ? (
+                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                  <CheckCircle2 size={13} /> Disetujui
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                  <Clock size={13} /> Menunggu Persetujuan
+                </span>
+              )}
             </div>
           </div>
         </div>

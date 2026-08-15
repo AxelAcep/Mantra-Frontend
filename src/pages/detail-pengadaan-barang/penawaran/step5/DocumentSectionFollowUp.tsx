@@ -30,24 +30,24 @@ function ActivityRow({ act, onChatClick }: ActivityRowProps) {
   return (
     <div
       key={act.id}
-      className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors"
+      className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors"
     >
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500 shrink-0">
+        <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
           <FileText size={18} />
         </div>
 
         <div>
-          <p className="text-lg font-bold text-slate-800">{act.judul}</p>
+          <p className="text-sm font-bold text-slate-800">{act.judul}</p>
 
-          <p className="text-sm text-gray-400">
+          <p className="text-xs text-gray-400">
             {act.pegawai?.nama ?? "—"} · {act.role} ·{" "}
             {act.targetSelesai
               ? new Date(act.targetSelesai).toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
               : "—"}
           </p>
         </div>
@@ -69,7 +69,7 @@ function ActivityRow({ act, onChatClick }: ActivityRowProps) {
 
         <button
           onClick={() => navigate(`/dailyactivity/${act.id}`)}
-          className="text-cyan-500 font-bold text-sm flex items-center gap-1 hover:text-cyan-600"
+          className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600"
         >
           Lihat Detail <ArrowRight size={14} />
         </button>
@@ -182,9 +182,8 @@ export default function DocumentSectionFollowUp({
       namaFile: doc.namaFile,
       path: doc.path,
       createdAt: doc.createdAt,
-      uploaderInfo: `${
-        doc.pegawai?.nama || doc.uploadedBy || "System"
-      } pada ${formatDateTime(doc.createdAt)}`,
+      uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "System"
+        } pada ${formatDateTime(doc.createdAt)}`,
       source: "step" as const,
       uploadedBy: doc.uploadedBy || "",
     }));
@@ -195,11 +194,9 @@ export default function DocumentSectionFollowUp({
         namaFile: doc.namaFile,
         path: doc.path,
         createdAt: doc.createdAt,
-        uploaderInfo: `${
-          doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
-        } pada ${formatDateTime(doc.createdAt)} - ${
-          activityAdmin?.judul || "Admin Sekretariat"
-        }`,
+        uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
+          } pada ${formatDateTime(doc.createdAt)} - ${activityAdmin?.judul || "Admin Sekretariat"
+          }`,
         source: "activity" as const,
         uploadedBy: doc.uploadedBy || "",
       })) ?? [];
@@ -210,11 +207,9 @@ export default function DocumentSectionFollowUp({
         namaFile: doc.namaFile,
         path: doc.path,
         createdAt: doc.createdAt,
-        uploaderInfo: `${
-          doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
-        } pada ${formatDateTime(doc.createdAt)} - ${
-          activitySales?.judul || "Sales PIC"
-        }`,
+        uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
+          } pada ${formatDateTime(doc.createdAt)} - ${activitySales?.judul || "Sales PIC"
+          }`,
         source: "activity" as const,
         uploadedBy: doc.uploadedBy || "",
       })) ?? [];
@@ -296,11 +291,7 @@ export default function DocumentSectionFollowUp({
   })();
 
   const followUpStatusLabel =
-    followUpStatus === "ON_PROGRESS"
-      ? "Proses"
-      : followUpStatus === "SELESAI"
-        ? "Selesai"
-        : followUpStatus;
+    followUpStatus === "ON_PROGRESS" ? "Proses" : "Selesai";
 
   const followUpStatusColor = (() => {
     if (followUpStatus === "SELESAI") {
@@ -315,21 +306,27 @@ export default function DocumentSectionFollowUp({
       {/* ── Logbook Operasional ── */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Logbook Operasional
           </div>
 
           <div className="flex gap-2">
-            <button
-              className={`flex items-center gap-1.5 text-[11px] font-bold px-3 py-2 rounded-lg border transition-colors uppercase ${followUpStatusColor}`}
-            >
-              <CheckCircle2 size={13} /> {followUpStatusLabel}
-            </button>
+            {followUpStatus === "SELESAI" ? (
+              <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <CheckCircle2 size={13} /> Diterima
+              </span>
+            ) : (
+              <button
+                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors uppercase ${followUpStatusColor}`}
+              >
+                <CheckCircle2 size={13} /> {followUpStatusLabel}
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-2">
           {activities.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">
               Belum ada logbook/daily activity untuk tahap ini.
@@ -345,8 +342,8 @@ export default function DocumentSectionFollowUp({
       {/* ── Dokumen Pendukung ── */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen Pendukung
           </div>
 
@@ -368,7 +365,7 @@ export default function DocumentSectionFollowUp({
           />
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-2">
           {combinedDokumen.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">
               Belum ada dokumen pendukung yang diunggah.

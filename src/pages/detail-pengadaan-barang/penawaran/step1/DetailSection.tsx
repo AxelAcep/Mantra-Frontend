@@ -111,7 +111,7 @@ function AssignCard({
   if (!isEditing && currentPegawai) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] uppercase tracking-tight mb-5">
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
           <span className="text-gray-500">{icon}</span>
           <span>{title}</span>
         </div>
@@ -256,7 +256,7 @@ function WorkTimeCard({
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
       <div className="flex justify-between items-center mb-5">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight">
+        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
           <Clock3 size={16} className="text-gray-500" />
           <span>Waktu Pengerjaan</span>
         </div>

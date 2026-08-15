@@ -30,8 +30,8 @@ export default function LogbookCard({
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm text-left">
       <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <FileText size={16} className="text-cyan-500" />
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+          <FileText size={16} className="text-gray-500" />
           {title}
         </div>
         {onAssignPGA && (
@@ -43,12 +43,12 @@ export default function LogbookCard({
           </button>
         )}
       </div>
-      <div className="p-6">
+      <div className="p-2">
         {activity ? (
           <div className="space-y-3">
-            <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4 hover:bg-slate-50 transition-colors">
+            <div className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                   <FileText size={18} />
                 </div>
                 <div>
@@ -89,24 +89,21 @@ export default function LogbookCard({
 
             {/* Render children (Staff PGA) */}
             {activity.children && activity.children.length > 0 && (
-              <div className="ml-6 pl-4 border-l-2 border-gray-100 space-y-3">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Penugasan Staff PGA
-                </p>
+              <>
                 {activity.children.map((child: any) => (
                   <div
                     key={child.id}
-                    className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-3 hover:bg-slate-50 transition-colors"
+                    className="flex items-center justify-between bg-white rounded-xl p-4 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-slate-50 rounded-lg text-slate-400">
-                        <FileText size={16} />
+                      <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                        <FileText size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-700">
+                        <p className="text-sm font-bold text-slate-800">
                           {child.judul}
                         </p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
+                        <p className="text-xs text-gray-400 mt-1">
                           {child.pegawai?.nama ?? "—"} ·{" "}
                           {child.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
                           {child.targetSelesai
@@ -125,20 +122,20 @@ export default function LogbookCard({
                     <div className="flex items-center gap-3 shrink-0">
                       <button
                         onClick={() => onChatClick(child.id, child.judul)}
-                        className="flex items-center gap-1.5 text-cyan-600 bg-cyan-50 hover:bg-cyan-100 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors"
+                        className="flex items-center gap-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg relative transition-colors shadow-sm"
                       >
-                        <MessageCircle size={12} /> Chat
+                        <MessageCircle size={13} /> Chat
                       </button>
                       <button
                         onClick={() => navigate(`/dailyactivity/${child.id}`)}
-                        className="text-cyan-500 font-bold text-[11px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+                        className="text-cyan-500 font-bold text-xs flex items-center gap-1 hover:text-cyan-600 shrink-0"
                       >
-                        Detail <ArrowRight size={12} />
+                        Lihat Detail <ArrowRight size={14} />
                       </button>
                     </div>
                   </div>
                 ))}
-              </div>
+              </>
             )}
           </div>
         ) : (

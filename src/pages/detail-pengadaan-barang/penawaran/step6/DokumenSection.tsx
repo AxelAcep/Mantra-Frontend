@@ -22,8 +22,8 @@ export default function DokumenSection({ dokumen }: DokumenSectionProps) {
       <SectionHeading title="Dokumen" />
       <div className="mt-4 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen Pendukung
           </div>
         </div>
@@ -42,14 +42,14 @@ export default function DokumenSection({ dokumen }: DokumenSectionProps) {
             </p>
           </div>
         ) : (
-          <div className="p-4 space-y-1">
+          <div className="p-2">
             {dokumen.map((doc, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"
+                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                     <FileText size={18} />
                   </div>
                   <div>

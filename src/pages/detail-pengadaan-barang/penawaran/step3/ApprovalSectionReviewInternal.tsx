@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock3,
   ExternalLink,
+  XCircle,
 } from "lucide-react";
 import type { ReviewInternalResponse } from "@/services/review.internal.services";
 
@@ -65,22 +66,24 @@ function RevisionInlineModal({
   );
 }
 
-function getStatusBadge(status: string | undefined) {
-  if (!status) return null;
-  const colors: Record<string, string> = {
-    ON_PROGRESS: "bg-amber-50 text-amber-600 border-amber-100",
-    PENDING: "bg-gray-50 text-gray-500 border-gray-100",
-    KONFIRMASI_SELESAI: "bg-green-50 text-green-600 border-green-100",
-    SELESAI: "bg-green-50 text-green-600 border-green-100",
-    DITERIMA: "bg-green-50 text-green-600 border-green-100",
-    DITOLAK: "bg-red-50 text-red-600 border-red-100",
-    PERLU_TINDAKAN: "bg-red-50 text-red-600 border-red-100",
-  };
+function renderBadge(state: "DISETUJUI" | "MENUNGGU" | "DITOLAK") {
+  if (state === "DISETUJUI") {
+    return (
+      <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+        <CheckCircle2 size={13} /> Disetujui
+      </span>
+    );
+  }
+  if (state === "DITOLAK") {
+    return (
+      <span className="flex items-center gap-1.5 bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+        <XCircle size={13} /> Ditolak
+      </span>
+    );
+  }
   return (
-    <span
-      className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${colors[status] || "bg-gray-50 text-gray-500 border-gray-100"}`}
-    >
-      {status.replace(/_/g, " ")}
+    <span className="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-lg text-xs font-semibold">
+      <Clock3 size={13} /> Menunggu Persetujuan
     </span>
   );
 }
@@ -95,11 +98,21 @@ export default function ApprovalSectionReviewInternal({
 
   const adminDailyStatus = data.activityAdmin?.status;
 
-  const AccAdminDirektur =
-    data.activityAdmin?.status == "DITERIMA" ||
-    data.activityAdmin?.status == "KONFIRMASI_SELESAI";
+  const adBadgeState = (() => {
+    const s = adminDailyStatus?.toUpperCase();
+    if (s === "DITERIMA" || s === "SELESAI") return "DISETUJUI";
+    if (s === "DITOLAK") return "DITOLAK";
+    return "MENUNGGU";
+  })();
 
-  const AccManagerOperasinal = data.activityAdmin?.status == "DITERIMA";
+  const moBadgeState = (() => {
+    const s = adminDailyStatus?.toUpperCase();
+    if (s === "DITERIMA" || s === "SELESAI") return "DISETUJUI";
+    return "MENUNGGU";
+  })();
+
+  const AccAdminDirektur = adBadgeState === "DISETUJUI";
+  const AccManagerOperasinal = moBadgeState === "DISETUJUI";
 
   const approvedCount =
     (AccAdminDirektur ? 1 : 0) + (AccManagerOperasinal ? 1 : 0);
@@ -109,11 +122,16 @@ export default function ApprovalSectionReviewInternal({
     <>
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <ShieldCheck size={18} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[13px] tracking-tight">
+            <ShieldCheck size={16} className="text-gray-500" />
             Persetujuan Review Internal
           </div>
-          <span className="bg-cyan-50 text-cyan-600 px-3 py-1 rounded-full text-[11px] font-semibold border border-cyan-100">
+          <span
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${approvedCount === 2
+                ? "bg-green-50 text-green-600 border-green-100"
+                : "bg-amber-50 text-amber-600 border-amber-100"
+              }`}
+          >
             {approvedCount} dari 2 menyetujui
           </span>
         </div>
@@ -127,16 +145,16 @@ export default function ApprovalSectionReviewInternal({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p
-                  className={`text-sm font-medium mb-2 transition-colors ${isFinancialExpanded ? "text-cyan-600" : "text-gray-500"}`}
+                  className={`text-xs font-medium mb-1 transition-colors ${isFinancialExpanded ? "text-cyan-600" : "text-gray-400"}`}
                 >
                   Nilai Penawaran yang Direview
                 </p>
                 <p
-                  className={`text-[20px] font-bold transition-colors ${isFinancialExpanded ? "text-cyan-700" : "text-slate-800"}`}
+                  className={`text-base font-bold transition-colors ${isFinancialExpanded ? "text-cyan-700" : "text-slate-800"}`}
                 >
                   {boq?.perusahaan?.nama ?? "-"}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 mt-0.5">
                   {boq?.lokasiProyek ?? "-"}
                 </p>
               </div>
@@ -166,51 +184,43 @@ export default function ApprovalSectionReviewInternal({
 
           {/* Admin Direktur */}
           <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
-                  AD
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-slate-800">
-                    Admin Direktur
-                  </p>
-                  <p className="text-sm text-gray-400 font-medium mt-1">
-                    {data.activityAdmin?.pegawai?.nama || "Admin Sekertariat"}
-                  </p>
-                </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+                AD
               </div>
-              {AccAdminDirektur ? (
-                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-2 rounded-xl text-sm font-semibold">
-                  <CheckCircle2 size={14} /> Disetujui
-                </span>
-              ) : (
-                <div className="flex items-center gap-3">
-                  {getStatusBadge(adminDailyStatus)}
-                  <div className="flex items-center gap-2 text-amber-500 text-sm font-semibold">
-                    <Clock3 size={14} /> Menunggu Persetujuan
+
+              <div className="flex-1 flex flex-col gap-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">
+                      Admin Direktur
+                    </p>
+                    <p className="text-xs text-gray-400 font-medium mt-0.5">
+                      {data.activityAdmin?.pegawai?.nama || "Admin Sekertariat"}
+                    </p>
                   </div>
+                  {renderBadge(adBadgeState)}
                 </div>
-              )}
+
+                {/* Info Daily */}
+                {data.activityAdmin && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">
+                      Daily: {data.activityAdmin.judul}
+                    </span>
+                    <button
+                      onClick={onLihatDaily}
+                      className="flex items-center gap-1 text-xs text-cyan-500 hover:text-cyan-600 font-medium"
+                    >
+                      <ExternalLink size={12} /> Lihat Detail
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Info Daily */}
-            {data.activityAdmin && (
-              <div className="mt-3 ml-16 flex items-center justify-between">
-                <span className="text-xs text-gray-400">
-                  Daily: {data.activityAdmin.judul}
-                </span>
-                <button
-                  onClick={onLihatDaily}
-                  className="flex items-center gap-1 text-xs text-cyan-500 hover:text-cyan-600 font-medium"
-                >
-                  <ExternalLink size={12} /> Lihat Detail
-                </button>
-              </div>
-            )}
-
             {/* {canAdminAcc && (
-    <div className="mt-5 ml-16 flex gap-3">
+    <div className="mt-5 ml-14 flex gap-3">
       <button
         onClick={onAcc}
         disabled={isUpdating}
@@ -234,33 +244,27 @@ export default function ApprovalSectionReviewInternal({
 
           {/* Manajer Operasional */}
           <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-lg shrink-0">
-                  MO
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-slate-800">
-                    Manager Operasional
-                  </p>
-                  <p className="text-sm text-gray-400 font-medium mt-1">
-                    Manajer Ops
-                  </p>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+                MO
+              </div>
+              <div className="flex-1 flex flex-col gap-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">
+                      Manager Operasional
+                    </p>
+                    <p className="text-xs text-gray-400 font-medium mt-0.5">
+                      Manajer Ops
+                    </p>
+                  </div>
+                  {renderBadge(moBadgeState)}
                 </div>
               </div>
-              {AccManagerOperasinal ? (
-                <span className="flex items-center gap-1.5 bg-green-50 text-green-600 px-3 py-2 rounded-xl text-sm font-semibold">
-                  <CheckCircle2 size={14} /> Disetujui
-                </span>
-              ) : (
-                <div className="flex items-center gap-2 text-amber-500 text-sm font-semibold">
-                  <Clock3 size={14} /> Menunggu Persetujuan
-                </div>
-              )}
             </div>
 
             {/* {canManajerAcc && (
-              <div className="mt-5 ml-16 flex gap-3">
+              <div className="mt-5 ml-14 flex gap-3">
                 <button
                   onClick={onAcc}
                   disabled={isUpdating}
@@ -282,7 +286,7 @@ export default function ApprovalSectionReviewInternal({
             )} */}
 
             {/* {canKonfirmasiUlang && !canManajerAcc && (
-              <div className="mt-5 ml-16">
+              <div className="mt-5 ml-14">
                 <button
                   onClick={onOnProgress}
                   disabled={isUpdating}

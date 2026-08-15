@@ -63,8 +63,8 @@ export default function AdminProyekUpload({
       {/* Kolom Admin PGA */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen PO untuk Admin PGA
           </div>
           <button
@@ -84,7 +84,7 @@ export default function AdminProyekUpload({
           />
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-2">
           {docPGA ? (
             <DocumentItem
               name={docPGA.namaFile}
@@ -104,8 +104,8 @@ export default function AdminProyekUpload({
       {/* Kolom Finance */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
-          <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-            <FileText size={16} className="text-cyan-500" />
+          <div className="flex items-center gap-2 font-bold text-slate-800 text-[0.75rem]">
+            <FileText size={16} className="text-gray-500" />
             Dokumen PO untuk Finance
           </div>
           <button
@@ -125,7 +125,7 @@ export default function AdminProyekUpload({
           />
         </div>
 
-        <div className="p-4 space-y-1">
+        <div className="p-2">
           {docFinance ? (
             <DocumentItem
               name={docFinance.namaFile}
