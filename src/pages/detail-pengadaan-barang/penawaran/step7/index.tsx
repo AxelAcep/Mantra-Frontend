@@ -13,6 +13,17 @@ function SectionHeading({ title }: { title: string }) {
   );
 }
 
+function SubHeading({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-1">
+      <h2 className="font-bold text-sm text-cyan-600 uppercase tracking-tight">
+        {title}
+      </h2>
+      <div className="h-px bg-cyan-100 flex-1" />
+    </div>
+  );
+}
+
 interface Step7Props {
   trackingId: string;
 }
@@ -61,25 +72,37 @@ export default function Step7({ trackingId }: Step7Props) {
       };
     }) ?? [];
 
-  const mappedDokumen = bast.activityAdminProyek?.dokumen ?? [];
+  const entries = bast.entries ?? [];
 
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-8">
         <div>
           <SectionHeading title="Detail" />
-          <DetailSectionBast
-            noReferensi={bast.noReferensi}
-            tanggalTerbit={bast.tanggalTerbit}
-            tanggalSerahTerima={bast.tanggalSerahTerima}
-            isSaving={updating}
-            onSave={(payload) => updateBast(payload)}
-          />
-        </div>
 
-        <div>
-          <SectionHeading title="Dokumen" />
-          <DocumentSectionBast dokumen={mappedDokumen} />
+          {entries.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-6">
+              Belum ada entry BAST.
+            </p>
+          ) : (
+            <div className="space-y-8 mt-4">
+              {entries.map((entry, i) => (
+                <div key={entry.id}>
+                  <SubHeading title={`BAST ${i + 1}`} />
+                  <DetailSectionBast
+                    noReferensi={entry.noReferensi}
+                    tanggalTerbit={entry.tanggalTerbit}
+                    tanggalSerahTerima={entry.tanggalSerahTerima}
+                    isSaving={updating}
+                    onSave={(payload) => updateBast(entry.id, payload)}
+                  />
+                  <DocumentSectionBast
+                    activityAdminProyek={entry.activityAdminProyek}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

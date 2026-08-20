@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   getDetailBast,
-  updateDetailBast,
+  createBastEntry,
+  updateBastEntry,
   type BastResponse,
 } from "@/services/bast.service";
 
@@ -9,6 +10,7 @@ export function useBast(trackingId: string) {
   const [bast, setBast] = useState<BastResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
 
   const fetchBast = useCallback(async () => {
@@ -31,16 +33,43 @@ export function useBast(trackingId: string) {
     fetchBast();
   }, [fetchBast]);
 
-  const updateBast = useCallback(
+  const addBastEntry = useCallback(
     async (payload: {
       noReferensi?: string;
       tanggalTerbit?: string;
       tanggalSerahTerima?: string;
     }) => {
+      setCreating(true);
+      setError(null);
+      try {
+        const data = await createBastEntry(trackingId, payload);
+        setBast(data);
+        return data;
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Gagal menambahkan entry BAST.",
+        );
+        throw err;
+      } finally {
+        setCreating(false);
+      }
+    },
+    [trackingId],
+  );
+
+  const updateBast = useCallback(
+    async (
+      entryId: string,
+      payload: {
+        noReferensi?: string;
+        tanggalTerbit?: string;
+        tanggalSerahTerima?: string;
+      },
+    ) => {
       setUpdating(true);
       setError(null);
       try {
-        const data = await updateDetailBast(trackingId, payload);
+        const data = await updateBastEntry(trackingId, entryId, payload);
         setBast(data);
         return data;
       } catch (err) {
@@ -59,8 +88,10 @@ export function useBast(trackingId: string) {
     bast,
     loading,
     error,
+    creating,
     updating,
     refetch: fetchBast,
+    addBastEntry,
     updateBast,
   };
 }

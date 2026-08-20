@@ -11,6 +11,7 @@ import DocumentSectionFollowUp from "./DocumentSectionFollowUp";
 import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
 import AdminProyekUpload from "./AdminProyekUpload";
 import ManagerProyekCard from "./AssignAdminProyekCard";
+import InputTotalBastFollowUp from "./InputTotalBastFollowUp";
 
 interface Step5Props {
   trackingId: string;
@@ -160,9 +161,7 @@ export default function Step5({
               <p className="text-xs text-gray-400 font-medium mb-1">
                 Sales Marketing
               </p>
-              <p className="text-sm font-bold text-slate-800">
-                {salesName}
-              </p>
+              <p className="text-sm font-bold text-slate-800">{salesName}</p>
             </div>
           </div>
 
@@ -224,11 +223,10 @@ export default function Step5({
 
         {data.stage >= 3 && (
           <>
-            <SectionHeading title="Upload Dokumen PO" />
-            <AdminProyekUpload
-              dokumen={mappedDokumen}
-              isUploading={uploadMut.isPending}
-              isAdminProyek={
+            <InputTotalBastFollowUp
+              trackingId={trackingId}
+              totalBast={data.TotalBAST}
+              canInput={
                 ((divisi === "MAINTENANCE_PAC" ||
                   divisi === "MAINTENANCE_FIRE") &&
                   role === "SUPERVISI" &&
@@ -236,6 +234,23 @@ export default function Step5({
                 role === "MASTER" ||
                 divisi === "MANAGER_OPERASIONAL" ||
                 divisi === "MONITORING_CONTROL_ADVISOR"
+              }
+              onUpdated={refetch}
+            />
+
+            <SectionHeading title="Upload Dokumen PO" />
+            <AdminProyekUpload
+              dokumen={mappedDokumen}
+              isUploading={uploadMut.isPending}
+              isAdminProyek={
+                (((divisi === "MAINTENANCE_PAC" ||
+                  divisi === "MAINTENANCE_FIRE") &&
+                  role === "SUPERVISI" &&
+                  data.activityAdminProyek?.status === "DITERIMA") ||
+                  role === "MASTER" ||
+                  divisi === "MANAGER_OPERASIONAL" ||
+                  divisi === "MONITORING_CONTROL_ADVISOR") &&
+                !!data.TotalBAST
               }
               onUpload={(file, kategori) =>
                 uploadMut.mutate({ file, kategori })

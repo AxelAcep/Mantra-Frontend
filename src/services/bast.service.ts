@@ -47,17 +47,25 @@ export interface LogBast {
   createdAt: string;
 }
 
+export interface BastEntry {
+  id: string;
+  bastId: string;
+  noReferensi: string;
+  tanggalTerbit?: string;
+  tanggalSerahTerima?: string;
+  activityAdminProyekId?: string;
+  activityAdminProyek?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface BastResponse {
   id: string;
   trackingPenawaranId: string;
   trackingPenawaran?: TrackingPenawaranDetail;
-  noReferensi: string;
-  tanggalTerbit?: string;
-  tanggalSerahTerima?: string;
   status: string;
   logs: LogBast[];
-  activityAdminProyekId?: string;
-  activityAdminProyek?: any;
+  entries: BastEntry[];
   createdAt: string;
   updatedAt: string;
 }
@@ -74,7 +82,7 @@ export async function getDetailBast(trackingId: string): Promise<BastResponse> {
   return res.json();
 }
 
-export async function updateDetailBast(
+export async function createBastEntry(
   trackingId: string,
   payload: {
     noReferensi?: string;
@@ -82,11 +90,39 @@ export async function updateDetailBast(
     tanggalSerahTerima?: string;
   },
 ): Promise<BastResponse> {
-  const res = await fetchClient(`/tracking-penawaran/${trackingId}/bast`, {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(payload),
-  });
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/bast/entry`,
+    {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal menambahkan entry BAST.");
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function updateBastEntry(
+  trackingId: string,
+  entryId: string,
+  payload: {
+    noReferensi?: string;
+    tanggalTerbit?: string;
+    tanggalSerahTerima?: string;
+  },
+): Promise<BastResponse> {
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/bast/entry/${entryId}`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal memperbarui detail BAST.");

@@ -215,3 +215,46 @@ export async function assignAdminProyek(payload: {
   const json = await res.json();
   return json.data;
 }
+
+export interface FollowUpResponse {
+  id: string;
+  trackingPenawaranId: string;
+  trackingPenawaran: TrackingPenawaranDetail;
+  adminId?: string;
+  admin?: { id: string; nama: string };
+  activityAdminId?: string;
+  activityAdmin?: ActivityDetail;
+  activityAdminProyek?: ActivityDetail;
+  salesId?: string;
+  sales?: { id: string; nama: string };
+  activitySalesId?: string;
+  activitySales?: ActivityDetail;
+  status: string;
+  stage: number;
+  TotalBAST?: number | null;
+  logs: LogFollowUp[];
+  logAktivitas: LogFollowUp[];
+  dokumen: FollowUpDokumen[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function inputBASTFollowup(
+  trackingId: string,
+  payload: { total_bast: number },
+): Promise<FollowUpResponse> {
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/follow-up/bast`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal update Total BAST.");
+  }
+  const json = await res.json();
+  return json.data;
+}

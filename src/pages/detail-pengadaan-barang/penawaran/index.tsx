@@ -71,9 +71,9 @@ function getStepNumber(step: string | undefined): number {
       return 6;
     case "BAST":
       return 7;
-    case "PEMBAYARAN":
-      return 8;
     case "GARANSI":
+      return 8;
+    case "PEMBAYARAN":
       return 9;
     default:
       return 1;
@@ -97,9 +97,9 @@ function getStepName(step: string | undefined): string {
     case "BAST":
       return "Tahap 7 (BAST)";
     case "PEMBAYARAN":
-      return "Tahap 8 (Accounting)";
+      return "Tahap 8 (Garansi)";
     case "GARANSI":
-      return "Tahap 9 (Garansi)";
+      return "Tahap 9 (Accounting)";
     default:
       return "Tahap 1 (Permintaan Masuk)";
   }
@@ -113,8 +113,8 @@ const STEP_LABELS: Record<number, string> = {
   5: "Follow Up Klien",
   6: "Implementasi",
   7: "BAST",
-  8: "Accounting",
-  9: "Garansi",
+  8: "Garansi",
+  9: "Accounting",
 };
 
 // ─── Main Component ─────────────────────────────────────────────────────────
@@ -248,7 +248,7 @@ export default function PenawaranPage() {
         {/* Step Content */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           {activeStep > getStepNumber(penawaran?.stepSaatIni) &&
-          !(activeStep === 8 && canAccessAccounting) ? (
+          !(activeStep === 9 && canAccessAccounting) ? (
             <StepRestricted
               currentStepName={getStepName(penawaran?.stepSaatIni)}
             />
@@ -285,9 +285,9 @@ export default function PenawaranPage() {
               {activeStep === 6 && (
                 <Step6 trackingId={trackingId} onChatClick={handleOpenChat} />
               )}
-              {activeStep === 7 && <Step7 />}
-              {activeStep === 8 && <Step8 trackingId={trackingId} />}
-              {activeStep === 9 && <Step9 />}
+              {activeStep === 7 && <Step7 trackingId={trackingId} />}
+              {activeStep === 8 && <Step9 />}
+              {activeStep === 9 && <Step8 trackingId={trackingId} />}
             </>
           )}
         </div>
