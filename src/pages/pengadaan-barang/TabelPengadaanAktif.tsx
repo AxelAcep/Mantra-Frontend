@@ -12,22 +12,33 @@ function formatTanggal(iso: string | null | undefined) {
   });
 }
 
-function formatStepName(step: string) {
-  const labels: Record<string, string> = {
-    PERMINTAAN_MASUK: "Permintaan Masuk",
-    PENYUSUNAN_BOQ: "Penyusunan BoQ",
-    REVIEW_INTERNAL: "Review Internal",
-    PERSETUJUAN_MANAJEMEN: "Persetujuan Manajemen",
-    FOLLOW_UP: "Follow Up Klien",
-    IMPLEMENTASI: "Implementasi",
-    BAST: "BAST",
-    PEMBAYARAN: "Accounting",
-    GARANSI: "Garansi",
+type TahapImplementasi = "PEMBELIAN_BARANG" | "PENGANTARAN" | "INSTALASI";
+
+function TahapBadge({ tahap }: { tahap?: TahapImplementasi }) {
+  const config: Record<TahapImplementasi, string> = {
+    PEMBELIAN_BARANG: "bg-orange-100 text-orange-700",
+    PENGANTARAN: "bg-blue-100 text-blue-700",
+    INSTALASI: "bg-emerald-100 text-emerald-700",
   };
-  return labels[step] || step;
+
+  const label: Record<TahapImplementasi, string> = {
+    PEMBELIAN_BARANG: "Pembelian Barang",
+    PENGANTARAN: "Pengantaran",
+    INSTALASI: "Instalasi",
+  };
+
+  const safeTahap: TahapImplementasi = tahap ?? "PEMBELIAN_BARANG";
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeTahap]}`}
+    >
+      {label[safeTahap]}
+    </span>
+  );
 }
 
-export default function TablePengadaanAktif() {
+export default function TabelPengadaanAktif() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -35,6 +46,7 @@ export default function TablePengadaanAktif() {
     page,
     limit: 10,
     search,
+    step: "IMPLEMENTASI",
   });
 
   return (
@@ -116,9 +128,7 @@ export default function TablePengadaanAktif() {
                   </div>
                 </td>
                 <td className="px-6 text-center">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-slate-600 border border-gray-200 whitespace-nowrap">
-                    {formatStepName(item.stepSaatIni)}
-                  </span>
+                  <TahapBadge tahap={item.implementasiTahap} />
                 </td>
                 <td className="px-6 text-right">
                   <Link

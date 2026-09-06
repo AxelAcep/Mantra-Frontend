@@ -28,6 +28,7 @@ import DetailKPIPage from "./pages/kpi";
 import PengaturanPegawaiPage from "./pages/pengaturan/pegawai";
 import PengaturanManagerPage from "./pages/pengaturan/manager";
 import BuatPenawaran from "./pages/detail-pengadaan-barang/create-penawaran/index";
+import AccountingDashboardPage from "./pages/accounting";
 
 interface UserSession {
   role?: "MASTER" | "PEGAWAI" | "KARYAWAN" | "SUPERVISI";
@@ -89,6 +90,7 @@ function App() {
           <Route path="dashboard" element={<DashboardWrapper />} />
           <Route path="logbook" element={<LogBookPage />} />
           <Route path="pengadaan-barang" element={<ListPengadaan />} />
+          <Route path="accounting" element={<AccountingDashboardPage />} />
           <Route path="perusahaan" element={<PerusahaanPage />} />
           <Route path="perusahaan/:id" element={<DetailPerusahaanPage />} />
           <Route path="penawaran/:id" element={<Penawaran />} />

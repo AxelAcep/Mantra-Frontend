@@ -129,6 +129,28 @@ export async function updateStatusFollowUp(
   return json.data;
 }
 
+export async function batalkanFollowUp(
+  trackingId: string,
+  alasan: string,
+): Promise<FollowUpResponse> {
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/follow-up/batalkan`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({ alasan }),
+    },
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.error ?? "Gagal membatalkan permintaan penawaran.",
+    );
+  }
+  const json = await res.json();
+  return json.data;
+}
+
 export async function uploadDokumenFollowUp(
   trackingId: string,
   file: File,

@@ -2,16 +2,11 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
+import BastLengkapBadge from "./BastLengkapBadge";
+import ProgressBadge from "./ProgressBadge";
 
-function formatTanggal(iso: string | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
+// Tab "Konfirmasi Selesai" = tracking yang lagi di tahap BAST dan SEMUA
+// entry-nya udah DITERIMA (lengkap). Pasangannya: tab "BAST" (masih berjalan).
 export default function TableKonfirmasiSelesai() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -21,6 +16,7 @@ export default function TableKonfirmasiSelesai() {
     limit: 10,
     search,
     step: "BAST",
+    bastLengkap: "true",
   });
 
   return (
@@ -47,8 +43,8 @@ export default function TableKonfirmasiSelesai() {
               <th className="px-6 py-4">Nomor PO</th>
               <th className="px-6 py-4">Nama Perusahaan</th>
               <th className="px-6 py-4">Jenis Barang</th>
-              <th className="px-6 py-4">Tanggal Terbit</th>
-              <th className="px-6 py-4">Tanggal BAST</th>
+              <th className="px-6 py-4 text-center">Progress Entry</th>
+              <th className="px-6 py-4 text-center">Status BAST</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
           </thead>
@@ -70,7 +66,7 @@ export default function TableKonfirmasiSelesai() {
             {!isLoading && !isError && data?.data.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-10 text-center text-gray-300 text-sm">
-                  Tidak ada data pengadaan dalam tahap konfirmasi selesai / BAST.
+                  Tidak ada data BAST yang sudah lengkap.
                 </td>
               </tr>
             )}
@@ -94,12 +90,14 @@ export default function TableKonfirmasiSelesai() {
                     )) || "—"}
                   </div>
                 </td>
-                <td className="px-6 text-gray-500 font-medium">
-                  {formatTanggal(item.tanggalTerbit || item.tanggalMasuk)}
+                <td className="px-6 text-center">
+                  <ProgressBadge
+                    selesai={item.bastEntriesSelesai}
+                    total={item.bastEntriesTotal}
+                  />
                 </td>
-                <td className="px-6 text-gray-500 font-medium">
-                  {/* BAST date is typically when the BAST status is selesai or updated */}
-                  {formatTanggal(item.tanggalTerbit)}
+                <td className="px-6 text-center">
+                  <BastLengkapBadge lengkap={item.bastLengkap} />
                 </td>
                 <td className="px-6 text-right">
                   <Link

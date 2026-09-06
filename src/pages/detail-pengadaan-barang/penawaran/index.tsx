@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProgressCard from "../progress-card";
 import TrackingHeader from "../header-card";
@@ -125,6 +125,7 @@ export default function PenawaranPage() {
   const mode = detectMode(userInfo.divisi, userInfo.role);
 
   const [activeStep, setActiveStep] = useState(1);
+  const [hasSetInitialStep, setHasSetInitialStep] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [activeChatJudul, setActiveChatJudul] = useState<string>("");
@@ -203,6 +204,20 @@ export default function PenawaranPage() {
       "FINANCE_ACCOUNTING",
     ].includes(userInfo.divisi) && getStepNumber(penawaran?.stepSaatIni) >= 5;
 
+  // Begitu data penawaran kemuat, buka langsung di tahap yang sedang berjalan
+  // (bukan selalu mulai dari step 1) — cuma sekali di awal, biar navigasi
+  // manual user sesudahnya (mis. cek step 3 lagi) gak ke-reset. Accounting
+  // (step 9) sengaja gak pernah dijadiin landing pertama — sensitif, gak
+  // semua orang boleh lihat, jadi biar dibuka manual doang kalau memang
+  // berwenang, bukan ke-loncat otomatis pas pertama buka detail.
+  useEffect(() => {
+    if (!hasSetInitialStep && penawaran?.stepSaatIni) {
+      const rawStep = getStepNumber(penawaran.stepSaatIni);
+      setActiveStep(rawStep === 9 ? 8 : rawStep);
+      setHasSetInitialStep(true);
+    }
+  }, [hasSetInitialStep, penawaran?.stepSaatIni]);
+
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
     (activeStep === 1 && !isPermintaanSelesai) ||
@@ -237,18 +252,23 @@ export default function PenawaranPage() {
                 : n < activeStep
                   ? "done"
                   : "inactive",
-            disabled: n === 8 && !canAccessAccounting,
+            // Step 9 = Accounting — sensitif, cuma role tertentu yang boleh buka.
+            disabled: n === 9 && !canAccessAccounting,
           }))}
           onStepClick={(step) => {
-            if (step === 8 && !canAccessAccounting) return;
+            if (step === 9 && !canAccessAccounting) return;
             setActiveStep(step);
           }}
         />
 
         {/* Step Content */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          {activeStep > getStepNumber(penawaran?.stepSaatIni) &&
-          !(activeStep === 9 && canAccessAccounting) ? (
+          {activeStep === 9 && !canAccessAccounting ? (
+            <StepRestricted
+              currentStepName={getStepName(penawaran?.stepSaatIni)}
+            />
+          ) : activeStep > getStepNumber(penawaran?.stepSaatIni) &&
+            !(activeStep === 9 && canAccessAccounting) ? (
             <StepRestricted
               currentStepName={getStepName(penawaran?.stepSaatIni)}
             />

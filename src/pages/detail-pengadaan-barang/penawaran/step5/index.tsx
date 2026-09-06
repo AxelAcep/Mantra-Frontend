@@ -5,6 +5,7 @@ import {
   useUpdateStatusFollowUp,
   useUploadDokumenFollowUp,
   useDeleteDokumenFollowUp,
+  useBatalkanFollowUp,
 } from "@/hooks/use-follow-up";
 import ApprovalSectionFollowUp from "./ApprovalSectionFollowUp";
 import DocumentSectionFollowUp from "./DocumentSectionFollowUp";
@@ -12,6 +13,7 @@ import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
 import AdminProyekUpload from "./AdminProyekUpload";
 import ManagerProyekCard from "./AssignAdminProyekCard";
 import InputTotalBastFollowUp from "./InputTotalBastFollowUp";
+import BatalkanPermintaanCard from "./BatalkanPermintaanCard";
 
 interface Step5Props {
   trackingId: string;
@@ -58,10 +60,17 @@ export default function Step5({
   const updateStatusMut = useUpdateStatusFollowUp(trackingId);
   const uploadMut = useUploadDokumenFollowUp(trackingId);
   const deleteMut = useDeleteDokumenFollowUp(trackingId);
+  const batalkanMut = useBatalkanFollowUp(trackingId);
 
   const { pegawaiId, divisi, role } = getUserInfo();
 
   const isManagerOps = divisi === "MANAGER_OPERASIONAL" || role === "MASTER";
+  const isBerwenangBatalkan =
+    divisi === "MANAGER_OPERASIONAL" ||
+    divisi === "DIREKTUR" ||
+    divisi === "KOMISARIS" ||
+    role === "MASTER";
+  const canBatalkan = isBerwenangBatalkan && data?.status === "ON_PROGRESS";
   const isSalesPIC = data
     ? pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIAT"
     : false;
@@ -195,6 +204,21 @@ export default function Step5({
             </div>
           </div>
         </div>
+
+        {data.status === "DIBATALKAN" && (
+          <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium">
+            Permintaan penawaran ini sudah dibatalkan dan tidak bisa
+            dilanjutkan lagi.
+          </div>
+        )}
+
+        {canBatalkan && (
+          <BatalkanPermintaanCard
+            isBatalkan={batalkanMut.isPending}
+            onConfirm={(alasan) => batalkanMut.mutate(alasan)}
+          />
+        )}
+
         <ApprovalSectionFollowUp
           stage={data.stage}
           status={data.status}

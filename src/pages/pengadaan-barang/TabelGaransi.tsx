@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
+import ProgressBadge from "./ProgressBadge";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -12,33 +13,21 @@ function formatTanggal(iso: string | null | undefined) {
   });
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, string> = {
-    ON_PROGRESS: "bg-orange-100 text-orange-700",
-    PERLU_TINDAKAN: "bg-red-100 text-red-700",
-    KONFIRMASI_SELESAI: "bg-amber-100 text-amber-700",
-    SELESAI: "bg-emerald-100 text-emerald-700",
-  };
-
-  const label: Record<string, string> = {
-    ON_PROGRESS: "On Progress",
-    PERLU_TINDAKAN: "Perlu Tindakan",
-    KONFIRMASI_SELESAI: "Menunggu Konfirmasi",
-    SELESAI: "Selesai",
-  };
-
-  const safeStatus = config[status] ? status : "ON_PROGRESS";
-
+function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeStatus]}`}
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${
+        tuntas
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-amber-100 text-amber-700"
+      }`}
     >
-      {label[safeStatus]}
+      {tuntas ? "Garansi Sudah" : "Garansi Belum"}
     </span>
   );
 }
 
-export default function TableImplementasi() {
+export default function TabelGaransi() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -46,7 +35,7 @@ export default function TableImplementasi() {
     page,
     limit: 10,
     search,
-    step: "IMPLEMENTASI",
+    step: "GARANSI",
   });
 
   return (
@@ -72,9 +61,10 @@ export default function TableImplementasi() {
               <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Nomor PO</th>
               <th className="px-6 py-4">Nama Perusahaan</th>
-              <th className="px-6 py-4">Lokasi Proyek</th>
-              <th className="px-6 py-4">Tanggal Terbit</th>
               <th className="px-6 py-4">Jenis Pengadaan</th>
+              <th className="px-6 py-4">Garansi Mulai</th>
+              <th className="px-6 py-4">Garansi Selesai</th>
+              <th className="px-6 py-4 text-center">Progress Bulan</th>
               <th className="px-6 py-4 text-center">Status</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
@@ -82,22 +72,22 @@ export default function TableImplementasi() {
           <tbody className="divide-y divide-gray-50 text-sm">
             {isLoading && (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-400 text-sm">
+                <td colSpan={8} className="px-6 py-10 text-center text-gray-400 text-sm">
                   Memuat data...
                 </td>
               </tr>
             )}
             {isError && (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-red-400 text-sm">
+                <td colSpan={8} className="px-6 py-10 text-center text-red-400 text-sm">
                   Gagal memuat data.
                 </td>
               </tr>
             )}
             {!isLoading && !isError && data?.data.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-300 text-sm">
-                  Tidak ada data pengadaan dalam tahap implementasi.
+                <td colSpan={8} className="px-6 py-10 text-center text-gray-300 text-sm">
+                  Tidak ada data garansi.
                 </td>
               </tr>
             )}
@@ -108,12 +98,6 @@ export default function TableImplementasi() {
                 </td>
                 <td className="px-6 font-semibold text-slate-600">
                   {item.perusahaanName || "—"}
-                </td>
-                <td className="px-6 text-gray-500">
-                  {item.lokasiProyek || "—"}
-                </td>
-                <td className="px-6 text-gray-500">
-                  {formatTanggal(item.tanggalTerbit || item.tanggalMasuk)}
                 </td>
                 <td className="px-6">
                   <div className="flex flex-wrap gap-1">
@@ -127,8 +111,24 @@ export default function TableImplementasi() {
                     )) || "—"}
                   </div>
                 </td>
+                <td className="px-6 text-gray-500 font-medium">
+                  {item.garansiMulai ? (
+                    formatTanggal(item.garansiMulai)
+                  ) : (
+                    <span className="text-gray-300">Belum dikonfigurasi</span>
+                  )}
+                </td>
+                <td className="px-6 text-gray-500 font-medium">
+                  {formatTanggal(item.garansiSelesai)}
+                </td>
                 <td className="px-6 text-center">
-                  <StatusBadge status={item.status || "ON_PROGRESS"} />
+                  <ProgressBadge
+                    selesai={item.garansiBulanSelesai}
+                    total={item.garansiBulanTotal}
+                  />
+                </td>
+                <td className="px-6 text-center">
+                  <GaransiTuntasBadge tuntas={item.garansiTuntas} />
                 </td>
                 <td className="px-6 text-right">
                   <Link

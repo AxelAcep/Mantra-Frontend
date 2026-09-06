@@ -74,6 +74,22 @@ export type PenawaranListItem = {
   tanggalTerbit?: string;
   totalTermin?: number;
   terminDibayar?: number;
+  // Tab "Pengadaan Aktif": tahap Implementasi saat ini.
+  implementasiTahap?: "PEMBELIAN_BARANG" | "PENGANTARAN" | "INSTALASI";
+  // Tab "BAST" / "Konfirmasi Selesai": BAST udah terpenuhi apa belum, +
+  // progress "sudah berapa dari berapa" entry.
+  bastLengkap?: boolean;
+  bastEntriesTotal?: number;
+  bastEntriesSelesai?: number;
+  // Tab "Garansi": periode, status tuntas, + progress "sudah berapa dari
+  // berapa" bulan kunjungan.
+  garansiMulai?: string;
+  garansiSelesai?: string;
+  garansiTuntas?: boolean;
+  garansiBulanTotal?: number;
+  garansiBulanSelesai?: number;
+  // Tab "Riwayat": status keseluruhan pengadaan.
+  overallStatus?: "ON_PROGRESS" | "SELESAI" | "DIBATALKAN";
 };
 
 export type PaginationMeta = {
@@ -93,6 +109,11 @@ export type GetPenawaranListParams = {
   limit?: number;
   search?: string;
   step?: string;
+  // Cuma dipakai bareng step="BAST": "true" = Konfirmasi Selesai (lengkap),
+  // "false" = Pembayaran (masih berjalan).
+  bastLengkap?: "true" | "false";
+  // Cuma dipakai tab Riwayat.
+  overallStatus?: "ON_PROGRESS" | "SELESAI" | "DIBATALKAN";
 };
 
 export async function getPenawaranList(
@@ -121,6 +142,7 @@ export async function getPenawaranListAktif(
   if (params.limit) query.set("limit", String(params.limit));
   if (params.search) query.set("search", params.search);
   if (params.step) query.set("step", params.step);
+  if (params.bastLengkap) query.set("bastLengkap", params.bastLengkap);
 
   const res = await fetchClient(`/tracking-penawaran/aktif?${query.toString()}`, {
     headers: authHeaders(),
@@ -128,5 +150,24 @@ export async function getPenawaranListAktif(
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message ?? "Gagal mengambil data penawaran aktif.");
+  return data;
+}
+
+export async function getPenawaranListRiwayat(
+  params: GetPenawaranListParams = {},
+): Promise<PenawaranListResponse> {
+  const query = new URLSearchParams();
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
+  if (params.search) query.set("search", params.search);
+  if (params.step) query.set("step", params.step);
+  if (params.overallStatus) query.set("overallStatus", params.overallStatus);
+
+  const res = await fetchClient(`/tracking-penawaran/riwayat?${query.toString()}`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.message ?? "Gagal mengambil data riwayat penawaran.");
   return data;
 }

@@ -21,6 +21,14 @@ import { Icons } from "@/assets";
 import { useTotalUnreadChatCount } from "@/hooks/use-activity";
 import { useMasterReschedule, useMasterSelesai } from "@/hooks/use-master-activity";
 import { useUnreadNotifikasiCount } from "@/hooks/use-notifikasi";
+import { useAccountingSummary } from "@/hooks/use-accounting-dashboard";
+
+const ACCOUNTING_DASHBOARD_DIVISI = [
+  "FINANCE_ACCOUNTING",
+  "MANAGER_OPERASIONAL",
+  "DIREKTUR",
+  "KOMISARIS",
+];
 
 type MenuItem = {
   title: string;
@@ -30,7 +38,12 @@ type MenuItem = {
   children?: { title: string; url: string }[];
 };
 
-const getMenuOperasional = (unreadCount: number, role?: string): MenuItem[] => {
+const getMenuOperasional = (
+  unreadCount: number,
+  role?: string,
+  divisi?: string,
+  accountingBadge?: number,
+): MenuItem[] => {
   const menu: MenuItem[] = [];
 
   if (role === "MASTER") {
@@ -42,6 +55,18 @@ const getMenuOperasional = (unreadCount: number, role?: string): MenuItem[] => {
   );
 
   menu.push({ title: "Pengadaan Barang", icon: Icons.Pengadaan, url: "/pengadaan-barang" });
+
+  const canAccessAccounting =
+    role === "MASTER" ||
+    (divisi != null && ACCOUNTING_DASHBOARD_DIVISI.includes(divisi));
+  if (canAccessAccounting) {
+    menu.push({
+      title: "Accounting",
+      icon: Icons.POAktif,
+      url: "/accounting",
+      badge: accountingBadge,
+    });
+  }
 
   if (role === "MASTER") {
     menu.push({ title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" });
@@ -103,6 +128,15 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
   const { data: unreadChatCount = 0 } = useTotalUnreadChatCount();
   const { data: unreadNotifikasiCount = 0 } = useUnreadNotifikasiCount();
   const totalNotifications = unreadChatCount + unreadNotifikasiCount;
+
+  const userDivisi = user?.pegawai?.divisi as string | undefined;
+  const canAccessAccounting =
+    isMaster ||
+    (userDivisi != null && ACCOUNTING_DASHBOARD_DIVISI.includes(userDivisi));
+  const { data: accountingSummary } = useAccountingSummary(canAccessAccounting);
+  const accountingBadge = accountingSummary
+    ? accountingSummary.totalLewat + accountingSummary.totalMendekati
+    : undefined;
 
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
@@ -268,7 +302,14 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {renderMenu(getMenuOperasional(totalNotifications, user?.role))}
+              {renderMenu(
+                getMenuOperasional(
+                  totalNotifications,
+                  user?.role,
+                  userDivisi,
+                  accountingBadge,
+                ),
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

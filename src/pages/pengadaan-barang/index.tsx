@@ -5,26 +5,26 @@ import {
 } from "lucide-react";
 import TablePermintaanPenawaran from "./TablePermintaanPenawaran";
 import TablePengadaanAktif from "./TabelPengadaanAktif";
-import TabelImplementasi from "./TabelImplementasi";
 import TabelPembayaran from "./TabelPembayaran";
 import TableKonfirmasiSelesai from "./TabelKonfirmasi";
+import TabelGaransi from "./TabelGaransi";
 import TableRiwayat from "./TabelRiwayat";
 import { useNavigate } from "react-router-dom";
 
 type TabName =
   | "Permintaan Penawaran"
   | "Pengadaan Aktif"
-  | "Implementasi"
-  | "Pembayaran"
+  | "BAST"
   | "Konfirmasi Selesai"
+  | "Garansi"
   | "Riwayat";
 
 const tabs: TabName[] = [
   "Permintaan Penawaran",
   "Pengadaan Aktif",
-  "Implementasi",
-  "Pembayaran",
+  "BAST",
   "Konfirmasi Selesai",
+  "Garansi",
   "Riwayat",
 ];
 
@@ -61,12 +61,12 @@ export default function ListPengadaan() {
         return <TablePermintaanPenawaran />;
       case "Pengadaan Aktif":
         return <TablePengadaanAktif />;
-      case "Implementasi":
-        return <TabelImplementasi />;
-      case "Pembayaran":
+      case "BAST":
         return <TabelPembayaran />;
       case "Konfirmasi Selesai":
         return <TableKonfirmasiSelesai />;
+      case "Garansi":
+        return <TabelGaransi />;
       case "Riwayat":
         return <TableRiwayat />;
       default:

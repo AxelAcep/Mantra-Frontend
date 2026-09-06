@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
+import { usePenawaranListRiwayat } from "@/hooks/use-create-penawaran";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -12,24 +12,89 @@ function formatTanggal(iso: string | null | undefined) {
   });
 }
 
+function formatStepName(step: string) {
+  const labels: Record<string, string> = {
+    PERMINTAAN_MASUK: "Permintaan Masuk",
+    PENYUSUNAN_BOQ: "Penyusunan BoQ",
+    REVIEW_INTERNAL: "Review Internal",
+    PERSETUJUAN_MANAJEMEN: "Persetujuan Manajemen",
+    FOLLOW_UP: "Follow Up Klien",
+    IMPLEMENTASI: "Implementasi",
+    BAST: "BAST",
+    PEMBAYARAN: "Accounting",
+    GARANSI: "Garansi",
+  };
+  return labels[step] || step;
+}
+
+const STEP_FILTER_OPTIONS = [
+  { value: "", label: "Semua Tahap" },
+  { value: "PERMINTAAN_MASUK", label: "Permintaan Masuk" },
+  { value: "PENYUSUNAN_BOQ", label: "Penyusunan BoQ" },
+  { value: "REVIEW_INTERNAL", label: "Review Internal" },
+  { value: "PERSETUJUAN_MANAJEMEN", label: "Persetujuan Manajemen" },
+  { value: "FOLLOW_UP", label: "Follow Up Klien" },
+  { value: "IMPLEMENTASI", label: "Implementasi" },
+  { value: "BAST", label: "BAST" },
+  { value: "PEMBAYARAN", label: "Accounting" },
+  { value: "GARANSI", label: "Garansi" },
+];
+
+const OVERALL_STATUS_FILTER_OPTIONS = [
+  { value: "", label: "Semua Status" },
+  { value: "ON_PROGRESS", label: "On Progress" },
+  { value: "SELESAI", label: "Selesai" },
+  { value: "DIBATALKAN", label: "Dibatalkan" },
+] as const;
+
+function OverallStatusBadge({ status }: { status?: string }) {
+  const config: Record<string, string> = {
+    ON_PROGRESS: "bg-orange-100 text-orange-700",
+    SELESAI: "bg-emerald-100 text-emerald-700",
+    DIBATALKAN: "bg-red-100 text-red-700",
+  };
+  const label: Record<string, string> = {
+    ON_PROGRESS: "On Progress",
+    SELESAI: "Selesai",
+    DIBATALKAN: "Dibatalkan",
+  };
+  const safeStatus = config[status ?? ""] ? status! : "ON_PROGRESS";
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeStatus]}`}
+    >
+      {label[safeStatus]}
+    </span>
+  );
+}
+
+// Riwayat = SEMUA TrackingPenawaran, status/step apapun (termasuk yang
+// dibatalkan) — gak dibatasin ke satu step tertentu, cuma bisa difilter
+// manual lewat dropdown di bawah.
 export default function TableRiwayat() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [step, setStep] = useState("");
+  const [overallStatus, setOverallStatus] = useState<
+    "" | "ON_PROGRESS" | "SELESAI" | "DIBATALKAN"
+  >("");
 
-  const { data, isLoading, isError } = usePenawaranListAktif({
+  const { data, isLoading, isError } = usePenawaranListRiwayat({
     page,
     limit: 10,
     search,
-    step: "GARANSI",
+    step: step || undefined,
+    overallStatus: overallStatus || undefined,
   });
 
   return (
     <div>
-      {/* Search */}
-      <div className="px-6 py-4 border-b border-gray-100">
+      {/* Search & Filter */}
+      <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap items-center gap-3">
         <input
           type="text"
-          placeholder="Cari nomor PO, perusahaan..."
+          placeholder="Cari nomor PO, perusahaan, lokasi..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -37,6 +102,36 @@ export default function TableRiwayat() {
           }}
           className="w-full max-w-sm px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 placeholder:text-gray-300"
         />
+        <select
+          value={step}
+          onChange={(e) => {
+            setStep(e.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 text-gray-600"
+        >
+          {STEP_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={overallStatus}
+          onChange={(e) => {
+            setOverallStatus(
+              e.target.value as "" | "ON_PROGRESS" | "SELESAI" | "DIBATALKAN",
+            );
+            setPage(1);
+          }}
+          className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 text-gray-600"
+        >
+          {OVERALL_STATUS_FILTER_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
@@ -47,29 +142,30 @@ export default function TableRiwayat() {
               <th className="px-6 py-4">Nomor PO</th>
               <th className="px-6 py-4">Perusahaan</th>
               <th className="px-6 py-4">Jenis Pengadaan</th>
-              <th className="px-6 py-4">Tanggal Pesan</th>
-              <th className="px-6 py-4">Tanggal Serah Terima</th>
+              <th className="px-6 py-4">Tanggal Masuk</th>
+              <th className="px-6 py-4 text-center">Tahapan Saat Ini</th>
+              <th className="px-6 py-4 text-center">Status</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 text-sm">
             {isLoading && (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400 text-sm">
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400 text-sm">
                   Memuat data...
                 </td>
               </tr>
             )}
             {isError && (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-red-400 text-sm">
+                <td colSpan={7} className="px-6 py-10 text-center text-red-400 text-sm">
                   Gagal memuat data.
                 </td>
               </tr>
             )}
             {!isLoading && !isError && data?.data.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-300 text-sm">
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-300 text-sm">
                   Tidak ada data riwayat pengadaan.
                 </td>
               </tr>
@@ -97,8 +193,13 @@ export default function TableRiwayat() {
                 <td className="px-6 text-gray-500 font-medium">
                   {formatTanggal(item.tanggalMasuk)}
                 </td>
-                <td className="px-6 text-gray-500 font-medium">
-                  {formatTanggal(item.tanggalTerbit)}
+                <td className="px-6 text-center">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-slate-600 border border-gray-200 whitespace-nowrap">
+                    {formatStepName(item.stepSaatIni)}
+                  </span>
+                </td>
+                <td className="px-6 text-center">
+                  <OverallStatusBadge status={item.overallStatus} />
                 </td>
                 <td className="px-6 text-right">
                   <Link

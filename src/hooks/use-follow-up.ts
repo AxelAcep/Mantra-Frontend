@@ -5,6 +5,7 @@ import {
   uploadDokumenFollowUp,
   deleteDokumenFollowUp,
   updateStatusFollowUp,
+  batalkanFollowUp,
 } from "@/services/follow-up.services";
 
 export function useDetailFollowUp(trackingId: string | undefined) {
@@ -67,6 +68,21 @@ export function useUpdateStatusFollowUp(trackingId: string) {
     },
     onError: (error: Error) => {
       console.error("Update status follow up failed:", error.message);
+    },
+  });
+}
+
+export function useBatalkanFollowUp(trackingId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (alasan: string) => batalkanFollowUp(trackingId, alasan),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
+      qc.invalidateQueries({ queryKey: ["follow-up-detail", trackingId] });
+    },
+    onError: (error: Error) => {
+      console.error("Batalkan follow up failed:", error.message);
     },
   });
 }
