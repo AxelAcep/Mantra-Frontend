@@ -10,7 +10,7 @@ import Step5 from "./step5/index";
 import Step6 from "./step6/index";
 import Step7 from "./step7/index";
 import Step8 from "./accounting/index";
-import Step9 from "./step9";
+import Step9 from "./step8/index";
 import StepRestricted from "./step-restricted";
 import { PenawaranChatPanel } from "@/components/penawaranChatPanel";
 import { Button } from "@/components/ui/button";
@@ -286,11 +286,48 @@ export default function PenawaranPage() {
                 <Step6 trackingId={trackingId} onChatClick={handleOpenChat} />
               )}
               {activeStep === 7 && <Step7 trackingId={trackingId} />}
-              {activeStep === 8 && <Step9 />}
+              {activeStep === 8 && <Step9 trackingId={trackingId} />}
               {activeStep === 9 && <Step8 trackingId={trackingId} />}
             </>
           )}
         </div>
+
+        {/* <>
+          {activeStep === 1 && (
+            <Step1
+              mode={mode}
+              trackingId={trackingId}
+              data={penawaran}
+              onChatClick={handleOpenChat}
+            />
+          )}
+          {activeStep === 2 && (
+            <Step2
+              mode={mode}
+              trackingId={trackingId}
+              data={penawaran}
+              onChatClick={handleOpenChat}
+              userDivisi={userInfo.divisi}
+            />
+          )}
+          {activeStep === 3 && <Step3 trackingId={trackingId} />}
+          {activeStep === 4 && (
+            <Step4 trackingId={trackingId} onStatusChange={setStep4Info} />
+          )}
+          {activeStep === 5 && (
+            <Step5
+              trackingId={trackingId}
+              onChatClick={handleOpenChat}
+              onStatusChange={setStep5Info}
+            />
+          )}
+          {activeStep === 6 && (
+            <Step6 trackingId={trackingId} onChatClick={handleOpenChat} />
+          )}
+          {activeStep === 7 && <Step7 trackingId={trackingId} />}
+          {activeStep === 8 && <Step9 />}
+          {activeStep === 9 && <Step8 trackingId={trackingId} />}
+        </> */}
       </div>
 
       {/* Bottom Action Bar */}
