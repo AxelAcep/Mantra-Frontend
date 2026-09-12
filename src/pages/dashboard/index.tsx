@@ -6,10 +6,12 @@ import { useEffect } from "react";
 import { useHeaderTitle } from "../../components/layout/layout"; // sesuaikan path
 import { Icons } from "@/assets";
 import { useMasterStats } from "@/hooks/use-kpi";
+import { usePengadaanSummary } from "@/hooks/use-create-penawaran";
 
 export default function DashboardPage() {
     const { setTitle } = useHeaderTitle();
     const { data: stats } = useMasterStats();
+    const { data: summary } = usePengadaanSummary();
 
     useEffect(() => {
         setTitle("Dashboard Operasional");
@@ -24,7 +26,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mt-6">
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={0}
+                    count={summary?.requestPenawaran ?? 0}
                     label="Request Penawaran"
                     icon={Icons.RequestPenawaran}
                     href="/dashboard/request-penawaran"
@@ -32,7 +34,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={0}
+                    count={summary?.penawaranApproval ?? 0}
                     label="Penawaran Approval"
                     icon={Icons.PenawaranApproval}
                     href="/dashboard/penawaran-approval"
@@ -40,7 +42,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={0}
+                    count={summary?.penawaranFinal ?? 0}
                     label="Penawaran Final"
                     icon={Icons.PenawaranFinal}
                     href="/dashboard/penawaran-final"
@@ -48,7 +50,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={0}
+                    count={summary?.poAktif ?? 0}
                     label="PO Aktif"
                     icon={Icons.POAktif}
                     href="/dashboard/po-aktif"

@@ -207,7 +207,7 @@ export default function Step5({
 
         {data.status === "DIBATALKAN" && (
           <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium">
-            Permintaan penawaran ini sudah dibatalkan dan tidak bisa
+            Permintaan penawaran ini sudah Case Closed dan tidak bisa
             dilanjutkan lagi.
           </div>
         )}

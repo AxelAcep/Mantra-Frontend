@@ -33,7 +33,7 @@ export default function BatalkanPermintaanCard({
           className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors"
         >
           <Ban size={16} />
-          Batalkan Permintaan Penawaran
+          Case Closed
         </button>
       </div>
 
@@ -48,11 +48,11 @@ export default function BatalkanPermintaanCard({
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-800">
-                    Batalkan Permintaan Penawaran
+                    Case Closed
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Tindakan ini permanen — penawaran gak bisa dilanjutkan lagi
-                    setelah dibatalkan.
+                    Tindakan ini permanen — penawaran tidak bisa dilanjutkan lagi
+                    setelah ditutup.
                   </p>
                 </div>
               </div>
@@ -61,7 +61,7 @@ export default function BatalkanPermintaanCard({
             {/* Body */}
             <div className="p-6">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-tight block mb-2">
-                Alasan Pembatalan
+                Alasan Case Closed
               </label>
               <textarea
                 value={alasan}
@@ -86,7 +86,7 @@ export default function BatalkanPermintaanCard({
                 disabled={!alasan.trim() || isBatalkan}
                 className="px-6 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isBatalkan ? "Membatalkan..." : "Ya, Batalkan"}
+                {isBatalkan ? "Menutup..." : "Ya, Tutup"}
               </button>
             </div>
           </div>

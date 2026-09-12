@@ -153,6 +153,25 @@ export async function getPenawaranListAktif(
   return data;
 }
 
+export type PengadaanSummary = {
+  requestPenawaran: number;
+  penawaranApproval: number;
+  penawaranFinal: number;
+  poAktif: number;
+  penawaranPengadaan: number;
+  konfirmasiSelesai: number;
+};
+
+export async function getPengadaanSummary(): Promise<PengadaanSummary> {
+  const res = await fetchClient("/dashboard/pengadaan-summary", {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.message ?? "Gagal mengambil ringkasan pengadaan.");
+  return data;
+}
+
 export async function getPenawaranListRiwayat(
   params: GetPenawaranListParams = {},
 ): Promise<PenawaranListResponse> {

@@ -44,7 +44,7 @@ const OVERALL_STATUS_FILTER_OPTIONS = [
   { value: "", label: "Semua Status" },
   { value: "ON_PROGRESS", label: "On Progress" },
   { value: "SELESAI", label: "Selesai" },
-  { value: "DIBATALKAN", label: "Dibatalkan" },
+  { value: "DIBATALKAN", label: "Case Closed" },
 ] as const;
 
 function OverallStatusBadge({ status }: { status?: string }) {
@@ -56,7 +56,7 @@ function OverallStatusBadge({ status }: { status?: string }) {
   const label: Record<string, string> = {
     ON_PROGRESS: "On Progress",
     SELESAI: "Selesai",
-    DIBATALKAN: "Dibatalkan",
+    DIBATALKAN: "Case Closed",
   };
   const safeStatus = config[status ?? ""] ? status! : "ON_PROGRESS";
 

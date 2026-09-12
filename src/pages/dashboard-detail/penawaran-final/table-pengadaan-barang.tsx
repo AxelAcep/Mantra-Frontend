@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -10,60 +12,40 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  ChevronsUpDown, 
+import {
+  Search,
+  ChevronsUpDown,
   ArrowRight,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
+import { usePenawaranList } from "@/hooks/use-create-penawaran";
 
-// Data Dummy sesuai dengan gambar terbaru (Prefix M-)
-const dummyRiwayatPenawaranData = [
-  {
-    noPenawaran: "M-2310-001",
-    tanggal: "24 Okt 2023",
-    perusahaan: "PT Maju Bersama",
-    jenisBarang: "PAC Montair",
-  },
-  {
-    noPenawaran: "M-2310-002",
-    tanggal: "23 Okt 2023",
-    perusahaan: "CV Sejahtera Abadi",
-    jenisBarang: "Fire GeneratorPro",
-  },
-  {
-    noPenawaran: "M-2310-003",
-    tanggal: "23 Okt 2023",
-    perusahaan: "Global Tech Solutions",
-    jenisBarang: "PAC Montair",
-  },
-  {
-    noPenawaran: "M-2310-004",
-    tanggal: "22 Okt 2023",
-    perusahaan: "PT Konstruksi Jaya",
-    jenisBarang: "Fire GeneratorPro",
-  },
-  {
-    noPenawaran: "M-2310-005",
-    tanggal: "21 Okt 2023",
-    perusahaan: "PT Sinar Mas",
-    jenisBarang: "PAC Montair",
-  },
-  {
-    noPenawaran: "M-2310-006",
-    tanggal: "21 Okt 2023",
-    perusahaan: "CV Karya Utama",
-    jenisBarang: "PAC Montair",
-  },
-];
-
-const riwayatPenawaranData: typeof dummyRiwayatPenawaranData = [];
+function formatDate(iso: string | null | undefined) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export default function DaftarPenawaranFinalPengadaanBarang() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+
+  const { data, isLoading } = usePenawaranList({
+    step: "FOLLOW_UP",
+    page,
+    limit: 10,
+    search,
+  });
+
+  const rows = data?.data ?? [];
+  const meta = data?.meta;
+
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
-      
       {/* --- HEADER / TOOLBAR --- */}
       <div className="p-4 border-b border-slate-100">
         <div className="relative w-full max-w-sm">
@@ -71,6 +53,11 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
           <Input
             type="text"
             placeholder="Cari perusahaan..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="pl-9 h-9 text-xs bg-slate-50/50 border-slate-200 shadow-none focus-visible:ring-cyan-500 rounded-lg"
           />
         </div>
@@ -81,83 +68,81 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50/30 hover:bg-slate-50/30">
-              
               <TableHead className="h-11 w-[20%] pl-4">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
                   NOMOR PENAWARAN
                   <ChevronsUpDown className="h-3 w-3 opacity-50" />
                 </div>
               </TableHead>
-              
               <TableHead className="h-11 w-[20%]">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
                   TANGGAL PERMINTAAN
                   <ChevronsUpDown className="h-3 w-3 opacity-50" />
                 </div>
               </TableHead>
-              
               <TableHead className="h-11 w-[30%]">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
                   NAMA PERUSAHAAN
                   <ChevronsUpDown className="h-3 w-3 opacity-50" />
                 </div>
               </TableHead>
-
               <TableHead className="h-11 w-[20%]">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase cursor-pointer hover:text-slate-800">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
                   JENIS PENGADAAN BARANG
                   <ChevronsUpDown className="h-3 w-3 opacity-50" />
                 </div>
               </TableHead>
-              
               <TableHead className="text-[10px] font-bold text-slate-500 uppercase h-11 text-right pr-4 w-[10%]">
                 AKSI
               </TableHead>
-              
             </TableRow>
           </TableHeader>
-          
+
           <TableBody>
-            {riwayatPenawaranData.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-10 text-slate-400 text-sm font-medium">
+                  Memuat data...
+                </TableCell>
+              </TableRow>
+            ) : rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-10 text-slate-400 text-sm font-medium">
                   Tidak ada data tersedia
                 </TableCell>
               </TableRow>
             ) : (
-              riwayatPenawaranData.map((row, index) => (
-                <TableRow 
-                  key={index} 
+              rows.map((row) => (
+                <TableRow
+                  key={row.id}
                   className="border-b-slate-100 hover:bg-slate-50 transition-colors"
                 >
-                  
-                  {/* Kolom Nomor Penawaran ditebalkan */}
                   <TableCell className="font-bold text-slate-700 text-xs py-4 pl-4">
-                    {row.noPenawaran}
+                    {row.nomorPenawaran || "—"}
                   </TableCell>
-
                   <TableCell className="text-slate-500 text-xs py-4">
-                    {row.tanggal}
+                    {formatDate(row.tanggalMasuk)}
                   </TableCell>
-                  
-                  {/* Kolom Nama Perusahaan ditebalkan */}
                   <TableCell className="font-bold text-slate-700 text-xs py-4">
-                    {row.perusahaan}
+                    {row.perusahaanName || "—"}
                   </TableCell>
-                  
                   <TableCell className="py-4">
-                    <Badge className="bg-slate-100 hover:bg-slate-200 text-slate-600 border-none rounded-md px-2 py-1 text-[10px] font-medium shadow-none">
-                      {row.jenisBarang}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1">
+                      {row.jenisPenawaran?.map((jenis) => (
+                        <Badge key={jenis} className="bg-slate-100 hover:bg-slate-200 text-slate-600 border-none rounded-md px-2 py-1 text-[10px] font-medium shadow-none">
+                          {jenis.replace("_", " ")}
+                        </Badge>
+                      )) || "—"}
+                    </div>
                   </TableCell>
-                  
                   <TableCell className="text-right py-4 pr-4">
-                    <button className="flex items-center justify-end gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline ml-auto w-full">
-                      Lihat Detail
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
+                    <Link
+                      to={`/penawaran/${row.id}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline"
+                    >
+                      Lihat Detail <ArrowRight className="w-3 h-3" />
+                    </Link>
                   </TableCell>
-                  
                 </TableRow>
               ))
             )}
@@ -166,44 +151,37 @@ export default function DaftarPenawaranFinalPengadaanBarang() {
       </CardContent>
 
       {/* --- FOOTER: Pagination --- */}
-      <div className="flex justify-between items-center p-4 border-t border-slate-100 bg-white">
-        <p className="text-xs text-slate-500">
-          Menampilkan <strong className="text-slate-700">{riwayatPenawaranData.length}</strong> dari <strong className="text-slate-700">{riwayatPenawaranData.length}</strong> data
-        </p>
-        
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-400 hover:text-slate-600" disabled>
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          
-          {riwayatPenawaranData.length === 0 ? (
-            <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-slate-100 text-slate-400 p-0 text-xs font-medium shadow-none cursor-not-allowed" disabled>
-              1
+      {meta && meta.totalPages > 0 && (
+        <div className="flex justify-between items-center p-4 border-t border-slate-100 bg-white">
+          <p className="text-xs text-slate-500">
+            Menampilkan <strong className="text-slate-700">{rows.length}</strong> dari <strong className="text-slate-700">{meta.total}</strong> data
+          </p>
+
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-7 h-7 rounded-md text-slate-400 hover:text-slate-600"
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              <ChevronLeft className="w-4 h-4" />
             </Button>
-          ) : (
-            <>
-              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md bg-cyan-500 text-white hover:bg-cyan-600 hover:text-white p-0 text-xs font-medium shadow-sm">
-                1
-              </Button>
-              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-                2
-              </Button>
-              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-                3
-              </Button>
-              <span className="text-slate-400 text-xs px-1">...</span>
-              <Button variant="ghost" size="sm" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 p-0 text-xs font-medium">
-                7
-              </Button>
-            </>
-          )}
-          
-          <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100" disabled={riwayatPenawaranData.length === 0}>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+            <span className="text-xs text-slate-500 px-2">
+              {page} / {meta.totalPages}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100"
+              disabled={page >= meta.totalPages}
+              onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-      </div>
-      
+      )}
     </Card>
   );
 }
