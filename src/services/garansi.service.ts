@@ -90,6 +90,7 @@ export interface GaransiResponse {
   picId: string;
   pic?: { id: string; nama: string; divisi?: string };
   status: string;
+  kategoriGaransi?: string;
   lamaTahun?: number;
   bulanMulai?: number;
   tahunMulai?: number;
@@ -98,6 +99,29 @@ export interface GaransiResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+export type KategoriGaransi =
+  | "PAC_DALAM_KOTA"
+  | "PAC_LUAR_KOTA"
+  | "FIRE_DALAM_KOTA"
+  | "FIRE_LUAR_KOTA"
+  | "TIDAK_ADA";
+
+export const KATEGORI_GARANSI_LABELS: Record<KategoriGaransi, string> = {
+  PAC_DALAM_KOTA: "PAC Dalam Kota",
+  PAC_LUAR_KOTA: "PAC Luar Kota",
+  FIRE_DALAM_KOTA: "Fire Dalam Kota",
+  FIRE_LUAR_KOTA: "Fire Luar Kota",
+  TIDAK_ADA: "Tidak Ada Garansi",
+};
+
+export const KATEGORI_GARANSI_JUMLAH: Record<KategoriGaransi, string> = {
+  PAC_DALAM_KOTA: "12x/tahun (1/bulan)",
+  PAC_LUAR_KOTA: "2x/tahun (6 bulan interval)",
+  FIRE_DALAM_KOTA: "4x/tahun (3 bulan interval)",
+  FIRE_LUAR_KOTA: "2x/tahun (6 bulan interval)",
+  TIDAK_ADA: "Tanpa garansi",
+};
 
 export async function getDetailGaransi(
   trackingId: string,
@@ -116,6 +140,7 @@ export async function getDetailGaransi(
 export async function konfigurasiGaransi(
   trackingId: string,
   payload: {
+    kategoriGaransi: KategoriGaransi;
     lamaTahun: number;
     bulanMulai: number;
     tahunMulai: number;

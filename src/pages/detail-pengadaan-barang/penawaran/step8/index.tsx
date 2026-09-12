@@ -129,6 +129,7 @@ export default function Step8({ trackingId }: Step8Props) {
               periodeAkhir={periodeAkhir}
               months={months}
               updatingTanggal={updatingTanggal}
+              kategoriGaransi={garansi.kategoriGaransi}
               onSaveTanggal={updateTanggalKunjungan}
             />
           )}

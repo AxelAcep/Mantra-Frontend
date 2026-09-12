@@ -35,7 +35,6 @@ export default function DaftarPermintaanPenawaranPengadaanBarang() {
   const [search, setSearch] = useState("");
 
   const { data, isLoading } = usePenawaranList({
-    step: "PERMINTAAN_MASUK",
     page,
     limit: 10,
     search,

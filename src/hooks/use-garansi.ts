@@ -4,6 +4,7 @@ import {
   konfigurasiGaransi,
   updateTanggalKunjunganGaransi,
   type GaransiResponse,
+  type KategoriGaransi,
 } from "@/services/garansi.service";
 
 export function useGaransi(trackingId: string) {
@@ -35,6 +36,7 @@ export function useGaransi(trackingId: string) {
 
   const konfigurasiTimeline = useCallback(
     async (payload: {
+      kategoriGaransi: KategoriGaransi;
       lamaTahun: number;
       bulanMulai: number;
       tahunMulai: number;

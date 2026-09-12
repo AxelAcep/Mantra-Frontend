@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CalendarPlus, Pencil, X, Check } from "lucide-react";
+import { CalendarPlus, Pencil, X, Check, AlertTriangle } from "lucide-react";
 
 export interface GaransiMonthItem {
   id: string;
@@ -172,8 +172,16 @@ interface TrackingGaransiSectionProps {
   periodeAkhir: string;
   months: GaransiMonthItem[];
   updatingTanggal: boolean;
+  kategoriGaransi?: string;
   onSaveTanggal: (monthId: string, tanggal: string) => Promise<unknown>;
 }
+
+const GRID_COLS_MAP: Record<string, string> = {
+  PAC_DALAM_KOTA: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+  PAC_LUAR_KOTA: "grid-cols-1 sm:grid-cols-2",
+  FIRE_DALAM_KOTA: "grid-cols-1 sm:grid-cols-2",
+  FIRE_LUAR_KOTA: "grid-cols-1 sm:grid-cols-2",
+};
 
 export default function TrackingGaransiSection({
   picGaransi,
@@ -181,12 +189,15 @@ export default function TrackingGaransiSection({
   periodeAkhir,
   months,
   updatingTanggal,
+  kategoriGaransi,
   onSaveTanggal,
 }: TrackingGaransiSectionProps) {
   const totalBulan = months.length;
   const bulanTerlaksana = months.filter(
     (m) => m.status === "DITERIMA" || m.status === "ON_PROGRESS",
   ).length;
+  const sisaBulan = totalBulan - bulanTerlaksana;
+  const showWarning = sisaBulan > 0 && sisaBulan <= 4;
   const progressPercent = totalBulan ? (bulanTerlaksana / totalBulan) * 100 : 0;
 
   return (
@@ -194,6 +205,16 @@ export default function TrackingGaransiSection({
       <h3 className="font-bold text-slate-800 text-sm mb-4">
         Tracking Garansi
       </h3>
+
+      {showWarning && (
+        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg mb-4">
+          <AlertTriangle size={14} className="text-red-500 shrink-0" />
+          <p className="text-[11px] font-medium text-red-600">
+            Ingat: Buat penawaran maintenance ke customer sebelum garansi
+            berakhir! Sisa {sisaBulan} bulan lagi.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-slate-50/50 border border-gray-100 p-4 rounded-xl">
@@ -214,7 +235,7 @@ export default function TrackingGaransiSection({
         </div>
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-xl p-6 mb-8">
+      <div className="bg-white border border-gray-100 rounded-xl p-6 mb-4">
         <div className="flex justify-between items-center mb-4">
           <h4 className="font-bold text-slate-800 text-xs">
             Progress Kunjungan Garansi
@@ -235,7 +256,7 @@ export default function TrackingGaransiSection({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid ${GRID_COLS_MAP[kategoriGaransi ?? ""] ?? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"} gap-4`}>
         {months.map((month) => (
           <MonthCard
             key={month.id}
