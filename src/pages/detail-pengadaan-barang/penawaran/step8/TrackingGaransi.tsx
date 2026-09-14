@@ -196,9 +196,17 @@ export default function TrackingGaransiSection({
   const bulanTerlaksana = months.filter(
     (m) => m.status === "DITERIMA" || m.status === "ON_PROGRESS",
   ).length;
-  const sisaBulan = totalBulan - bulanTerlaksana;
-  const showWarning = sisaBulan > 0 && sisaBulan <= 4;
+
+  // Hitung sisa bulan berdasarkan waktu kalender (bukan progress bar)
+  const now = new Date();
+  const lastMonth = months[months.length - 1];
+  const bulanSekarang = now.getMonth() + 1; // 1-12
+  const tahunSekarang = now.getFullYear();
+  const sisaBulanKalender =
+    (lastMonth.tahun - tahunSekarang) * 12 + (lastMonth.bulan - bulanSekarang);
+  const showWarning = sisaBulanKalender > 0 && sisaBulanKalender <= 4;
   const progressPercent = totalBulan ? (bulanTerlaksana / totalBulan) * 100 : 0;
+  const [showPreviewWarning, setShowPreviewWarning] = useState(false);
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mt-6">
@@ -206,12 +214,21 @@ export default function TrackingGaransiSection({
         Tracking Garansi
       </h3>
 
-      {showWarning && (
+      {!showWarning && (
+        <button
+          onClick={() => setShowPreviewWarning(!showPreviewWarning)}
+          className="mb-4 text-[10px] font-medium text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors"
+        >
+          {showPreviewWarning ? "Sembunyikan Preview" : "Preview Warning Garansi"}
+        </button>
+      )}
+
+      {(showWarning || showPreviewWarning) && (
         <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg mb-4">
           <AlertTriangle size={14} className="text-red-500 shrink-0" />
           <p className="text-[11px] font-medium text-red-600">
             Ingat: Buat penawaran maintenance ke customer sebelum garansi
-            berakhir! Sisa {sisaBulan} bulan lagi.
+            berakhir! Sisa {sisaBulanKalender} bulan lagi.
           </p>
         </div>
       )}
