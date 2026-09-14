@@ -47,6 +47,7 @@ export default function DaftarPOAktifPengadaanBarang() {
   const [search, setSearch] = useState("");
 
   const { data, isLoading } = usePenawaranListAktif({
+    step: "IMPLEMENTASI,BAST",
     page,
     limit: 10,
     search,

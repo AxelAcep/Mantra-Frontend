@@ -40,7 +40,7 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
   const [search, setSearch] = useState("");
 
   const { data, isLoading } = usePenawaranList({
-    step: "REVIEW_INTERNAL",
+    step: "REVIEW_INTERNAL,PERSETUJUAN_MANAJEMEN",
     page,
     limit: 10,
     search,

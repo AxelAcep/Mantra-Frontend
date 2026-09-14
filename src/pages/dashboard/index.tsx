@@ -58,7 +58,7 @@ export default function DashboardPage() {
                 />
                 <CardRingkasan
                     title="PENGADAAN BARANG"
-                    count={0}
+                    count={summary?.penawaranPengadaan ?? 0}
                     label="Penawaran Pengadaan"
                     icon={Icons.PenawaranPengadaan}
                     href="/dashboard/pengadaan-barang"
