@@ -10,23 +10,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Search,
   ChevronsUpDown,
   ChevronUp,
   ChevronDown,
-  Check,
-  X,
-  CheckCheck,
 } from "lucide-react";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
 import { useDebounce } from "@/hooks/use-debounce";
-import { AlertDialogMassalPengadaanBarang } from "./alert-dialog-massal-pengadaan-barang";
-import { AlertDialogSetuju } from "./alert-dialog-setuju";
-import { AlertDialogTolak } from "./alert-dialog-tolak";
 
 type SortDir = "asc" | "desc" | "";
 
@@ -93,9 +86,6 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
   const rows = data?.data ?? [];
   const meta = data?.meta;
 
-  const handleConfirmMassal = () => {};
-  const handleConfirmSetuju = () => {};
-
   function handleSort(field: string) {
     if (sortBy !== field) { setSortBy(field); setSortDir("asc"); }
     else if (sortDir === "asc") setSortDir("desc");
@@ -116,18 +106,12 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
             className="pl-9 h-9 text-xs bg-slate-50/50 border-slate-200 shadow-none focus-visible:ring-cyan-500 rounded-lg"
           />
         </div>
-        <AlertDialogMassalPengadaanBarang onConfirm={handleConfirmMassal}>
-          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white rounded-full h-9 px-5 text-xs font-medium shadow-sm shrink-0">
-            <CheckCheck className="w-4 h-4 mr-1.5" />
-            Terima Semua Penawaran
-          </Button>
-        </AlertDialogMassalPengadaanBarang>
       </div>
 
       {/* --- TABEL --- */}
       <CardContent className="p-0">
         <div className="w-full overflow-x-auto">
-          <div className="w-full min-w-[1000px]">
+          <div className="w-full min-w-[900px]">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
@@ -170,21 +154,9 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right py-4 pr-4">
-                        <div className="flex items-center justify-end gap-3">
-                          <div className="flex items-center gap-1.5">
-                            <AlertDialogSetuju onConfirm={handleConfirmSetuju}>
-                              <button className="h-6 w-6 rounded-full border border-emerald-200 text-emerald-500 flex items-center justify-center hover:bg-emerald-100 transition-colors">
-                                <Check className="h-3.5 w-3.5 stroke-[3]" />
-                              </button>
-                            </AlertDialogSetuju>
-                            <AlertDialogTolak onConfirm={(alasan) => console.log("Alasan Tolak:", alasan)}>
-                              <button className="h-6 w-6 rounded-full border border-rose-200 text-rose-500 flex items-center justify-center hover:bg-rose-100 transition-colors">
-                                <X className="h-3.5 w-3.5 stroke-[3]" />
-                              </button>
-                            </AlertDialogTolak>
-                          </div>
-                          <Link to={`/penawaran/${row.id}`} className="text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline shrink-0">Lihat Detail</Link>
-                        </div>
+                        <Link to={`/penawaran/${row.id}`} className="inline-flex items-center gap-1 text-[11px] font-medium text-cyan-500 hover:text-cyan-600 hover:underline">
+                          Lihat Detail
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))
