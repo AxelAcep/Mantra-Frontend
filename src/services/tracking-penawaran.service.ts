@@ -114,6 +114,9 @@ export type GetPenawaranListParams = {
   bastLengkap?: "true" | "false";
   // Cuma dipakai tab Riwayat.
   overallStatus?: "ON_PROGRESS" | "SELESAI" | "DIBATALKAN";
+  // Sorting
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
 };
 
 export async function getPenawaranList(
@@ -124,6 +127,8 @@ export async function getPenawaranList(
   if (params.limit) query.set("limit", String(params.limit));
   if (params.search) query.set("search", params.search);
   if (params.step) query.set("step", params.step);
+  if (params.sortBy) query.set("sortBy", params.sortBy);
+  if (params.sortDir) query.set("sortDir", params.sortDir);
 
   const res = await fetchClient(`/tracking-penawaran?${query.toString()}`, {
     headers: authHeaders(),
@@ -143,6 +148,8 @@ export async function getPenawaranListAktif(
   if (params.search) query.set("search", params.search);
   if (params.step) query.set("step", params.step);
   if (params.bastLengkap) query.set("bastLengkap", params.bastLengkap);
+  if (params.sortBy) query.set("sortBy", params.sortBy);
+  if (params.sortDir) query.set("sortDir", params.sortDir);
 
   const res = await fetchClient(`/tracking-penawaran/aktif?${query.toString()}`, {
     headers: authHeaders(),

@@ -23,6 +23,8 @@ export default function Layout() {
             setTitle("Notifikasi");
         } else if (path.includes("/pengadaan-barang")) {
             setTitle("Pengadaan Barang");
+        } else if (path.includes("/penawaran")) {
+            setTitle("Pengadaan Barang");
         } else if (path.includes("/perusahaan")) {
             setTitle("Daftar Perusahaan");
         }
