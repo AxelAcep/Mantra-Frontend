@@ -3,9 +3,10 @@
 // (MANAGER_OPERASIONAL), DIREKTUR, KOMISARIS, dan role MASTER selalu boleh
 // akses semua tahap.
 //
-// "Admin Proyek" (step 6 Implementasi, 7 BAST, 8 Garansi) BUKAN divisi tetap
-// — itu pegawai spesifik yang di-assign per-tracking (lewat AssignAdminProyek)
-// — jadi dicek terpisah lewat parameter `isAdminProyek`, bukan daftar divisi.
+// "Admin Proyek" (step 5 Follow Up, 6 Implementasi, 7 BAST, 8 Garansi) BUKAN
+// divisi tetap — itu pegawai spesifik yang di-assign per-tracking (lewat
+// AssignAdminProyek) — jadi dicek terpisah lewat parameter `isAdminProyek`,
+// bukan daftar divisi.
 
 const FULL_ACCESS_DIVISI = ["MANAGER_OPERASIONAL", "DIREKTUR", "KOMISARIS"];
 
@@ -21,7 +22,7 @@ const STEP_ALLOWED_DIVISI: Record<number, string[]> = {
   9: ["FINANCE_ACCOUNTING"], // Accounting
 };
 
-const ADMIN_PROYEK_STEPS = [6, 7, 8];
+const ADMIN_PROYEK_STEPS = [5, 6, 7, 8];
 
 export function canViewPengadaanStep(
   step: number,
@@ -34,7 +35,7 @@ export function canViewPengadaanStep(
 }
 
 // Sama kayak canViewPengadaanStep, ditambah pengecualian Admin Proyek buat
-// step Implementasi/BAST/Garansi.
+// step Follow Up/Implementasi/BAST/Garansi.
 export function canViewPengadaanStepWithAdminProyek(
   step: number,
   role: string,
