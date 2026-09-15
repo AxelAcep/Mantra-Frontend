@@ -53,12 +53,22 @@ function getFlagLabel(flag: FlagTermin) {
   return null;
 }
 
-function getStatusStyle(sudahDibayar: boolean, flag: FlagTermin) {
+function getStatusStyle(
+  sudahDibayar: boolean,
+  flag: FlagTermin,
+  belumMulai: boolean,
+) {
   if (sudahDibayar)
     return {
       label: "Lunas",
       circle: "bg-cyan-500 border-white text-white",
       card: "",
+    };
+  if (belumMulai)
+    return {
+      label: "Belum Mulai",
+      circle: "bg-white border-gray-200 text-gray-300",
+      card: "opacity-60",
     };
   if (flag === "LEWAT")
     return {
@@ -478,9 +488,11 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
 
       <div className="relative space-y-4">
         {items.map((item, index) => {
+          const belumMulai = !item.sudahDibayar && !item.activityId;
           const { label, circle, card } = getStatusStyle(
             item.sudahDibayar,
             item.flag,
+            belumMulai,
           );
           const flagInfo = getFlagLabel(item.flag);
           const isExpanded = expanded.includes(item.id);
@@ -526,9 +538,11 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                         <Badge
                           className={`text-[9px] font-bold border-0 px-2 py-0.5 rounded-full ${item.sudahDibayar
                               ? "bg-cyan-50 text-cyan-500"
-                              : item.flag === "LEWAT"
-                                ? "bg-red-50 text-red-500"
-                                : "bg-amber-50 text-amber-500"
+                              : belumMulai
+                                ? "bg-gray-100 text-gray-400"
+                                : item.flag === "LEWAT"
+                                  ? "bg-red-50 text-red-500"
+                                  : "bg-amber-50 text-amber-500"
                             }`}
                         >
                           {label}
@@ -752,8 +766,25 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                         </div>
                       )}
 
+                      {/* Belum mulai — nunggu termin sebelumnya tuntas (dibayar + daily disetujui) */}
+                      {belumMulai && !isEditing && (
+                        <p className="mt-2 text-[10px] text-gray-400 font-medium text-center bg-gray-50 border border-gray-100 rounded-lg py-2">
+                          Menunggu termin sebelumnya tuntas (dibayar & daily disetujui).
+                        </p>
+                      )}
+
+                      {/* Daily masih berjalan, belum disetujui manager */}
+                      {!belumMulai &&
+                        !item.sudahDibayar &&
+                        !item.activitySelesai &&
+                        !isEditing && (
+                          <p className="mt-2 text-[9px] text-amber-500 font-medium text-center">
+                            Daily penagihan termin ini masih berjalan (belum disetujui).
+                          </p>
+                        )}
+
                       {/* Tandai Lunas */}
-                      {canBayar && !item.sudahDibayar && !isEditing && (
+                      {canBayar && !item.sudahDibayar && !belumMulai && !isEditing && (
                         <button
                           onClick={() => bayar(item.id)}
                           disabled={isBayaring}

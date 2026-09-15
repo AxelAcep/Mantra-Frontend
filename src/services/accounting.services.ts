@@ -85,6 +85,12 @@ export interface ItemTermin {
   keterangan?: string;
   deadline?: string;
   flag: FlagTermin;
+  // Termin jalan berurutan mirip BAST/Garansi: cuma termin pertama yang
+  // langsung punya daily, termin berikutnya baru dapet daily-nya (activityId
+  // keisi) setelah termin sebelumnya tuntas (sudahDibayar DAN activitySelesai
+  // dua-duanya). Kalau activityId masih kosong, termin ini belum "mulai".
+  activityId?: string;
+  activitySelesai: boolean;
   createdAt: string;
   updatedAt: string;
 }

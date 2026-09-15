@@ -63,6 +63,9 @@ export interface BastResponse {
   id: string;
   trackingPenawaranId: string;
   trackingPenawaran?: TrackingPenawaranDetail;
+  // Tracking bisa punya sampai 2 BAST — PAC & FIRE terpisah, atau UMUM
+  // (generik) kalau gak ada Jenis Penawaran PAC Montair / Generator FirePro.
+  kategori: "PAC" | "FIRE" | "UMUM";
   status: string;
   logs: LogBast[];
   entries: BastEntry[];
@@ -70,7 +73,11 @@ export interface BastResponse {
   updatedAt: string;
 }
 
-export async function getDetailBast(trackingId: string): Promise<BastResponse> {
+// GET .../bast sekarang balikin LIST (bisa 1 atau 2 BAST tergantung kategori
+// yang kedetect dari Jenis Penawaran tracking-nya).
+export async function getDetailBast(
+  trackingId: string,
+): Promise<BastResponse[]> {
   const res = await fetchClient(`/tracking-penawaran/${trackingId}/bast`, {
     method: "GET",
     headers: authHeaders(),
@@ -85,11 +92,12 @@ export async function getDetailBast(trackingId: string): Promise<BastResponse> {
 export async function createBastEntry(
   trackingId: string,
   payload: {
+    kategori?: "PAC" | "FIRE" | "UMUM"; // wajib kalau tracking punya 2 BAST
     noReferensi?: string;
     tanggalTerbit?: string;
     tanggalSerahTerima?: string;
   },
-): Promise<BastResponse> {
+): Promise<BastResponse[]> {
   const res = await fetchClient(
     `/tracking-penawaran/${trackingId}/bast/entry`,
     {
@@ -114,7 +122,7 @@ export async function updateBastEntry(
     tanggalTerbit?: string;
     tanggalSerahTerima?: string;
   },
-): Promise<BastResponse> {
+): Promise<BastResponse[]> {
   const res = await fetchClient(
     `/tracking-penawaran/${trackingId}/bast/entry/${entryId}`,
     {

@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { useDetailPenawaran } from "@/hooks/use-penawaran";
 import { usePreloadBoQ } from "@/hooks/use-boq";
 import { useDetailReviewInternal } from "@/hooks/use-review-internal";
+import { useDetailFollowUp } from "@/hooks/use-follow-up";
+import { canViewPengadaanStepWithAdminProyek } from "@/utils/step-access";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function getUserInfo() {
@@ -163,6 +165,9 @@ export default function PenawaranPage() {
   // ── Data & Mutations ───────────────────────────────────────────────────
   const { data: penawaran, isLoading } = useDetailPenawaran(trackingId);
   const { data: boqData } = usePreloadBoQ(trackingId);
+  // Dipakai buat cek "Admin Proyek" (step 6/7/8) — bukan divisi tetap, tapi
+  // pegawai spesifik yang di-assign ke tracking ini lewat AssignAdminProyek.
+  const { data: followUpData } = useDetailFollowUp(trackingId);
 
   // ── Derived Status ─────────────────────────────────────────────────────
   const permintaanStatus = penawaran?.permintaanMasuk?.status as
@@ -195,14 +200,35 @@ export default function PenawaranPage() {
   //   setIsRevisionModalOpen(false);
   // }
 
-  // Accounting
+  // "Admin Proyek" — bukan divisi tetap, tapi pegawai spesifik yang
+  // di-assign ke tracking ini (via AssignAdminProyek di step Follow Up).
+  const isAdminProyek =
+    !!userInfo.pegawaiId &&
+    followUpData?.activityAdminProyek?.pegawai?.id === userInfo.pegawaiId;
+
+  function hasStepPermission(step: number): boolean {
+    return canViewPengadaanStepWithAdminProyek(
+      step,
+      userInfo.role,
+      userInfo.divisi,
+      isAdminProyek,
+    );
+  }
+
+  // Accounting (step 9) punya aturan lama: kebuka lebih awal (progress >= 5)
+  // walau belum sampe step-nya sendiri, khusus buat yang berwenang.
   const canAccessAccounting =
-    [
-      "KOMISARIS",
-      "DIREKTUR",
-      "MANAGER_OPERASIONAL",
-      "FINANCE_ACCOUNTING",
-    ].includes(userInfo.divisi) && getStepNumber(penawaran?.stepSaatIni) >= 5;
+    hasStepPermission(9) && getStepNumber(penawaran?.stepSaatIni) >= 5;
+
+  // Satu fungsi buat nentuin step ke-n boleh diakses atau enggak — dipakai
+  // bareng buat disable tab ProgressCard & gating konten step. Step lain
+  // (bukan 9) masih harus nurutin progress (gak boleh loncat ke depan),
+  // Accounting punya pengecualian sendiri.
+  function isStepBlocked(step: number): boolean {
+    if (!hasStepPermission(step)) return true;
+    if (step === 9) return !canAccessAccounting;
+    return step > getStepNumber(penawaran?.stepSaatIni);
+  }
 
   // Begitu data penawaran kemuat, buka langsung di tahap yang sedang berjalan
   // (bukan selalu mulai dari step 1) — cuma sekali di awal, biar navigasi
@@ -252,23 +278,17 @@ export default function PenawaranPage() {
                 : n < activeStep
                   ? "done"
                   : "inactive",
-            // Step 9 = Accounting — sensitif, cuma role tertentu yang boleh buka.
-            disabled: n === 9 && !canAccessAccounting,
+            disabled: isStepBlocked(n),
           }))}
           onStepClick={(step) => {
-            if (step === 9 && !canAccessAccounting) return;
+            if (isStepBlocked(step)) return;
             setActiveStep(step);
           }}
         />
 
         {/* Step Content */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          {activeStep === 9 && !canAccessAccounting ? (
-            <StepRestricted
-              currentStepName={getStepName(penawaran?.stepSaatIni)}
-            />
-          ) : activeStep > getStepNumber(penawaran?.stepSaatIni) &&
-            !(activeStep === 9 && canAccessAccounting) ? (
+          {isStepBlocked(activeStep) ? (
             <StepRestricted
               currentStepName={getStepName(penawaran?.stepSaatIni)}
             />

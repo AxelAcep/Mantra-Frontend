@@ -14,6 +14,7 @@ import AdminProyekUpload from "./AdminProyekUpload";
 import ManagerProyekCard from "./AssignAdminProyekCard";
 import InputTotalBastFollowUp from "./InputTotalBastFollowUp";
 import BatalkanPermintaanCard from "./BatalkanPermintaanCard";
+import { detectBastKategori } from "@/utils/bast-kategori";
 
 interface Step5Props {
   trackingId: string;
@@ -135,6 +136,11 @@ export default function Step5({
 
   const isAdminSekertariat = divisi === "ADMIN_SEKERTARIAT";
 
+  const isDualBast = detectBastKategori(tracking?.jenisPenawaran).length === 2;
+  const isTotalBastFilled = isDualBast
+    ? data.totalBastPAC != null && data.totalBastFire != null
+    : data.totalBast != null;
+
   const mappedLogs =
     data.logs?.map((log, i) => {
       const d = log.createdAt ? new Date(log.createdAt) : new Date();
@@ -249,7 +255,10 @@ export default function Step5({
           <>
             <InputTotalBastFollowUp
               trackingId={trackingId}
-              totalBast={data.TotalBAST}
+              jenisPenawaran={tracking?.jenisPenawaran ?? []}
+              totalBast={data.totalBast}
+              totalBastPAC={data.totalBastPAC}
+              totalBastFire={data.totalBastFire}
               canInput={
                 ((divisi === "MAINTENANCE_PAC" ||
                   divisi === "MAINTENANCE_FIRE") &&
@@ -274,7 +283,7 @@ export default function Step5({
                   role === "MASTER" ||
                   divisi === "MANAGER_OPERASIONAL" ||
                   divisi === "MONITORING_CONTROL_ADVISOR") &&
-                !!data.TotalBAST
+                isTotalBastFilled
               }
               onUpload={(file, kategori) =>
                 uploadMut.mutate({ file, kategori })

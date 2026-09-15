@@ -7,7 +7,7 @@ import {
 } from "@/services/bast.service";
 
 export function useBast(trackingId: string) {
-  const [bast, setBast] = useState<BastResponse | null>(null);
+  const [basts, setBasts] = useState<BastResponse[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -19,7 +19,7 @@ export function useBast(trackingId: string) {
     setError(null);
     try {
       const data = await getDetailBast(trackingId);
-      setBast(data);
+      setBasts(data);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Gagal mengambil data BAST.",
@@ -35,6 +35,7 @@ export function useBast(trackingId: string) {
 
   const addBastEntry = useCallback(
     async (payload: {
+      kategori?: "PAC" | "FIRE" | "UMUM";
       noReferensi?: string;
       tanggalTerbit?: string;
       tanggalSerahTerima?: string;
@@ -43,7 +44,7 @@ export function useBast(trackingId: string) {
       setError(null);
       try {
         const data = await createBastEntry(trackingId, payload);
-        setBast(data);
+        setBasts(data);
         return data;
       } catch (err) {
         setError(
@@ -70,7 +71,7 @@ export function useBast(trackingId: string) {
       setError(null);
       try {
         const data = await updateBastEntry(trackingId, entryId, payload);
-        setBast(data);
+        setBasts(data);
         return data;
       } catch (err) {
         setError(
@@ -85,7 +86,7 @@ export function useBast(trackingId: string) {
   );
 
   return {
-    bast,
+    basts,
     loading,
     error,
     creating,
