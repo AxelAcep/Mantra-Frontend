@@ -320,7 +320,7 @@ export default function DocumentSectionFollowUp({
               <button
                 className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors uppercase ${followUpStatusColor}`}
               >
-                <CheckCircle2 size={13} /> {followUpStatusLabel}
+                {followUpStatusLabel}
               </button>
             )}
           </div>

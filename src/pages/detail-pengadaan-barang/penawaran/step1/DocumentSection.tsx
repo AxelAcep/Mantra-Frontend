@@ -126,7 +126,7 @@ export default function DocumentSection({
               <button
                 className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors uppercase ${badgeColor}`}
               >
-                <CheckCircle2 size={13} /> {badgeLabel}
+                {badgeLabel}
               </button>
             )}
           </div>
