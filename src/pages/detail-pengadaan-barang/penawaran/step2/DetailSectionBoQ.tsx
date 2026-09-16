@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
-import { Wallet, Clock3, ChevronDown, Save } from "lucide-react";
+import { Wallet, Clock3, ChevronDown, Save, Hash } from "lucide-react";
 import type { Mode } from "../step1";
 
 export interface FinancialSummary {
@@ -23,12 +23,15 @@ interface DetailSectionBoQProps {
   financial?: FinancialSummary;
   workingTime?: WorkingTime;
   mode?: Mode;
+  nomorPenawaran?: string;
   onSave?: (body: {
     harga1?: number;
     harga2?: number;
     harga3?: number;
   }) => void;
+  onSaveNomorPenawaran?: (nomor: string) => void;
   isSaving?: boolean;
+  isSavingNomor?: boolean;
   // PROPS BARU
   isFinanceEditable?: boolean;
   boqActivityStatus?: string;
@@ -53,13 +56,18 @@ function formatRupiah(value: number) {
 export default function DetailSectionBoQ({
   financial,
   workingTime,
+  nomorPenawaran: nomorPenawaran初始,
   onSave,
+  onSaveNomorPenawaran,
   isSaving,
+  isSavingNomor,
   isFinanceEditable: isFinanceEditableProp,
   boqActivityStatus,
   userDivisi,
 }: DetailSectionBoQProps) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
+  const [nomorPenawaran, setNomorPenawaran] = useState(nomorPenawaran初始 ?? "");
+  const [isEditingNomor, setIsEditingNomor] = useState(false);
 
   // Tentukan apakah input finance bisa diedit
   const isBoQActivitySelesai =
@@ -68,6 +76,8 @@ export default function DetailSectionBoQ({
   const isAllowedDivisi = userDivisi
     ? ALLOWED_DIVISI.includes(userDivisi)
     : false;
+
+  const isPresales = userDivisi === "PRESALES";
 
   // Finance editable hanya jika activity BoQ selesai DAN user divisi yang diizinkan
   const isFinanceEditable =
@@ -92,6 +102,10 @@ export default function DetailSectionBoQ({
     setHarga2(financial?.harga2 ?? 0);
     setHarga3(financial?.harga3 ?? 0);
   }, [financial]);
+
+  useEffect(() => {
+    setNomorPenawaran(nomorPenawaran初始 ?? "");
+  }, [nomorPenawaran初始]);
 
   const total = harga1 + harga2 + harga3;
 
@@ -140,7 +154,66 @@ export default function DetailSectionBoQ({
   const displayedRemaining = isDone ? 0 : (workingTime?.remainingHours ?? "-");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
+    <div className="space-y-4 lg:space-y-5">
+      {/* Nomor Penawaran */}
+      <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+            <Hash size={16} className="text-gray-500" />
+            <span>Nomor Penawaran</span>
+          </div>
+          {isEditingNomor ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setNomorPenawaran(nomorPenawaran初始 ?? "");
+                  setIsEditingNomor(false);
+                }}
+                className="px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  onSaveNomorPenawaran?.(nomorPenawaran);
+                  setIsEditingNomor(false);
+                }}
+                disabled={isSavingNomor}
+                className="flex items-center gap-1.5 text-xs font-bold text-white bg-cyan-500 hover:bg-cyan-600 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
+              >
+                <Save size={12} />
+                {isSavingNomor ? "Menyimpan..." : "Simpan"}
+              </button>
+            </div>
+          ) : isPresales ? (
+            <button
+              onClick={() => setIsEditingNomor(true)}
+              className="px-3 py-1.5 text-xs text-cyan-600 font-bold hover:underline"
+            >
+              Ubah
+            </button>
+          ) : null}
+        </div>
+        <div className="mt-4">
+          {isEditingNomor ? (
+            <input
+              type="text"
+              value={nomorPenawaran}
+              onChange={(e) => setNomorPenawaran(e.target.value)}
+              placeholder="cth. PNW-2025-0142"
+              className="w-full bg-slate-50/70 border border-cyan-300 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+          ) : (
+            <div className="bg-slate-50/70 rounded-xl border border-gray-100 p-4">
+              <p className="text-sm font-bold text-slate-800">
+                {nomorPenawaran || "-"}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
       {/* Ringkasan Finansial */}
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
         <div className="flex items-center justify-between mb-5">
@@ -263,6 +336,7 @@ export default function DetailSectionBoQ({
             Batas Waktu {workingTime?.deadline ?? "-"}
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

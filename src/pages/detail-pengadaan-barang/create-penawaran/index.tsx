@@ -11,7 +11,6 @@ import {
   Phone,
   Mail,
   Building2,
-  Hash,
 } from "lucide-react";
 
 type JenisPenawaran =
@@ -38,7 +37,6 @@ const JENIS_PENAWARAN_OPTIONS: JenisPenawaran[] = [
 ];
 
 interface CreatePenawaranForm {
-  nomorPenawaran: string;
   perusahaanId: string;
   lokasiProyek: string;
   customerName: string;
@@ -87,7 +85,6 @@ export default function BuatPenawaran() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<CreatePenawaranForm>({
-    nomorPenawaran: "",
     perusahaanId: "",
     lokasiProyek: "",
     customerName: "",
@@ -122,7 +119,6 @@ export default function BuatPenawaran() {
   };
 
   const isValid =
-    form.nomorPenawaran.trim() &&
     form.perusahaanId.trim() &&
     form.lokasiProyek.trim() &&
     form.customerName.trim() &&
@@ -173,22 +169,6 @@ export default function BuatPenawaran() {
                 Data Penawaran
               </div>
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <FormField label="Nomor Penawaran" required>
-                  <div className="relative">
-                    <Hash
-                      size={14}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"
-                    />
-                    <input
-                      type="text"
-                      placeholder="cth. PNW-2025-0142"
-                      value={form.nomorPenawaran}
-                      onChange={(e) => set("nomorPenawaran", e.target.value)}
-                      className={`${inputClass} pl-8`}
-                    />
-                  </div>
-                </FormField>
-
                 <FormField label="Perusahaan" required>
                   <div className="relative">
                     <Building2
@@ -253,11 +233,7 @@ export default function BuatPenawaran() {
                   </div>
                 </FormField>
 
-                <FormField
-                  label="Lokasi Proyek"
-                  required
-                  className="md:col-span-2"
-                >
+                <FormField label="Lokasi Proyek" required>
                   <div className="relative">
                     <MapPin
                       size={14}
@@ -312,11 +288,10 @@ export default function BuatPenawaran() {
                 <User size={16} className="text-cyan-500" />
                 Kontak Customer
               </div>
-              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
                 <FormField
                   label="Nama Customer"
                   required
-                  className="md:col-span-2"
                 >
                   <div className="relative">
                     <User

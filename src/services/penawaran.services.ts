@@ -345,6 +345,23 @@ export async function assignMarketing(
   if (!res.ok) throw new Error("Gagal assign marketing");
 }
 
+
+
+export async function updateNomorPenawaran(
+  id: string,
+  nomorPenawaran: string,
+): Promise<void> {
+  const res = await fetchClient(`/tracking-penawaran/${id}/detail`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ nomorPenawaran }),
+  });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message ?? "Gagal update nomor penawaran.");
+  }
+}
+
 export type PenawaranListItem = {
   id: string;
   nomorPenawaran: string;

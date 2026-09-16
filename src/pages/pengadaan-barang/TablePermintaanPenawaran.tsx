@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
@@ -115,20 +115,23 @@ export default function TablePermintaanPenawaran() {
                 <td className="px-6 text-gray-500">
                   {formatTanggal(item.tanggalMasuk)}
                 </td>
-                <td className="px-6 font-semibold text-slate-600">
-                  {item.nomorPenawaran}
+                <td className={`px-6 ${item.nomorPenawaran ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
+                  {item.nomorPenawaran || "-"}
                 </td>
-                <td className="px-6 font-semibold text-slate-600">
-                  {item.perusahaanName || "—"}
+                <td className={`px-6 ${item.perusahaanName ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
+                  {item.perusahaanName || "-"}
+                  {item.lokasiProyek && (
+                    <span className="text-gray-500 font-medium ml-1">
+                      ({item.lokasiProyek})
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 text-gray-500 font-medium">
-                  {item.pembuatPenawaran?.nama ?? "—"}
+                  {item.pembuatPenawaran?.nama || "-"}
                 </td>
                 {isMaster && (
                   <td className="px-6 font-medium text-gray-500">
-                    {formatRupiah(item.estimasiHarga) ?? (
-                      <span className="text-gray-300">Belum Tersedia</span>
-                    )}
+                    {formatRupiah(item.estimasiHarga) || "-"}
                   </td>
                 )}
                 <td className="px-6">
@@ -140,11 +143,11 @@ export default function TablePermintaanPenawaran() {
                       >
                         {jenis.replace("_", " ")}
                       </span>
-                    )) || "—"}
+                    )) || "-"}
                   </div>
                 </td>
                 <td className="px-6 text-gray-500 font-medium text-center">
-                  {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
+                  {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "-"}
                 </td>
                 <td className="px-6 text-right">
                   <Link

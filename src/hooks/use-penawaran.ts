@@ -15,6 +15,7 @@ import {
   deletePenawaranDokumen,
   getPegawaiByDivisi,
   updateDetailTrackingPenawaran,
+  updateNomorPenawaran,
   assignMarketing,
   type StatusPermintaan,
 } from "@/services/penawaran.services";
@@ -197,6 +198,18 @@ export function useAssignMarketing(trackingId: string) {
   return useMutation({
     mutationFn: (marketingId: string) =>
       assignMarketing(trackingId, marketingId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
+    },
+  });
+}
+
+
+export function useUpdateNomorPenawaran(trackingId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (nomorPenawaran: string) =>
+      updateNomorPenawaran(trackingId, nomorPenawaran),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
     },

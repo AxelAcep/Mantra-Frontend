@@ -4,6 +4,7 @@ import DocumentSectionBoQ from "./DocumentSectionBoQ";
 import ActivityLogSection from "../step1/ActivityLogSection";
 import DetailSectionBoQ from "./DetailSectionBoQ";
 import { usePreloadBoQ, useUpdateSubTotalBoQ } from "@/hooks/use-boq";
+import { useUpdateNomorPenawaran } from "@/hooks/use-penawaran";
 //  1. IMPORT HOOK MUTASI YANG SUDAH KITA BUAT
 import { useUploadDokumenBoQ, useDeleteDokumenBoQ } from "@/hooks/use-boq";
 import type { Mode } from "../step1";
@@ -113,6 +114,7 @@ export default function Step2({
   const uploadMut = useUploadDokumenBoQ(trackingId);
   const deleteMut = useDeleteDokumenBoQ(trackingId);
   const updateSubTotalMut = useUpdateSubTotalBoQ(trackingId);
+  const updateNomorMut = useUpdateNomorPenawaran(trackingId);
 
   if (loading) {
     return (
@@ -195,9 +197,12 @@ export default function Step2({
           mode={mode}
           financial={financialData}
           workingTime={workingTimeData}
-          onSave={(body) => updateSubTotalMut.mutate(body)} // ← tambahin ini
-          isSaving={updateSubTotalMut.isPending} // ← tambahin ini
-          userDivisi={userDivisi} // ← oper ke sini
+          nomorPenawaran={boqData?.trackingPenawaran?.nomorPenawaran}
+          onSave={(body) => updateSubTotalMut.mutate(body)}
+          onSaveNomorPenawaran={(nomor) => updateNomorMut.mutate(nomor)}
+          isSaving={updateSubTotalMut.isPending}
+          isSavingNomor={updateNomorMut.isPending}
+          userDivisi={userDivisi}
           boqActivityStatus={workingTimeData.status}
         />
 

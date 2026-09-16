@@ -154,12 +154,7 @@ export default function RequestDetailSection({
       </div>
 
       {/* Fields */}
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        <DetailField
-          label="Nomor Penawaran"
-          value={tracking?.nomorPenawaran ? `#${tracking.nomorPenawaran}` : "-"}
-        // Nomor penawaran tidak bisa diedit
-        />
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <DetailField
           label="Customer Name"
           value={tracking?.customerName}
@@ -169,24 +164,40 @@ export default function RequestDetailSection({
             setForm((prev) => ({ ...prev, customerName: val }))
           }
         />
-        <DetailField
-          label="Customer Phone Number"
-          value={tracking?.customerPhone}
-          editing={isEditing}
-          inputValue={form.customerPhone}
-          onInputChange={(val) =>
-            setForm((prev) => ({ ...prev, customerPhone: val }))
-          }
-        />
-        <DetailField
-          label="Customer E-Mail"
-          value={tracking?.customerEmail}
-          editing={isEditing}
-          inputValue={form.customerEmail}
-          onInputChange={(val) =>
-            setForm((prev) => ({ ...prev, customerEmail: val }))
-          }
-        />
+        <div className="bg-slate-50/70 rounded-xl border border-gray-100 p-4 min-h-[88px]">
+          <p className="text-[11px] text-gray-400 font-bold mb-2 uppercase tracking-tight">
+            Customer Phone & Email
+          </p>
+          {isEditing ? (
+            <div className="space-y-2">
+              <input
+                value={form.customerPhone}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, customerPhone: e.target.value }))
+                }
+                placeholder="No. Telepon"
+                className="w-full bg-white border border-cyan-300 rounded-lg px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              />
+              <input
+                value={form.customerEmail}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, customerEmail: e.target.value }))
+                }
+                placeholder="Email"
+                className="w-full bg-white border border-cyan-300 rounded-lg px-3 py-1.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              />
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-slate-800">
+                {tracking?.customerPhone || "-"}
+              </p>
+              <p className="text-sm font-medium text-slate-700">
+                {tracking?.customerEmail || "-"}
+              </p>
+            </div>
+          )}
+        </div>
         <DetailField
           label="Lokasi Proyek"
           value={tracking?.lokasiProyek}
@@ -203,7 +214,6 @@ export default function RequestDetailSection({
               ? tracking.jenisPenawaran.map((j) => JENIS_LABEL[j] ?? j)
               : []
           }
-        // Jenis penawaran tidak diedit di sini
         />
       </div>
 
