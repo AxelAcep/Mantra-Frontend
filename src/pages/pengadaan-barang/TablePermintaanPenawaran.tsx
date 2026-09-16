@@ -33,38 +33,6 @@ function formatRupiah(nilai: number | null | undefined) {
   }).format(nilai);
 }
 
-type StatusType =
-  | "ON_PROGRESS"
-  | "PERLU_TINDAKAN"
-  | "KONFIRMASI_SELESAI"
-  | "SELESAI";
-
-function StatusBadge({ status }: { status: StatusType }) {
-  const config: Record<StatusType, string> = {
-    ON_PROGRESS: "bg-orange-100 text-orange-700",
-    PERLU_TINDAKAN: "bg-red-100 text-red-700",
-    KONFIRMASI_SELESAI: "bg-amber-100 text-amber-700",
-    SELESAI: "bg-emerald-100 text-emerald-700",
-  };
-
-  const label: Record<StatusType, string> = {
-    ON_PROGRESS: "On Progress",
-    PERLU_TINDAKAN: "Perlu Tindakan",
-    KONFIRMASI_SELESAI: "Menunggu Konfirmasi",
-    SELESAI: "Selesai",
-  };
-
-  const safeStatus: StatusType = config[status] ? status : "ON_PROGRESS";
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${config[safeStatus]}`}
-    >
-      {label[safeStatus]}
-    </span>
-  );
-}
-
 export default function TablePermintaanPenawaran() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -100,10 +68,10 @@ export default function TablePermintaanPenawaran() {
               <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Tanggal Permintaan</th>
               <th className="px-6 py-4">No. Penawaran</th>
-              <th className="px-6 py-4">PIC Req</th>
+              <th className="px-6 py-4">Nama Perusahaan</th>
               <th className="px-6 py-4">Pembuat Penawaran</th>
-              {isMaster && <th className="px-6 py-4">Estimasi Nilai</th>}
-              <th className="px-6 py-4 text-center">Status</th>
+              {isMaster && <th className="px-6 py-4">Harga</th>}
+              <th className="px-6 py-4">Jenis Pengadaan</th>
               <th className="px-6 py-4 text-center">Tahapan</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
@@ -139,54 +107,55 @@ export default function TablePermintaanPenawaran() {
                 </td>
               </tr>
             )}
-            {!isError && data?.data.map((item) => {
-              const status = (item.status ?? "ON_PROGRESS") as StatusType;
-              return (
-                <tr
-                  key={item.id}
-                  className={`transition-colors border-b ${status === "PERLU_TINDAKAN"
-                    ? "bg-[#fffbeb]"
-                    : "hover:bg-slate-50/50"
-                    } [&_td]:py-4`}
-                >
-                  <td className="px-6 text-gray-500">
-                    {formatTanggal(item.tanggalMasuk)}
+            {!isError && data?.data.map((item) => (
+              <tr
+                key={item.id}
+                className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4"
+              >
+                <td className="px-6 text-gray-500">
+                  {formatTanggal(item.tanggalMasuk)}
+                </td>
+                <td className="px-6 font-semibold text-slate-600">
+                  {item.nomorPenawaran}
+                </td>
+                <td className="px-6 font-semibold text-slate-600">
+                  {item.perusahaanName || "—"}
+                </td>
+                <td className="px-6 text-gray-500 font-medium">
+                  {item.pembuatPenawaran?.nama ?? "—"}
+                </td>
+                {isMaster && (
+                  <td className="px-6 font-medium text-gray-500">
+                    {formatRupiah(item.estimasiHarga) ?? (
+                      <span className="text-gray-300">Belum Tersedia</span>
+                    )}
                   </td>
-                  <td className="px-6 font-semibold text-slate-600">
-                    {item.nomorPenawaran}
-                  </td>
-                  <td className="px-6 font-semibold text-slate-600">
-                    {item.picReq?.nama ?? "—"}
-                  </td>
-                  <td className="px-6 text-gray-500 font-medium">
-                    {item.pembuatPenawaran?.nama ?? "—"}
-                  </td>
-                  {isMaster && (
-                    <td className="px-6 font-medium text-gray-500">
-                      {formatRupiah(item.estimasiHarga) ?? (
-                        <span className="text-gray-300">Belum Tersedia</span>
-                      )}
-                    </td>
-                  )}
-                  <td className="px-6">
-                    <div className="flex justify-center">
-                      <StatusBadge status={status} />
-                    </div>
-                  </td>
-                  <td className="px-6 text-gray-500 font-medium text-center">
-                    {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
-                  </td>
-                  <td className="px-6 text-right">
-                    <Link
-                      className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
-                      to={`/penawaran/${item.id}`}
-                    >
-                      Lihat Detail <ArrowRight size={14} />
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
+                )}
+                <td className="px-6">
+                  <div className="flex flex-wrap gap-1">
+                    {item.jenisPenawaran?.map((jenis) => (
+                      <span
+                        key={jenis}
+                        className="px-2 py-0.5 bg-gray-100 text-slate-600 rounded text-[10px] font-bold border border-gray-200 uppercase"
+                      >
+                        {jenis.replace("_", " ")}
+                      </span>
+                    )) || "—"}
+                  </div>
+                </td>
+                <td className="px-6 text-gray-500 font-medium text-center">
+                  {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "—"}
+                </td>
+                <td className="px-6 text-right">
+                  <Link
+                    className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
+                    to={`/penawaran/${item.id}`}
+                  >
+                    Lihat Detail <ArrowRight size={14} />
+                  </Link>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
         </div>

@@ -199,11 +199,12 @@ export default function TrackingGaransiSection({
 
   // Hitung sisa bulan berdasarkan waktu kalender (bukan progress bar)
   const now = new Date();
-  const lastMonth = months[months.length - 1];
+  const lastMonth = months.length > 0 ? months[months.length - 1] : null;
   const bulanSekarang = now.getMonth() + 1; // 1-12
   const tahunSekarang = now.getFullYear();
-  const sisaBulanKalender =
-    (lastMonth.tahun - tahunSekarang) * 12 + (lastMonth.bulan - bulanSekarang);
+  const sisaBulanKalender = lastMonth
+    ? (lastMonth.tahun - tahunSekarang) * 12 + (lastMonth.bulan - bulanSekarang)
+    : 0;
   const showWarning = sisaBulanKalender > 0 && sisaBulanKalender <= 4;
   const progressPercent = totalBulan ? (bulanTerlaksana / totalBulan) * 100 : 0;
   const [showPreviewWarning, setShowPreviewWarning] = useState(false);

@@ -155,7 +155,7 @@ export default function BuatPenawaran() {
             <ArrowLeft size={18} />
           </button>
           <h1 className="text-2xl font-bold text-slate-800">
-            Buat Penawaran Baru
+            Request Penawaran Baru
           </h1>
         </div>
         <p className="text-sm text-gray-500 mb-8 ml-12">

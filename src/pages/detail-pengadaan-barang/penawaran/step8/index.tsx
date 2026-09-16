@@ -122,6 +122,15 @@ export default function Step8({ trackingId }: Step8Props) {
               isSaving={konfiguring}
               onSubmit={konfigurasiTimeline}
             />
+          ) : garansi.kategoriGaransi === "TIDAK_ADA" ? (
+            <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mt-6">
+              <h3 className="font-bold text-slate-800 text-sm mb-2">
+                Tidak Ada Garansi
+              </h3>
+              <p className="text-sm text-gray-500">
+                Pengadaan ini tidak memiliki garansi.
+              </p>
+            </div>
           ) : (
             <TrackingGaransiSection
               picGaransi={garansi.pic?.nama ?? "-"}
@@ -135,7 +144,7 @@ export default function Step8({ trackingId }: Step8Props) {
           )}
         </div>
 
-        {garansi.status !== "BELUM_DIKONFIGURASI" && (
+        {garansi.status !== "BELUM_DIKONFIGURASI" && garansi.kategoriGaransi !== "TIDAK_ADA" && (
           <div>
             <SectionHeading title="Dokumen" />
             <div className="space-y-4 mt-6">

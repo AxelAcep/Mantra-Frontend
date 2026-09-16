@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 type TabName =
   | "Permintaan Penawaran"
-  | "Pengadaan Aktif"
+  | "PO Aktif"
   | "BAST"
   | "Konfirmasi Selesai"
   | "Garansi"
@@ -21,7 +21,7 @@ type TabName =
 
 const tabs: TabName[] = [
   "Permintaan Penawaran",
-  "Pengadaan Aktif",
+  "PO Aktif",
   "BAST",
   "Konfirmasi Selesai",
   "Garansi",
@@ -59,7 +59,7 @@ export default function ListPengadaan() {
     switch (activeTab) {
       case "Permintaan Penawaran":
         return <TablePermintaanPenawaran />;
-      case "Pengadaan Aktif":
+      case "PO Aktif":
         return <TablePengadaanAktif />;
       case "BAST":
         return <TabelPembayaran />;
@@ -102,7 +102,7 @@ export default function ListPengadaan() {
               className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
             >
               <Plus size={16} />
-              Buat Penawaran
+              Request Penawaran
             </button>
           )}
         </div>
