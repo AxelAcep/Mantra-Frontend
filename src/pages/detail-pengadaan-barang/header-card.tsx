@@ -44,10 +44,6 @@ export default function TrackingHeader({
           </div>
         </div>
       </div>
-
-      <span className="self-start md:self-center px-6 py-2 bg-yellow-50 text-yellow-700 border border-yellow-100 rounded-full text-sm font-medium shadow-sm">
-        Status: {status}
-      </span>
     </div>
   )
 }

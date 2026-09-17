@@ -63,7 +63,7 @@ function DetailField({
         </div>
       ) : (
         <p
-          className={`text-sm leading-snug ${strong ? "font-bold text-slate-800" : "font-medium text-slate-700"
+          className={`text-sm leading-snug break-words ${strong ? "font-bold text-slate-800" : "font-medium text-slate-700"
             }`}
         >
           {value ?? "-"}
@@ -188,7 +188,7 @@ export default function RequestDetailSection({
               />
             </div>
           ) : (
-            <p className="text-sm text-slate-800">
+            <p className="text-sm text-slate-800 break-words">
               <span className="font-bold">{tracking?.customerPhone || "-"}</span>
               {" / "}
               <span className="font-medium text-slate-700">{tracking?.customerEmail || "-"}</span>

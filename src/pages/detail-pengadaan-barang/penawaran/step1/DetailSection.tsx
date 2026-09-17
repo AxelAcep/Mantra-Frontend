@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Clock3 } from "lucide-react";
+import { User, Clock3, Pencil } from "lucide-react";
 import type { TrackingPenawaranDetail } from "@/services/penawaran.services";
 import {
   useAssignPreSales,
@@ -139,7 +139,7 @@ function AssignCard({
             }}
             className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-xs font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95 shrink-0"
           >
-            Ubah
+            <Pencil size={13} /> Edit
           </button>
         </div>
       </div>

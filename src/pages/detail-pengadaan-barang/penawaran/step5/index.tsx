@@ -201,7 +201,7 @@ export default function Step5({
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex-1">
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex-1 overflow-hidden">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
               <User size={16} className="text-gray-500" /> Kontak Klien
             </div>
