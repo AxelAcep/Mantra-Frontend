@@ -188,14 +188,11 @@ export default function RequestDetailSection({
               />
             </div>
           ) : (
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-800">
-                {tracking?.customerPhone || "-"}
-              </p>
-              <p className="text-sm font-medium text-slate-700">
-                {tracking?.customerEmail || "-"}
-              </p>
-            </div>
+            <p className="text-sm text-slate-800">
+              <span className="font-bold">{tracking?.customerPhone || "-"}</span>
+              {" / "}
+              <span className="font-medium text-slate-700">{tracking?.customerEmail || "-"}</span>
+            </p>
           )}
         </div>
         <DetailField
