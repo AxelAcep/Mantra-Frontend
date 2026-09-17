@@ -50,6 +50,7 @@ export interface LogBast {
 export interface BastEntry {
   id: string;
   bastId: string;
+  index: number;
   noReferensi: string;
   tanggalTerbit?: string;
   tanggalSerahTerima?: string;

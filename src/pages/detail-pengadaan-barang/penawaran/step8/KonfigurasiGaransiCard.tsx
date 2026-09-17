@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Settings, ArrowLeft, ArrowRight, ShieldCheck, Flame, X } from "lucide-react";
+import { Settings, ArrowLeft, ArrowRight, ShieldCheck, Flame, Calendar, X } from "lucide-react";
 import {
   type KategoriGaransi,
+  type KategoriBastGaransi,
   KATEGORI_GARANSI_LABELS,
   KATEGORI_GARANSI_JUMLAH,
+  allowedKategoriGaransi,
 } from "@/services/garansi.service";
 
 const BULAN_OPTIONS = [
@@ -21,49 +23,32 @@ const BULAN_OPTIONS = [
   { value: 12, label: "Desember" },
 ];
 
-type KategoriOption = {
-  id: KategoriGaransi;
-  icon: React.ReactNode;
-  color: string;
-  borderColor: string;
+const KATEGORI_ICON: Record<KategoriGaransi, React.ReactNode> = {
+  PAC_DALAM_KOTA: <ShieldCheck size={20} />,
+  PAC_LUAR_KOTA: <ShieldCheck size={20} />,
+  FIRE_DALAM_KOTA: <Flame size={20} />,
+  FIRE_LUAR_KOTA: <Flame size={20} />,
+  UMUM: <Calendar size={20} />,
+  TIDAK_ADA: <X size={20} />,
 };
 
-const KATEGORI_OPTIONS: KategoriOption[] = [
-  {
-    id: "PAC_DALAM_KOTA",
-    icon: <ShieldCheck size={20} />,
-    color: "text-blue-600",
-    borderColor: "border-blue-200 hover:border-blue-400",
-  },
-  {
-    id: "FIRE_DALAM_KOTA",
-    icon: <Flame size={20} />,
-    color: "text-orange-600",
-    borderColor: "border-orange-200 hover:border-orange-400",
-  },
-  {
-    id: "PAC_LUAR_KOTA",
-    icon: <ShieldCheck size={20} />,
-    color: "text-blue-500",
-    borderColor: "border-blue-100 hover:border-blue-300",
-  },
-  {
-    id: "FIRE_LUAR_KOTA",
-    icon: <Flame size={20} />,
-    color: "text-orange-500",
-    borderColor: "border-orange-100 hover:border-orange-300",
-  },
-  {
-    id: "TIDAK_ADA",
-    icon: <X size={20} />,
-    color: "text-slate-500",
-    borderColor: "border-slate-200 hover:border-slate-400",
-  },
-];
+const KATEGORI_COLOR: Record<KategoriGaransi, string> = {
+  PAC_DALAM_KOTA: "text-blue-600 border-blue-200 hover:border-blue-400",
+  PAC_LUAR_KOTA: "text-blue-500 border-blue-100 hover:border-blue-300",
+  FIRE_DALAM_KOTA: "text-orange-600 border-orange-200 hover:border-orange-400",
+  FIRE_LUAR_KOTA: "text-orange-500 border-orange-100 hover:border-orange-300",
+  UMUM: "text-cyan-600 border-cyan-200 hover:border-cyan-400",
+  TIDAK_ADA: "text-slate-500 border-slate-200 hover:border-slate-400",
+};
 
 interface KonfigurasiGaransiCardProps {
+  // Kategori inti (PAC/FIRE/UMUM) udah ke-detect otomatis dari BAST — kartu
+  // ini cuma nawarin pilihan dalam/luar kota (atau generik) yang relevan buat
+  // kategori itu, bukan milih PAC/FIRE-nya (itu udah ketentuan, bukan pilihan).
+  kategoriBast: KategoriBastGaransi;
   isSaving: boolean;
   onSubmit: (payload: {
+    kategoriBast: KategoriBastGaransi;
     kategoriGaransi: KategoriGaransi;
     lamaTahun: number;
     bulanMulai: number;
@@ -72,10 +57,13 @@ interface KonfigurasiGaransiCardProps {
 }
 
 export default function KonfigurasiGaransiCard({
+  kategoriBast,
   isSaving,
   onSubmit,
 }: KonfigurasiGaransiCardProps) {
   const now = new Date();
+  const options = allowedKategoriGaransi(kategoriBast);
+
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedKategori, setSelectedKategori] =
     useState<KategoriGaransi | null>(null);
@@ -84,48 +72,13 @@ export default function KonfigurasiGaransiCard({
   const [tahunMulai, setTahunMulai] = useState(now.getFullYear());
   const [formError, setFormError] = useState<string | null>(null);
 
-  const handleSelectKategori = (kategori: KategoriGaransi) => {
-    if (kategori === "TIDAK_ADA") {
-      setSelectedKategori(kategori);
-      handleSubmitKategori(kategori);
-    } else {
-      setSelectedKategori(kategori);
-      setStep(2);
-    }
-  };
-
-  const handleSubmitKategori = async (kategori: KategoriGaransi) => {
+  const submit = async (
+    kategori: KategoriGaransi,
+    payload: { lamaTahun: number; bulanMulai: number; tahunMulai: number },
+  ) => {
     setFormError(null);
     try {
-      await onSubmit({
-        kategoriGaransi: kategori,
-        lamaTahun: 1,
-        bulanMulai: now.getMonth() + 1,
-        tahunMulai: now.getFullYear(),
-      });
-    } catch (err) {
-      setFormError(
-        err instanceof Error
-          ? err.message
-          : "Gagal mengkonfigurasi garansi.",
-      );
-    }
-  };
-
-  const handleSubmitTimeline = async () => {
-    setFormError(null);
-    if (lamaTahun <= 0) {
-      setFormError("Lama tahun garansi wajib diisi.");
-      return;
-    }
-    if (!selectedKategori) return;
-    try {
-      await onSubmit({
-        kategoriGaransi: selectedKategori,
-        lamaTahun,
-        bulanMulai,
-        tahunMulai,
-      });
+      await onSubmit({ kategoriBast, kategoriGaransi: kategori, ...payload });
     } catch (err) {
       setFormError(
         err instanceof Error
@@ -135,6 +88,29 @@ export default function KonfigurasiGaransiCard({
     }
   };
 
+  const handleSelectKategori = (kategori: KategoriGaransi) => {
+    if (kategori === "TIDAK_ADA") {
+      setSelectedKategori(kategori);
+      submit(kategori, {
+        lamaTahun: 1,
+        bulanMulai: now.getMonth() + 1,
+        tahunMulai: now.getFullYear(),
+      });
+    } else {
+      setSelectedKategori(kategori);
+      setStep(2);
+    }
+  };
+
+  const handleSubmitTimeline = async () => {
+    if (lamaTahun <= 0) {
+      setFormError("Lama tahun garansi wajib diisi.");
+      return;
+    }
+    if (!selectedKategori) return;
+    await submit(selectedKategori, { lamaTahun, bulanMulai, tahunMulai });
+  };
+
   const previewJumlah = (() => {
     if (!selectedKategori || selectedKategori === "TIDAK_ADA") return null;
     const map: Record<string, number> = {
@@ -142,6 +118,7 @@ export default function KonfigurasiGaransiCard({
       PAC_LUAR_KOTA: 2,
       FIRE_DALAM_KOTA: 4,
       FIRE_LUAR_KOTA: 2,
+      UMUM: 12,
     };
     const perTahun = map[selectedKategori] ?? 0;
     return perTahun * lamaTahun;
@@ -168,22 +145,20 @@ export default function KonfigurasiGaransiCard({
 
       {step === 1 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          {KATEGORI_OPTIONS.map((opt) => (
+          {options.map((opt) => (
             <button
-              key={opt.id}
-              onClick={() => handleSelectKategori(opt.id)}
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all hover:shadow-md cursor-pointer ${opt.borderColor} ${
-                selectedKategori === opt.id
-                  ? "ring-2 ring-cyan-400"
-                  : ""
+              key={opt}
+              onClick={() => handleSelectKategori(opt)}
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all hover:shadow-md cursor-pointer ${KATEGORI_COLOR[opt]} ${
+                selectedKategori === opt ? "ring-2 ring-cyan-400" : ""
               }`}
             >
-              <div className={opt.color}>{opt.icon}</div>
+              <div>{KATEGORI_ICON[opt]}</div>
               <span className="text-xs font-bold text-slate-700 text-center">
-                {KATEGORI_GARANSI_LABELS[opt.id]}
+                {KATEGORI_GARANSI_LABELS[opt]}
               </span>
               <span className="text-[10px] text-slate-400 text-center">
-                {KATEGORI_GARANSI_JUMLAH[opt.id]}
+                {KATEGORI_GARANSI_JUMLAH[opt]}
               </span>
             </button>
           ))}

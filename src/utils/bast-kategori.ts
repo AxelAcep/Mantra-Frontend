@@ -23,3 +23,14 @@ export const KATEGORI_BAST_LABEL: Record<KategoriBast, string> = {
   FIRE: "Fire",
   UMUM: "",
 };
+
+// Nomor BAST yang DITAMPILKAN di FE — beda dari kode asli (noReferensi) yang
+// digenerate backend. Auto-increment per kategori: BAST/PAC/01, BAST/PAC/02,
+// BAST/FP/01, dst. Kalau gak ada kategori (UMUM), cukup BAST/01. Murni
+// tampilan, gak ngubah data yang beneran tersimpan di backend.
+export function formatNomorBast(kategori: KategoriBast, index: number): string {
+  const nomor = String(index).padStart(2, "0");
+  if (kategori === "PAC") return `BAST/PAC/${nomor}`;
+  if (kategori === "FIRE") return `BAST/FP/${nomor}`;
+  return `BAST/${nomor}`;
+}

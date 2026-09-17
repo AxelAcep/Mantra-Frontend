@@ -5,10 +5,11 @@ import {
   updateTanggalKunjunganGaransi,
   type GaransiResponse,
   type KategoriGaransi,
+  type KategoriBastGaransi,
 } from "@/services/garansi.service";
 
 export function useGaransi(trackingId: string) {
-  const [garansi, setGaransi] = useState<GaransiResponse | null>(null);
+  const [garansis, setGaransis] = useState<GaransiResponse[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [konfiguring, setKonfiguring] = useState(false);
@@ -20,7 +21,7 @@ export function useGaransi(trackingId: string) {
     setError(null);
     try {
       const data = await getDetailGaransi(trackingId);
-      setGaransi(data);
+      setGaransis(data);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Gagal mengambil data Garansi.",
@@ -36,6 +37,7 @@ export function useGaransi(trackingId: string) {
 
   const konfigurasiTimeline = useCallback(
     async (payload: {
+      kategoriBast?: KategoriBastGaransi;
       kategoriGaransi: KategoriGaransi;
       lamaTahun: number;
       bulanMulai: number;
@@ -45,7 +47,7 @@ export function useGaransi(trackingId: string) {
       setError(null);
       try {
         const data = await konfigurasiGaransi(trackingId, payload);
-        setGaransi(data);
+        setGaransis(data);
         return data;
       } catch (err) {
         setError(
@@ -69,7 +71,7 @@ export function useGaransi(trackingId: string) {
         const data = await updateTanggalKunjunganGaransi(trackingId, monthId, {
           tanggalKunjungan,
         });
-        setGaransi(data);
+        setGaransis(data);
         return data;
       } catch (err) {
         setError(
@@ -86,7 +88,7 @@ export function useGaransi(trackingId: string) {
   );
 
   return {
-    garansi,
+    garansis,
     loading,
     error,
     konfiguring,

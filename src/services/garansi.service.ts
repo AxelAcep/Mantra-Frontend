@@ -82,10 +82,16 @@ export interface GaransiMonth {
   updatedAt: string;
 }
 
+export type KategoriBastGaransi = "PAC" | "FIRE" | "UMUM";
+
 export interface GaransiResponse {
   id: string;
   trackingPenawaranId: string;
   trackingPenawaran?: TrackingPenawaranDetail;
+  // Kategori inti — otomatis ke-detect dari Bast yang men-trigger Garansi
+  // ini. Tracking bisa punya sampai 2 Garansi (PAC & FIRE) kalau BAST-nya
+  // juga kebentuk 2, persis mekanisme BAST.
+  kategoriBast: KategoriBastGaransi;
   bastId: string;
   picId: string;
   pic?: { id: string; nama: string; divisi?: string };
@@ -105,6 +111,7 @@ export type KategoriGaransi =
   | "PAC_LUAR_KOTA"
   | "FIRE_DALAM_KOTA"
   | "FIRE_LUAR_KOTA"
+  | "UMUM"
   | "TIDAK_ADA";
 
 export const KATEGORI_GARANSI_LABELS: Record<KategoriGaransi, string> = {
@@ -112,6 +119,7 @@ export const KATEGORI_GARANSI_LABELS: Record<KategoriGaransi, string> = {
   PAC_LUAR_KOTA: "PAC Luar Kota",
   FIRE_DALAM_KOTA: "Fire Dalam Kota",
   FIRE_LUAR_KOTA: "Fire Luar Kota",
+  UMUM: "Garansi Bulanan",
   TIDAK_ADA: "Tidak Ada Garansi",
 };
 
@@ -120,12 +128,25 @@ export const KATEGORI_GARANSI_JUMLAH: Record<KategoriGaransi, string> = {
   PAC_LUAR_KOTA: "2x/tahun (6 bulan interval)",
   FIRE_DALAM_KOTA: "4x/tahun (3 bulan interval)",
   FIRE_LUAR_KOTA: "2x/tahun (6 bulan interval)",
+  UMUM: "12x/tahun (1/bulan)",
   TIDAK_ADA: "Tanpa garansi",
 };
 
+// Opsi kategori garansi yang boleh dipilih, dibatasin sesuai KategoriBast si
+// Garansi (harus sinkron sama backend models.AllowedKategoriGaransi).
+export function allowedKategoriGaransi(
+  kategoriBast: KategoriBastGaransi,
+): KategoriGaransi[] {
+  if (kategoriBast === "PAC") return ["PAC_DALAM_KOTA", "PAC_LUAR_KOTA", "TIDAK_ADA"];
+  if (kategoriBast === "FIRE") return ["FIRE_DALAM_KOTA", "FIRE_LUAR_KOTA", "TIDAK_ADA"];
+  return ["UMUM", "TIDAK_ADA"];
+}
+
+// GET .../garansi sekarang balikin LIST (bisa 1 atau 2 Garansi tergantung
+// kategori yang kedetect dari BAST tracking-nya).
 export async function getDetailGaransi(
   trackingId: string,
-): Promise<GaransiResponse> {
+): Promise<GaransiResponse[]> {
   const res = await fetchClient(`/tracking-penawaran/${trackingId}/garansi`, {
     method: "GET",
     headers: authHeaders(),
@@ -140,12 +161,13 @@ export async function getDetailGaransi(
 export async function konfigurasiGaransi(
   trackingId: string,
   payload: {
+    kategoriBast?: KategoriBastGaransi; // wajib kalau tracking punya 2 Garansi
     kategoriGaransi: KategoriGaransi;
     lamaTahun: number;
     bulanMulai: number;
     tahunMulai: number;
   },
-): Promise<GaransiResponse> {
+): Promise<GaransiResponse[]> {
   const res = await fetchClient(
     `/tracking-penawaran/${trackingId}/garansi/konfigurasi`,
     {
@@ -168,7 +190,7 @@ export async function updateTanggalKunjunganGaransi(
   trackingId: string,
   monthId: string,
   payload: { tanggalKunjungan: string },
-): Promise<GaransiResponse> {
+): Promise<GaransiResponse[]> {
   const res = await fetchClient(
     `/tracking-penawaran/${trackingId}/garansi/month/${monthId}/tanggal-kunjungan`,
     {

@@ -3,7 +3,7 @@ import { useBast } from "@/hooks/use-bast";
 import DetailSectionBast from "./DetailSectionBast";
 import DocumentSectionBast from "./DocumentSectionBast";
 import ActivityLogSectionBast from "./ActivityLogSection";
-import { KATEGORI_BAST_LABEL } from "@/utils/bast-kategori";
+import { KATEGORI_BAST_LABEL, formatNomorBast } from "@/utils/bast-kategori";
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -98,27 +98,28 @@ export default function Step7({ trackingId }: Step7Props) {
                 </p>
               ) : (
                 <div className="space-y-8 mt-4">
-                  {entries.map((entry, i) => (
-                    <div key={entry.id}>
-                      <SubHeading
-                        title={
-                          kategoriLabel
-                            ? `BAST ${kategoriLabel} ${i + 1}`
-                            : `BAST ${i + 1}`
-                        }
-                      />
-                      <DetailSectionBast
-                        noReferensi={entry.noReferensi}
-                        tanggalTerbit={entry.tanggalTerbit}
-                        tanggalSerahTerima={entry.tanggalSerahTerima}
-                        isSaving={updating}
-                        onSave={(payload) => updateBast(entry.id, payload)}
-                      />
-                      <DocumentSectionBast
-                        activityAdminProyek={entry.activityAdminProyek}
-                      />
-                    </div>
-                  ))}
+                  {entries.map((entry, i) => {
+                    const entryIndex = entry.index || i + 1;
+                    return (
+                      <div key={entry.id}>
+                        <SubHeading
+                          title={formatNomorBast(bast.kategori, entryIndex)}
+                        />
+                        <DetailSectionBast
+                          kategori={bast.kategori}
+                          index={entryIndex}
+                          noReferensi={entry.noReferensi}
+                          tanggalTerbit={entry.tanggalTerbit}
+                          tanggalSerahTerima={entry.tanggalSerahTerima}
+                          isSaving={updating}
+                          onSave={(payload) => updateBast(entry.id, payload)}
+                        />
+                        <DocumentSectionBast
+                          activityAdminProyek={entry.activityAdminProyek}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

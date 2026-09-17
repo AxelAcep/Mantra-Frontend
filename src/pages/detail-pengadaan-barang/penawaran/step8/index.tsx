@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGaransi } from "@/hooks/use-garansi";
 import TrackingGaransiSection from "./TrackingGaransi";
 import LogBookSection from "./LogBook";
 import DokumenPendukungSection from "./DokumenPendukung";
 import ActivityLogSectionGaransi from "./ActivityLog";
 import KonfigurasiGaransiCard from "./KonfigurasiGaransiCard";
+import type { GaransiResponse } from "@/services/garansi.service";
 
 const NAMA_BULAN_PANJANG = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
+
+const TAB_LABEL: Record<string, string> = {
+  PAC: "PAC",
+  FIRE: "FirePro",
+  UMUM: "Garansi",
+};
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -24,44 +31,21 @@ interface Step8Props {
   trackingId: string;
 }
 
-export default function Step8({ trackingId }: Step8Props) {
-  const {
-    garansi,
-    loading,
-    error,
-    refetch,
-    konfiguring,
-    konfigurasiTimeline,
-    updatingTanggal,
-    updateTanggalKunjungan,
-  } = useGaransi(trackingId);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] text-slate-500">
-        <p className="animate-pulse">Memuat data Garansi...</p>
-      </div>
-    );
-  }
-
-  if (error || !garansi) {
-    return (
-      <div className="p-6 text-center border border-red-100 bg-red-50 rounded-xl space-y-3">
-        <p className="text-red-600 font-medium">
-          {error
-            ? `Gagal memuat data Garansi: ${error}`
-            : "Data Garansi belum tersedia. Garansi otomatis dibuat setelah BAST selesai."}
-        </p>
-        <button
-          onClick={() => refetch()}
-          className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
-        >
-          Coba Lagi
-        </button>
-      </div>
-    );
-  }
-
+// Isi satu tab Garansi (dipakai baik ada 1 Garansi doang maupun pas lagi
+// nampilin salah satu dari 2 tab PAC/FirePro).
+function GaransiTabContent({
+  garansi,
+  konfiguring,
+  konfigurasiTimeline,
+  updatingTanggal,
+  updateTanggalKunjungan,
+}: {
+  garansi: GaransiResponse;
+  konfiguring: boolean;
+  konfigurasiTimeline: ReturnType<typeof useGaransi>["konfigurasiTimeline"];
+  updatingTanggal: boolean;
+  updateTanggalKunjungan: ReturnType<typeof useGaransi>["updateTanggalKunjungan"];
+}) {
   const months = garansi.months ?? [];
 
   const periodeMulai =
@@ -119,6 +103,7 @@ export default function Step8({ trackingId }: Step8Props) {
           <SectionHeading title="Detail" />
           {garansi.status === "BELUM_DIKONFIGURASI" ? (
             <KonfigurasiGaransiCard
+              kategoriBast={garansi.kategoriBast}
               isSaving={konfiguring}
               onSubmit={konfigurasiTimeline}
             />
@@ -158,6 +143,82 @@ export default function Step8({ trackingId }: Step8Props) {
       <div className="col-span-12 lg:col-span-3">
         <ActivityLogSectionGaransi logs={mappedLogs} />
       </div>
+    </div>
+  );
+}
+
+export default function Step8({ trackingId }: Step8Props) {
+  const {
+    garansis,
+    loading,
+    error,
+    refetch,
+    konfiguring,
+    konfigurasiTimeline,
+    updatingTanggal,
+    updateTanggalKunjungan,
+  } = useGaransi(trackingId);
+
+  // Tracking bisa punya sampai 2 Garansi (PAC & FirePro) kalau BAST-nya juga
+  // kebentuk 2 — cuma dijadiin tab terpisah kalau memang ada 2. Kalau cuma 1
+  // (PAC aja, Fire aja, atau UMUM) tetep tampil langsung tanpa tab.
+  const [activeTab, setActiveTab] = useState(0);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] text-slate-500">
+        <p className="animate-pulse">Memuat data Garansi...</p>
+      </div>
+    );
+  }
+
+  if (error || !garansis || garansis.length === 0) {
+    return (
+      <div className="p-6 text-center border border-red-100 bg-red-50 rounded-xl space-y-3">
+        <p className="text-red-600 font-medium">
+          {error
+            ? `Gagal memuat data Garansi: ${error}`
+            : "Data Garansi belum tersedia. Garansi otomatis dibuat setelah BAST selesai."}
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+        >
+          Coba Lagi
+        </button>
+      </div>
+    );
+  }
+
+  const current = garansis[Math.min(activeTab, garansis.length - 1)];
+
+  return (
+    <div className="space-y-6">
+      {garansis.length > 1 && (
+        <div className="flex items-center gap-2 border-b border-gray-100">
+          {garansis.map((g, i) => (
+            <button
+              key={g.id}
+              onClick={() => setActiveTab(i)}
+              className={`px-4 py-2 text-sm font-bold border-b-2 -mb-px transition-colors ${
+                i === activeTab
+                  ? "border-cyan-500 text-cyan-600"
+                  : "border-transparent text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {TAB_LABEL[g.kategoriBast] ?? g.kategoriBast}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <GaransiTabContent
+        garansi={current}
+        konfiguring={konfiguring}
+        konfigurasiTimeline={konfigurasiTimeline}
+        updatingTanggal={updatingTanggal}
+        updateTanggalKunjungan={updateTanggalKunjungan}
+      />
     </div>
   );
 }

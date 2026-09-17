@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Hash, Calendar, Pencil, X, Check } from "lucide-react";
+import { formatNomorBast, type KategoriBast } from "@/utils/bast-kategori";
 
 interface DetailSectionBastProps {
+  kategori: KategoriBast;
+  index: number;
   noReferensi: string;
   tanggalTerbit?: string;
   tanggalSerahTerima?: string;
@@ -32,12 +35,15 @@ function toDateInputValue(dateStr?: string) {
 }
 
 export default function DetailSectionBast({
+  kategori,
+  index,
   noReferensi,
   tanggalTerbit,
   tanggalSerahTerima,
   isSaving,
   onSave,
 }: DetailSectionBastProps) {
+  const nomorBast = formatNomorBast(kategori, index);
   const [isEditing, setIsEditing] = useState(false);
   const [formNoReferensi, setFormNoReferensi] = useState(noReferensi);
   const [formTanggalTerbit, setFormTanggalTerbit] = useState(
@@ -117,21 +123,24 @@ export default function DetailSectionBast({
           <div className="flex items-center gap-2 mb-4 text-cyan-600">
             <Hash size={16} strokeWidth={2.5} />
             <p className="text-[10px] font-bold uppercase tracking-tight">
-              No. Referensi
+              Nomor BAST
             </p>
           </div>
           {isEditing ? (
-            <input
-              type="text"
-              value={formNoReferensi}
-              onChange={(e) => setFormNoReferensi(e.target.value)}
-              placeholder="BAST-XXXX-XXX"
-              className="w-full text-lg font-bold text-slate-800 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-100 focus:border-cyan-300"
-            />
+            <>
+              <input
+                type="text"
+                value={formNoReferensi}
+                onChange={(e) => setFormNoReferensi(e.target.value)}
+                placeholder="BAST-XXXX-XXX"
+                className="w-full text-lg font-bold text-slate-800 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-100 focus:border-cyan-300"
+              />
+              <p className="text-[10px] text-gray-400 mt-1">
+                No. referensi dokumen (kode tampilan: {nomorBast})
+              </p>
+            </>
           ) : (
-            <h3 className="text-xl font-bold text-slate-800">
-              {noReferensi || "-"}
-            </h3>
+            <h3 className="text-xl font-bold text-slate-800">{nomorBast}</h3>
           )}
         </div>
 
