@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Wallet, Clock3, ChevronDown, Save, Hash } from "lucide-react";
 import type { Mode } from "../step1";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 export interface FinancialSummary {
   estimasiHarga: number;
@@ -185,9 +186,16 @@ export default function DetailSectionBoQ({
                 {isSavingNomor ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
-          ) : isPresales ? (
+          ) : isPresales || isAllowedDivisi ? (
             <button
-              onClick={() => setIsEditingNomor(true)}
+              onClick={() => {
+                setNomorPenawaran(
+                  formatNomorPenawaran(nomorPenawaran初始) === "-"
+                    ? ""
+                    : (nomorPenawaran初始 ?? ""),
+                );
+                setIsEditingNomor(true);
+              }}
               className="px-3 py-1.5 text-xs text-cyan-600 font-bold hover:underline"
             >
               Ubah
@@ -206,7 +214,7 @@ export default function DetailSectionBoQ({
           ) : (
             <div className="bg-slate-50/70 rounded-xl border border-gray-100 p-4">
               <p className="text-sm font-bold text-slate-800">
-                {nomorPenawaran || "-"}
+                {formatNomorPenawaran(nomorPenawaran)}
               </p>
             </div>
           )}

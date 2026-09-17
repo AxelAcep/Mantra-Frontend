@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePenawaranListRiwayat } from "@/hooks/use-create-penawaran";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -173,7 +174,7 @@ export default function TableRiwayat() {
             {!isError && data?.data.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
                 <td className="px-6 font-semibold text-slate-600 uppercase">
-                  {item.nomorPenawaran}
+                  {formatNomorPenawaran(item.nomorPenawaran)}
                 </td>
                 <td className="px-6 font-semibold text-slate-600">
                   {item.perusahaanName || "—"}

@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ArrowRight
 } from "lucide-react";
+import { formatNomorPenawaran } from "@/lib/utils";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -152,7 +153,7 @@ export default function DaftarProgressPengadaanBarang() {
                       className="border-b-slate-100 hover:bg-slate-50/50 transition-colors"
                     >
                       <TableCell className="font-bold text-slate-800 text-xs py-4 pl-4">
-                        {row.nomorPenawaran || "—"}
+                        {formatNomorPenawaran(row.nomorPenawaran)}
                       </TableCell>
                       <TableCell className="text-slate-500 text-xs py-4">
                         {formatDate(row.tanggalMasuk)}

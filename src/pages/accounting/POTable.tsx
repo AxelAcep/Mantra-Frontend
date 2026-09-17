@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAccountingPOList } from "@/hooks/use-accounting-dashboard";
 import type { StatusPembayaranPO } from "@/services/accounting-dashboard.service";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -139,7 +140,7 @@ export default function POTable() {
               {!isError && data?.data.map((item) => (
                 <tr key={item.trackingId} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
                   <td className="px-6 font-semibold text-slate-600 uppercase">
-                    {item.nomorPenawaran}
+                    {formatNomorPenawaran(item.nomorPenawaran)}
                   </td>
                   <td className="px-6 font-semibold text-slate-600">
                     {item.perusahaanName || "—"}

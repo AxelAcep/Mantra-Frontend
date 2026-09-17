@@ -13,6 +13,7 @@ import Step8 from "./accounting/index";
 import Step9 from "./step8/index";
 import StepRestricted from "./step-restricted";
 import { PenawaranChatPanel } from "@/components/penawaranChatPanel";
+import { formatNomorPenawaran } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useDetailPenawaran } from "@/hooks/use-penawaran";
 import { usePreloadBoQ } from "@/hooks/use-boq";
@@ -262,7 +263,11 @@ export default function PenawaranPage() {
         <TrackingHeader
           title="Tracking Penawaran"
           project={penawaran?.jenisPenawaran?.join(", ") ?? "-"}
-          code={`#${penawaran?.nomorPenawaran ?? ""}`}
+          code={
+            formatNomorPenawaran(penawaran?.nomorPenawaran) === "-"
+              ? "-"
+              : `#${penawaran?.nomorPenawaran}`
+          }
           company={penawaran?.perusahaan?.nama ?? "-"}
           status={penawaran?.stepSaatIni ?? "-"}
         />

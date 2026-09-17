@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
 import BastLengkapBadge from "./BastLengkapBadge";
 import ProgressBadge from "./ProgressBadge";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -84,7 +85,7 @@ export default function TablePembayaran() {
             {!isError && data?.data.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
                 <td className="px-6 font-semibold text-slate-600 uppercase">
-                  {item.nomorPenawaran}
+                  {formatNomorPenawaran(item.nomorPenawaran)}
                 </td>
                 <td className="px-6 font-semibold text-slate-600">
                   {item.perusahaanName || "—"}

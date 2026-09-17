@@ -8,6 +8,7 @@ import {
   XCircle,
 } from "lucide-react";
 import type { ReviewInternalResponse } from "@/services/review.internal.services";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 interface Props {
   data: ReviewInternalResponse;
@@ -168,7 +169,7 @@ export default function ApprovalSectionReviewInternal({
               <div className="mt-4 text-sm text-slate-600 space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
                 <p>
                   <span className="font-semibold">No. Penawaran:</span>{" "}
-                  {boq?.nomorPenawaran ?? "-"}
+                  {formatNomorPenawaran(boq?.nomorPenawaran)}
                 </p>
                 <p>
                   <span className="font-semibold">Jenis:</span>{" "}

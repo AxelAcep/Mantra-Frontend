@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
 import BastLengkapBadge from "./BastLengkapBadge";
 import ProgressBadge from "./ProgressBadge";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 // Tab "Konfirmasi Selesai" = tracking yang lagi di tahap BAST dan SEMUA
 // entry-nya udah DITERIMA (lengkap). Pasangannya: tab "BAST" (masih berjalan).
@@ -73,7 +74,7 @@ export default function TableKonfirmasiSelesai() {
             {!isError && data?.data.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
                 <td className="px-6 font-semibold text-slate-600 uppercase">
-                  {item.nomorPenawaran}
+                  {formatNomorPenawaran(item.nomorPenawaran)}
                 </td>
                 <td className="px-6 font-semibold text-slate-600">
                   {item.perusahaanName || "—"}

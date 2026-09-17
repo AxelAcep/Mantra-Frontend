@@ -1,6 +1,7 @@
 import { AlertTriangle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { AccountingHighlightItem } from "@/services/accounting-dashboard.service";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 function formatTanggal(iso: string) {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -55,7 +56,7 @@ export default function HighlightSection({ highlights }: HighlightSectionProps) 
             <div className="min-w-[220px]">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-bold text-slate-800">
-                  {item.nomorPenawaran}
+                  {formatNomorPenawaran(item.nomorPenawaran)}
                 </p>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${

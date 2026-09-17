@@ -22,3 +22,11 @@ export function getTimeAgo(dateStr: string) {
   if (diffInHour < 24) return `${diffInHour} jam yang lalu`
   return `${diffInDay} hari yang lalu`
 }
+
+// Nomor penawaran belum diisi disimpan backend sebagai placeholder
+// "PENDING-<trackingId>" (lihat CreateTrackingPenawaran) biar gak bentrok
+// sama constraint unique/not-null. Di FE ditampilkan sebagai "-".
+export function formatNomorPenawaran(nomorPenawaran?: string | null) {
+  if (!nomorPenawaran || nomorPenawaran.startsWith("PENDING")) return "-"
+  return nomorPenawaran
+}

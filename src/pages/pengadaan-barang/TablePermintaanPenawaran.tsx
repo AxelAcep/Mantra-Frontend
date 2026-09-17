@@ -2,6 +2,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
+import { formatNomorPenawaran } from "@/lib/utils";
 
 interface UserSession {
   role?: string;
@@ -115,8 +116,8 @@ export default function TablePermintaanPenawaran() {
                 <td className="px-6 text-gray-500">
                   {formatTanggal(item.tanggalMasuk)}
                 </td>
-                <td className={`px-6 ${item.nomorPenawaran ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
-                  {item.nomorPenawaran || "-"}
+                <td className={`px-6 ${item.nomorPenawaran && !item.nomorPenawaran.startsWith("PENDING") ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
+                  {formatNomorPenawaran(item.nomorPenawaran)}
                 </td>
                 <td className={`px-6 ${item.perusahaanName ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
                   {item.perusahaanName || "-"}
