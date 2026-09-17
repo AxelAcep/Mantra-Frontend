@@ -37,7 +37,7 @@ export async function fetchClient(
 }
 
 export type CreateTrackingPenawaranPayload = {
-  nomorPenawaran: string;
+  nomorPenawaran?: string;
   perusahaanId: string;
   lokasiProyek: string;
   customerName: string;
