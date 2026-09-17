@@ -87,7 +87,11 @@ export default function DocumentSection({
               </button>
 
               <a
-                href={doc.path}
+                href={
+                  doc.path.startsWith("http")
+                    ? doc.path
+                    : `${import.meta.env.VITE_API_URL}${doc.path}`
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors"

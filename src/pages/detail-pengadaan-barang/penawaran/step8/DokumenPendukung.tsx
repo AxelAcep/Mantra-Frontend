@@ -36,6 +36,12 @@ export default function DokumenPendukungSection({
               const uploadedDate = d
                 ? `${d.toLocaleDateString("id-ID", { day: "numeric", month: "short" })}, ${d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
                 : "-";
+              // Gabungkan BASE_URL backend + path dari DB — doc.path itu
+              // path relatif, kalau dipakai langsung sebagai href browser
+              // nyarinya di origin frontend sendiri (404).
+              const fileUrl = doc.path.startsWith("http")
+                ? doc.path
+                : `${import.meta.env.VITE_API_URL}${doc.path}`;
 
               return (
                 <div
@@ -57,7 +63,7 @@ export default function DokumenPendukungSection({
                     </div>
                   </div>
                   <a
-                    href={doc.path}
+                    href={fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-50 rounded transition-colors"

@@ -214,6 +214,19 @@ export default function DocumentSectionFollowUp({
         uploadedBy: doc.uploadedBy || "",
       })) ?? [];
 
+    const adminProyekDocs =
+      adminProyekDetail?.data?.dokumen?.map((doc: any) => ({
+        id: doc.id,
+        namaFile: doc.namaFile,
+        path: doc.path,
+        createdAt: doc.createdAt,
+        uploaderInfo: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"
+          } pada ${formatDateTime(doc.createdAt)} - ${activityAdminProyek?.judul || "Admin Proyek"
+          }`,
+        source: "activity" as const,
+        uploadedBy: doc.uploadedBy || "",
+      })) ?? [];
+
     const seenPaths = new Set<string>();
 
     const result: Array<{
@@ -247,6 +260,13 @@ export default function DocumentSectionFollowUp({
       }
     });
 
+    adminProyekDocs.forEach((d) => {
+      if (!seenPaths.has(d.path)) {
+        seenPaths.add(d.path);
+        result.push(d);
+      }
+    });
+
     return result;
   }, [
     dokumen,
@@ -255,6 +275,7 @@ export default function DocumentSectionFollowUp({
     adminProyekDetail,
     activityAdmin?.judul,
     activitySales?.judul,
+    activityAdminProyek?.judul,
   ]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {

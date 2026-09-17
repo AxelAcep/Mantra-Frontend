@@ -95,7 +95,7 @@ function AssignCard({
   title: string;
   divisi: string;
   currentPegawai?: { id: string; nama: string; divisi?: string };
-  onAssign: (id: string, onSuccess: () => void) => void; // ← callback
+  onAssign: (id: string, onSuccess: () => void) => void;
   isPending: boolean;
 }) {
   const [selectedId, setSelectedId] = useState(currentPegawai?.id ?? "");
@@ -112,19 +112,22 @@ function AssignCard({
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
         <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
-          <span className="text-gray-500">{icon}</span>
-          <span>{title}</span>
+          <span className="text-gray-500 shrink-0">{icon}</span>
+          <span className="truncate">{title}</span>
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+
+        {/* flex-wrap: kalau nama panjang + tombol ga muat sejajar, tombol turun ke baris baru */}
+        <div className="flex items-center flex-wrap gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
               {getInitials(currentPegawai.nama)}
             </div>
-            <div>
-              <p className="text-[0.75rem] font-bold text-slate-800 leading-tight">
+            {/* min-w-0 wajib biar flex child ini boleh menyusut & truncate bekerja */}
+            <div className="min-w-0">
+              <p className="text-[0.75rem] font-bold text-slate-800 leading-tight truncate">
                 {currentPegawai.nama}
               </p>
-              <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight">
+              <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight truncate">
                 {currentPegawai.divisi ?? divisi}
               </p>
             </div>
@@ -134,7 +137,7 @@ function AssignCard({
               setSelectedId(currentPegawai.id);
               setIsEditing(true);
             }}
-            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-xs font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95"
+            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-xs font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95 shrink-0"
           >
             Ubah
           </button>
@@ -146,8 +149,8 @@ function AssignCard({
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full flex flex-col">
       <div className="flex items-center gap-2 text-slate-800 font-bold text-[11px] uppercase tracking-tight mb-5">
-        <span className="text-gray-500">{icon}</span>
-        <span>{title}</span>
+        <span className="text-gray-500 shrink-0">{icon}</span>
+        <span className="truncate">{title}</span>
       </div>
       <PegawaiSelect
         divisi={divisi}
@@ -155,7 +158,7 @@ function AssignCard({
         onChange={setSelectedId}
         placeholder={`Pilih ${title}`}
       />
-      <div className="flex items-center gap-2 mt-3 justify-end">
+      <div className="flex items-center flex-wrap gap-2 mt-3 justify-end">
         {currentPegawai && (
           <button
             onClick={() => setIsEditing(false)}
@@ -167,7 +170,7 @@ function AssignCard({
         <button
           onClick={() => {
             if (!selectedId || isPending) return;
-            onAssign(selectedId, () => setIsEditing(false)); // ← pass callback
+            onAssign(selectedId, () => setIsEditing(false));
           }}
           disabled={!selectedId || isPending}
           className="px-4 py-1.5 text-xs bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -190,7 +193,8 @@ function WorkTimeCard({
 }) {
   const progress = React.useMemo(() => {
     if (!activity) return 0;
-    if (activity.status === "SELESAI" || activity.status === "DITERIMA") return 100;
+    if (activity.status === "SELESAI" || activity.status === "DITERIMA")
+      return 100;
     const start = new Date(activity.waktuMulai).getTime();
     const end = new Date(activity.targetSelesai).getTime();
     // eslint-disable-next-line react-hooks/purity
@@ -204,7 +208,8 @@ function WorkTimeCard({
 
   const sisaWaktu = React.useMemo(() => {
     if (!activity) return "-";
-    if (activity.status === "DITERIMA" || activity.status === "SELESAI") return "Selesai";
+    if (activity.status === "DITERIMA" || activity.status === "SELESAI")
+      return "Selesai";
     // eslint-disable-next-line react-hooks/purity
     const diff = new Date(activity.targetSelesai).getTime() - Date.now();
     if (diff <= 0) return "Waktu habis";
@@ -215,21 +220,24 @@ function WorkTimeCard({
 
   const batasWaktu = activity
     ? new Date(activity.targetSelesai).toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }) + " WIB"
+        hour: "2-digit",
+        minute: "2-digit",
+      }) + " WIB"
     : "-";
 
   const isOverdue = React.useMemo(() => {
     if (!activity) return false;
-    if (activity.status === "DITERIMA" || activity.status === "SELESAI") return false;
+    if (activity.status === "DITERIMA" || activity.status === "SELESAI")
+      return false;
     if (activity.status === "OVERDUE") return true;
     return new Date(activity.targetSelesai).getTime() - Date.now() <= 0;
   }, [activity]);
 
   const statusLabel =
     activity?.status === "ON_PROGRESS"
-      ? (isOverdue ? "Overdue" : "Proses")
+      ? isOverdue
+        ? "Overdue"
+        : "Proses"
       : activity?.status === "SELESAI"
         ? "Selesai"
         : (activity?.status ?? "-");
@@ -260,7 +268,9 @@ function WorkTimeCard({
           <Clock3 size={16} className="text-gray-500" />
           <span>Waktu Pengerjaan</span>
         </div>
-        <span className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}>
+        <span
+          className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
+        >
           {statusLabel}
         </span>
       </div>
@@ -317,7 +327,7 @@ export default function DetailSection({
       {canAssignPreSales ? (
         <AssignCard
           icon={<User size={16} />}
-          title="PIC Request"
+          title="PIC Requestsss"
           divisi="SALES"
           currentPegawai={marketing}
           onAssign={(id, onSuccess) => {

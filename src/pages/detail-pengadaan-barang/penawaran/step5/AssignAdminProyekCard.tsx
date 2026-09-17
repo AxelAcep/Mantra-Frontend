@@ -6,12 +6,14 @@ import { useFollowUpAdmin } from "@/hooks/use-followUp-admin";
 interface ManagerProyekCardProps {
   followUpId: string;
   currentNama?: string;
+  canEdit?: boolean;
   onAssigned?: () => void;
 }
 
 export default function ManagerProyekCard({
   followUpId,
   currentNama,
+  canEdit = true,
   onAssigned,
 }: ManagerProyekCardProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -41,7 +43,7 @@ export default function ManagerProyekCard({
         <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
           <User size={16} className="text-gray-500" /> Manager Proyek
         </div>
-        {!isEditing && (
+        {!isEditing && canEdit && (
           <button
             onClick={() => setIsEditing(true)}
             className="text-cyan-400 transition-colors"

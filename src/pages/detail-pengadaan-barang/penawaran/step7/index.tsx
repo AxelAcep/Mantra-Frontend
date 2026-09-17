@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useBast } from "@/hooks/use-bast";
 import DetailSectionBast from "./DetailSectionBast";
 import DocumentSectionBast from "./DocumentSectionBast";
 import ActivityLogSectionBast from "./ActivityLogSection";
 import { KATEGORI_BAST_LABEL, formatNomorBast } from "@/utils/bast-kategori";
+import type { BastResponse } from "@/services/bast.service";
+
+const TAB_LABEL: Record<string, string> = {
+  PAC: "PAC",
+  FIRE: "FirePro",
+  UMUM: "BAST",
+};
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -29,9 +36,94 @@ interface Step7Props {
   trackingId: string;
 }
 
+// Isi satu tab BAST (dipakai baik ada 1 BAST doang maupun pas lagi nampilin
+// salah satu dari 2 tab PAC/FirePro) — pola sama persis kayak GaransiTabContent
+// di step8, biar konsisten.
+function BastTabContent({
+  bast,
+  updating,
+  updateBast,
+}: {
+  bast: BastResponse;
+  updating: boolean;
+  updateBast: ReturnType<typeof useBast>["updateBast"];
+}) {
+  const entries = bast.entries ?? [];
+  const kategoriLabel = KATEGORI_BAST_LABEL[bast.kategori];
+
+  const mappedLogs =
+    bast.logs?.map((log, i) => {
+      const d = log.createdAt ? new Date(log.createdAt) : new Date();
+      return {
+        id: i + 1,
+        user: log.namaPegawai || "System",
+        action: log.aksi || "-",
+        description: log.keterangan || "",
+        time: d.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        date: d,
+      };
+    }) ?? [];
+
+  return (
+    <div className="grid grid-cols-12 gap-6">
+      <div className="col-span-12 lg:col-span-9 space-y-8">
+        <div>
+          <SectionHeading
+            title={kategoriLabel ? `Detail — BAST ${kategoriLabel}` : "Detail"}
+          />
+
+          {entries.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-6">
+              Belum ada entry BAST.
+            </p>
+          ) : (
+            <div className="space-y-8 mt-4">
+              {entries.map((entry, i) => {
+                const entryIndex = entry.index || i + 1;
+                return (
+                  <div key={entry.id}>
+                    <SubHeading
+                      title={formatNomorBast(bast.kategori, entryIndex)}
+                    />
+                    <DetailSectionBast
+                      kategori={bast.kategori}
+                      index={entryIndex}
+                      noReferensi={entry.noReferensi}
+                      tanggalTerbit={entry.tanggalTerbit}
+                      tanggalSerahTerima={entry.tanggalSerahTerima}
+                      isSaving={updating}
+                      onSave={(payload) => updateBast(entry.id, payload)}
+                    />
+                    <DocumentSectionBast
+                      activityAdminProyek={entry.activityAdminProyek}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="col-span-12 lg:col-span-3">
+        <ActivityLogSectionBast logs={mappedLogs} />
+      </div>
+    </div>
+  );
+}
+
 export default function Step7({ trackingId }: Step7Props) {
   const { basts, loading, error, refetch, updateBast, updating } =
     useBast(trackingId);
+
+  // Tracking bisa punya sampai 2 BAST (PAC & FirePro) kalau Jenis
+  // Penawaran-nya kedetect dua-duanya — cuma dijadiin tab terpisah kalau
+  // memang ada 2. Kalau cuma 1 (PAC aja, Fire aja, atau UMUM) tetep tampil
+  // langsung tanpa tab. Pola identik dengan Garansi (step8).
+  const [activeTab, setActiveTab] = useState(0);
 
   if (loading) {
     return (
@@ -57,79 +149,29 @@ export default function Step7({ trackingId }: Step7Props) {
     );
   }
 
-  // Tracking bisa punya sampai 2 BAST (PAC & FIRE) — gabungin log semua BAST
-  // buat sidebar, ditandain kategorinya biar jelas asalnya dari BAST mana.
-  const mappedLogs = basts
-    .flatMap((bast) =>
-      (bast.logs ?? []).map((log) => {
-        const d = log.createdAt ? new Date(log.createdAt) : new Date();
-        const kategoriLabel = KATEGORI_BAST_LABEL[bast.kategori];
-        return {
-          user: log.namaPegawai || "System",
-          action: kategoriLabel ? `[BAST ${kategoriLabel}] ${log.aksi}` : log.aksi || "-",
-          description: log.keterangan || "",
-          time: d.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          date: d,
-        };
-      }),
-    )
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .map((log, i) => ({ id: i + 1, ...log }));
+  const current = basts[Math.min(activeTab, basts.length - 1)];
 
   return (
-    <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-12 lg:col-span-9 space-y-10">
-        {basts.map((bast) => {
-          const entries = bast.entries ?? [];
-          const kategoriLabel = KATEGORI_BAST_LABEL[bast.kategori];
+    <div className="space-y-6">
+      {basts.length > 1 && (
+        <div className="flex items-center gap-2 border-b border-gray-100">
+          {basts.map((b, i) => (
+            <button
+              key={b.id}
+              onClick={() => setActiveTab(i)}
+              className={`px-4 py-2 text-sm font-bold border-b-2 -mb-px transition-colors ${
+                i === activeTab
+                  ? "border-cyan-500 text-cyan-600"
+                  : "border-transparent text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {TAB_LABEL[b.kategori] ?? b.kategori}
+            </button>
+          ))}
+        </div>
+      )}
 
-          return (
-            <div key={bast.id}>
-              <SectionHeading
-                title={kategoriLabel ? `Detail — BAST ${kategoriLabel}` : "Detail"}
-              />
-
-              {entries.length === 0 ? (
-                <p className="text-sm text-slate-400 text-center py-6">
-                  Belum ada entry BAST.
-                </p>
-              ) : (
-                <div className="space-y-8 mt-4">
-                  {entries.map((entry, i) => {
-                    const entryIndex = entry.index || i + 1;
-                    return (
-                      <div key={entry.id}>
-                        <SubHeading
-                          title={formatNomorBast(bast.kategori, entryIndex)}
-                        />
-                        <DetailSectionBast
-                          kategori={bast.kategori}
-                          index={entryIndex}
-                          noReferensi={entry.noReferensi}
-                          tanggalTerbit={entry.tanggalTerbit}
-                          tanggalSerahTerima={entry.tanggalSerahTerima}
-                          isSaving={updating}
-                          onSave={(payload) => updateBast(entry.id, payload)}
-                        />
-                        <DocumentSectionBast
-                          activityAdminProyek={entry.activityAdminProyek}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="col-span-12 lg:col-span-3">
-        <ActivityLogSectionBast logs={mappedLogs} />
-      </div>
+      <BastTabContent bast={current} updating={updating} updateBast={updateBast} />
     </div>
   );
 }

@@ -43,7 +43,7 @@ const ALLOWED_DIVISI = [
   "DIREKTUR",
   "KOMISARIS",
   "MANAGER_OPERASIONAL",
-  "ADMIN_SEKERTARIAT",
+  "ADMIN_SEKERTARIS",
 ];
 
 function formatRupiah(value: number) {
@@ -67,7 +67,9 @@ export default function DetailSectionBoQ({
   userDivisi,
 }: DetailSectionBoQProps) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
-  const [nomorPenawaran, setNomorPenawaran] = useState(nomorPenawaran初始 ?? "");
+  const [nomorPenawaran, setNomorPenawaran] = useState(
+    nomorPenawaran初始 ?? "",
+  );
   const [isEditingNomor, setIsEditingNomor] = useState(false);
 
   // Tentukan apakah input finance bisa diedit
@@ -222,129 +224,133 @@ export default function DetailSectionBoQ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
-      {/* Ringkasan Finansial */}
-      <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
-            <Wallet size={16} className="text-gray-500" />
-            <span>Ringkasan Finansial</span>
+        {/* Ringkasan Finansial */}
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+              <Wallet size={16} className="text-gray-500" />
+              <span>Ringkasan Finansial</span>
+            </div>
+            {isFinanceEditable && (
+              <button
+                onClick={() => onSave?.({ harga1, harga2, harga3 })}
+                disabled={isSaving}
+                className="flex items-center gap-1.5 text-xs font-bold text-white bg-cyan-500 hover:bg-cyan-600 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
+              >
+                <Save size={12} />
+                {isSaving ? "Menyimpan..." : "Simpan"}
+              </button>
+            )}
           </div>
-          {isFinanceEditable && (
+
+          <div className="space-y-4">
             <button
-              onClick={() => onSave?.({ harga1, harga2, harga3 })}
-              disabled={isSaving}
-              className="flex items-center gap-1.5 text-xs font-bold text-white bg-cyan-500 hover:bg-cyan-600 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
-            >
-              <Save size={12} />
-              {isSaving ? "Menyimpan..." : "Simpan"}
-            </button>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <button
-            onClick={() => setIsFinancialExpanded(!isFinancialExpanded)}
-            className={`w-full text-left transition-all rounded-xl border p-5 group ${isFinancialExpanded
-              ? "bg-cyan-50/50 border-cyan-100 shadow-sm"
-              : "bg-slate-50/50 border-gray-100 hover:bg-slate-50"
+              onClick={() => setIsFinancialExpanded(!isFinancialExpanded)}
+              className={`w-full text-left transition-all rounded-xl border p-5 group ${
+                isFinancialExpanded
+                  ? "bg-cyan-50/50 border-cyan-100 shadow-sm"
+                  : "bg-slate-50/50 border-gray-100 hover:bg-slate-50"
               }`}
-          >
-            <p
-              className={`text-xs font-bold mb-2 uppercase tracking-tight transition-colors ${isFinancialExpanded ? "text-cyan-600" : "text-slate-400"
-                }`}
             >
-              Sub Total I + II + III
-            </p>
-            <div className="flex items-center justify-between">
-              <span
-                className={`text-xl md:text-xl font-bold transition-colors ${isFinancialExpanded ? "text-cyan-700" : "text-slate-800"
-                  }`}
+              <p
+                className={`text-xs font-bold mb-2 uppercase tracking-tight transition-colors ${
+                  isFinancialExpanded ? "text-cyan-600" : "text-slate-400"
+                }`}
               >
-                {formatRupiah(total)}
-              </span>
-              <div
-                className={`p-1 rounded-lg transition-all ${isFinancialExpanded
-                  ? "bg-white/50 text-cyan-500 rotate-180"
-                  : "text-slate-400"
+                Sub Total I + II + III
+              </p>
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-xl md:text-xl font-bold transition-colors ${
+                    isFinancialExpanded ? "text-cyan-700" : "text-slate-800"
                   }`}
-              >
-                <ChevronDown size={20} />
-              </div>
-            </div>
-          </button>
-
-          {isFinancialExpanded && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-              {fields.map((item) => (
-                <div
-                  key={item.key}
-                  className="bg-slate-50/80 rounded-xl border border-slate-100 p-4"
                 >
-                  <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">
-                    {item.label}
-                  </p>
-                  {isFinanceEditable ? (
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={
-                        item.value ? item.value.toLocaleString("id-ID") : ""
-                      }
-                      onChange={(e) => {
-                        // hapus semua karakter selain angka
-                        const raw = e.target.value.replace(/\D/g, "");
-                        // hapus leading zero
-                        const cleaned = raw.replace(/^0+(?=\d)/, "");
-                        item.setValue(cleaned ? parseInt(cleaned, 10) : 0);
-                      }}
-                      className="w-full text-sm font-bold text-slate-700 bg-white border border-cyan-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                    />
-                  ) : (
-                    <p className="text-sm font-bold text-slate-700">
-                      {formatRupiah(item.value)}
-                    </p>
-                  )}
+                  {formatRupiah(total)}
+                </span>
+                <div
+                  className={`p-1 rounded-lg transition-all ${
+                    isFinancialExpanded
+                      ? "bg-white/50 text-cyan-500 rotate-180"
+                      : "text-slate-400"
+                  }`}
+                >
+                  <ChevronDown size={20} />
                 </div>
-              ))}
+              </div>
+            </button>
+
+            {isFinancialExpanded && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                {fields.map((item) => (
+                  <div
+                    key={item.key}
+                    className="bg-slate-50/80 rounded-xl border border-slate-100 p-4"
+                  >
+                    <p className="text-[10px] text-slate-400 font-bold mb-1.5 uppercase tracking-wider">
+                      {item.label}
+                    </p>
+                    {isFinanceEditable ? (
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={
+                          item.value ? item.value.toLocaleString("id-ID") : ""
+                        }
+                        onChange={(e) => {
+                          // hapus semua karakter selain angka
+                          const raw = e.target.value.replace(/\D/g, "");
+                          // hapus leading zero
+                          const cleaned = raw.replace(/^0+(?=\d)/, "");
+                          item.setValue(cleaned ? parseInt(cleaned, 10) : 0);
+                        }}
+                        className="w-full text-sm font-bold text-slate-700 bg-white border border-cyan-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                      />
+                    ) : (
+                      <p className="text-sm font-bold text-slate-700">
+                        {formatRupiah(item.value)}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Waktu Pengerjaan */}
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
+          <div className="flex justify-between items-center mb-5">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+              <Clock3 size={16} className="text-gray-500" />
+              <span>Waktu Pengerjaan</span>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Waktu Pengerjaan */}
-      <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-        <div className="flex justify-between items-center mb-5">
-          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
-            <Clock3 size={16} className="text-gray-500" />
-            <span>Waktu Pengerjaan</span>
-          </div>
-          <span
-            className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
-          >
-            {workingTime?.status ?? "-"}
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400 font-medium text-xs">
-              Sisa waktu: {isDone ? "Selesai" : `${displayedRemaining} jam`}
-            </span>
-            <span className="text-sm font-bold text-slate-800">
-              {displayedPercentage}%
+            <span
+              className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
+            >
+              {workingTime?.status ?? "-"}
             </span>
           </div>
-          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${isDone ? "bg-green-500" : "bg-yellow-400"}`}
-              style={{ width: `${displayedPercentage}%` }}
-            />
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400 font-medium text-xs">
+                Sisa waktu: {isDone ? "Selesai" : `${displayedRemaining} jam`}
+              </span>
+              <span className="text-sm font-bold text-slate-800">
+                {displayedPercentage}%
+              </span>
+            </div>
+            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${isDone ? "bg-green-500" : "bg-yellow-400"}`}
+                style={{ width: `${displayedPercentage}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400 font-medium pt-1">
+              Batas Waktu {workingTime?.deadline ?? "-"}
+            </p>
           </div>
-          <p className="text-xs text-gray-400 font-medium pt-1">
-            Batas Waktu {workingTime?.deadline ?? "-"}
-          </p>
         </div>
-      </div>
       </div>
     </div>
   );

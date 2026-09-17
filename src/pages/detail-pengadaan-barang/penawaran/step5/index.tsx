@@ -136,6 +136,22 @@ export default function Step5({
 
   const isAdminSekertariat = divisi === "ADMIN_SEKERTARIAT";
 
+  // Admin Proyek yang beneran ditugaskan (bukan cuma divisi PAC/FIRE
+  // sembarang), atau MO/Direktur/Komisaris/Master — sinkron sama guard di
+  // backend (isAssignedAdminProyek + isManagerOps/isDirekturKomisaris/isMaster
+  // di InputBASTFollowup & UploadDokumenFollowUp).
+  const isAssignedAdminProyek =
+    !!pegawaiId &&
+    !!data.activityAdminProyek?.pegawai?.id &&
+    pegawaiId === data.activityAdminProyek.pegawai.id;
+  const isAdminProyekOrBerwenang =
+    isAssignedAdminProyek ||
+    role === "MASTER" ||
+    divisi === "MANAGER_OPERASIONAL" ||
+    divisi === "DIREKTUR" ||
+    divisi === "KOMISARIS" ||
+    divisi === "MONITORING_CONTROL_ADVISOR";
+
   const isDualBast = detectBastKategori(tracking?.jenisPenawaran).length === 2;
   const isTotalBastFilled = isDualBast
     ? data.totalBastPAC != null && data.totalBastFire != null
@@ -168,7 +184,7 @@ export default function Step5({
         <SectionHeading title="Detail" />
 
         <div className="flex flex-wrap justify-end gap-4 lg:gap-6">
-          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm w-fit">
+          <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm w-fit max-w-[280px]">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
               <User size={16} className="text-gray-500" /> PIC Follow Up
             </div>
@@ -176,7 +192,12 @@ export default function Step5({
               <p className="text-xs text-gray-400 font-medium mb-1">
                 Sales Marketing
               </p>
-              <p className="text-sm font-bold text-slate-800">{salesName}</p>
+              <p
+                className="text-sm font-bold text-slate-800 truncate"
+                title={salesName}
+              >
+                {salesName}
+              </p>
             </div>
           </div>
 
@@ -185,25 +206,34 @@ export default function Step5({
               <User size={16} className="text-gray-500" /> Kontak Klien
             </div>
             <div className="flex flex-wrap gap-4 w-full">
-              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px] max-w-full">
                 <p className="text-xs text-gray-400 font-medium mb-1">
                   Customer Name
                 </p>
-                <p className="text-sm font-bold text-slate-800">
+                <p
+                  className="text-sm font-bold text-slate-800 truncate"
+                  title={customerName}
+                >
                   {customerName}
                 </p>
               </div>
-              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px] max-w-full">
                 <p className="text-xs text-gray-400 font-medium mb-1">
                   No. Telepon
                 </p>
-                <p className="text-sm font-bold text-slate-800">
+                <p
+                  className="text-sm font-bold text-slate-800 truncate"
+                  title={customerPhone}
+                >
                   {customerPhone}
                 </p>
               </div>
-              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px]">
+              <div className="bg-slate-50/60 rounded-xl border border-gray-100 px-4 py-3 flex-1 min-w-[150px] max-w-full">
                 <p className="text-xs text-gray-400 font-medium mb-1">Email</p>
-                <p className="text-sm font-bold text-slate-800">
+                <p
+                  className="text-sm font-bold text-slate-800 truncate"
+                  title={customerEmail}
+                >
                   {customerEmail}
                 </p>
               </div>
@@ -248,6 +278,12 @@ export default function Step5({
           currentNama={
             data.activityAdminProyek?.pegawai?.nama ?? "Pilih Admin Proyek"
           }
+          canEdit={
+            role === "MASTER" ||
+            divisi === "MANAGER_OPERASIONAL" ||
+            divisi === "DIREKTUR" ||
+            divisi === "KOMISARIS"
+          }
           onAssigned={refetch}
         />
 
@@ -259,15 +295,7 @@ export default function Step5({
               totalBast={data.totalBast}
               totalBastPAC={data.totalBastPAC}
               totalBastFire={data.totalBastFire}
-              canInput={
-                ((divisi === "MAINTENANCE_PAC" ||
-                  divisi === "MAINTENANCE_FIRE") &&
-                  role === "SUPERVISI" &&
-                  data.activityAdminProyek?.status === "DITERIMA") ||
-                role === "MASTER" ||
-                divisi === "MANAGER_OPERASIONAL" ||
-                divisi === "MONITORING_CONTROL_ADVISOR"
-              }
+              canInput={isAdminProyekOrBerwenang}
               onUpdated={refetch}
             />
 
@@ -275,16 +303,7 @@ export default function Step5({
             <AdminProyekUpload
               dokumen={mappedDokumen}
               isUploading={uploadMut.isPending}
-              isAdminProyek={
-                (((divisi === "MAINTENANCE_PAC" ||
-                  divisi === "MAINTENANCE_FIRE") &&
-                  role === "SUPERVISI" &&
-                  data.activityAdminProyek?.status === "DITERIMA") ||
-                  role === "MASTER" ||
-                  divisi === "MANAGER_OPERASIONAL" ||
-                  divisi === "MONITORING_CONTROL_ADVISOR") &&
-                isTotalBastFilled
-              }
+              isAdminProyek={isAdminProyekOrBerwenang && isTotalBastFilled}
               onUpload={(file, kategori) =>
                 uploadMut.mutate({ file, kategori })
               }
