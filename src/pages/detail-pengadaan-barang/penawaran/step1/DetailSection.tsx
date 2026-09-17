@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Clock3 } from "lucide-react";
+import { User, Clock3, Pencil } from "lucide-react";
 import type { TrackingPenawaranDetail } from "@/services/penawaran.services";
 import {
   useAssignPreSales,
@@ -111,33 +111,33 @@ function AssignCard({
   if (!isEditing && currentPegawai) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm h-full">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight mb-5">
-          <span className="text-gray-500">{icon}</span>
-          <span>{title}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
-              {getInitials(currentPegawai.nama)}
-            </div>
-            <div>
-              <p className="text-[0.75rem] font-bold text-slate-800 leading-tight">
-                {currentPegawai.nama}
-              </p>
-              <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight">
-                {currentPegawai.divisi ?? divisi}
-              </p>
-            </div>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2 text-slate-800 font-bold text-[13px] tracking-tight">
+            <span className="text-gray-500">{icon}</span>
+            <span>{title}</span>
           </div>
           <button
             onClick={() => {
               setSelectedId(currentPegawai.id);
               setIsEditing(true);
             }}
-            className="px-5 py-2 border-2 border-cyan-500 text-cyan-500 text-xs font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95"
+            className="flex items-center gap-1.5 text-xs text-cyan-600 font-bold hover:underline"
           >
-            Ubah
+            <Pencil size={13} /> Edit
           </button>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+            {getInitials(currentPegawai.nama)}
+          </div>
+          <div>
+            <p className="text-[0.75rem] font-bold text-slate-800 leading-tight">
+              {currentPegawai.nama}
+            </p>
+            <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight">
+              {currentPegawai.divisi ?? divisi}
+            </p>
+          </div>
         </div>
       </div>
     );

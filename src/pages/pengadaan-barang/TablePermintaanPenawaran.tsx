@@ -69,7 +69,7 @@ export default function TablePermintaanPenawaran() {
               <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
               <th className="px-6 py-4">Tanggal Permintaan</th>
               <th className="px-6 py-4">No. Penawaran</th>
-              <th className="px-6 py-4">Nama Perusahaan</th>
+              <th className="px-6 py-4">Nama Perusahaan / Lokasi</th>
               <th className="px-6 py-4">Pembuat Penawaran</th>
               {isMaster && <th className="px-6 py-4">Harga</th>}
               <th className="px-6 py-4">Jenis Pengadaan</th>
@@ -119,13 +119,20 @@ export default function TablePermintaanPenawaran() {
                 <td className={`px-6 ${item.nomorPenawaran && !item.nomorPenawaran.startsWith("PENDING") ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
                   {formatNomorPenawaran(item.nomorPenawaran)}
                 </td>
-                <td className={`px-6 ${item.perusahaanName ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
-                  {item.perusahaanName || "-"}
-                  {item.lokasiProyek && (
-                    <span className="text-gray-500 font-medium ml-1">
-                      ({item.lokasiProyek})
-                    </span>
-                  )}
+                <td className="h-full px-6 font-semibold text-slate-600 max-w-55">
+                  <div className="flex h-full flex-col justify-center">
+                    <div className="min-h-0 overflow-hidden text-ellipsis line-clamp-1">
+                      {item.perusahaanName || "-"}
+                    </div>
+
+                    {item.lokasiProyek && (
+                      <div className="min-h-0 overflow-hidden font-medium text-gray-500">
+                        <span className="line-clamp-1">
+                          ({item.lokasiProyek})
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 text-gray-500 font-medium">
                   {item.pembuatPenawaran?.nama || "-"}
