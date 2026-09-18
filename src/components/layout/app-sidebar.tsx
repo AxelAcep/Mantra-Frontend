@@ -62,7 +62,7 @@ const getMenuOperasional = (
   if (canAccessAccounting) {
     menu.push({
       title: "Accounting",
-      icon: Icons.POAktif,
+      icon: Icons.Accounting,
       url: "/accounting",
       badge: accountingBadge,
     });

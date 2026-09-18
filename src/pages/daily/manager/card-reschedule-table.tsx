@@ -90,12 +90,12 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className="cursor-pointer select-none group text-slate-600 text-xs"
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
             onClick={() => onSort(field)}
             title={title}
         >
             <div className="flex items-center gap-1">
-                <span className={`uppercase font-medium transition-colors ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -267,7 +267,7 @@ export function RescheduleTable({
                                         sortDir={sortConfig.direction}
                                         onSort={handleSort}
                                     />
-                                    <TableHead className="text-slate-600 text-xs">PERUSAHAAN</TableHead>
+                                    <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
                                     <SortableHeader
                                         label="JADWAL AWAL"
                                         field="awal"
@@ -282,9 +282,9 @@ export function RescheduleTable({
                                         sortDir={sortConfig.direction}
                                         onSort={handleSort}
                                     />
-                                    <TableHead className="text-slate-600 text-xs">ALASAN</TableHead>
-                                    <TableHead className="text-slate-600 text-xs text-center">STATUS</TableHead>
-                                    <TableHead className="text-right text-slate-600 text-xs">AKSI</TableHead>
+                                    <TableHead className="text-[#000000] text-xs font-semibold">ALASAN</TableHead>
+                                    <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
+                                    <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -316,8 +316,8 @@ export function RescheduleTable({
                                                             {getInitials(item.activity.pegawai.nama)}
                                                         </div>
                                                         <div title={item.activity.pegawai.nama} className="max-w-[150px]">
-                                                            <p className="font-semibold text-gray-900 truncate">{item.activity.pegawai.nama}</p>
-                                                            <p className="text-xs text-muted-foreground truncate">{item.activity.pegawai.divisi}</p>
+                                                            <p className="font-semibold text-gray-900 truncate">{item.activity.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                            <p className="text-[0.75rem] text-muted-foreground truncate">{item.activity.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                         </div>
                                                     </div>
                                                 ) : (

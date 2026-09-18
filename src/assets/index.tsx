@@ -37,6 +37,7 @@ import IconLeftArrow from "./Icon_LeftArrow.svg"
 import IconFile from "./Icon-File.svg"
 import IconEdit from "./Icon-Edit-Pensil.svg"
 import IconCalendarX from "./Icon-Calendar-X.svg"
+import IconAccounting from "./Vector_Accounting.svg"
 
 export const Icons = {
   Mantra: IconMantra,
@@ -78,4 +79,5 @@ export const Icons = {
   File: IconFile,
   Edit: IconEdit,
   CalendarX: IconCalendarX,
+  Accounting: IconAccounting,
 };

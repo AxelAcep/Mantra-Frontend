@@ -93,11 +93,11 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className="cursor-pointer select-none group text-slate-600 text-xs"
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
-                <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -219,11 +219,11 @@ export function CardRiwayatTable({
                             <TableRow className="bg-slate-50 border-b border-slate-100">
                                 <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                                 <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <TableHead className="text-slate-600 text-xs">JUDUL / PERUSAHAAN</TableHead>
-                                <TableHead className="text-slate-600 text-xs">NO. REFERENSI</TableHead>
-                                <TableHead className="text-slate-600 text-xs">DEADLINE / SUBMIT</TableHead>
+                                <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
+                                <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
+                                <TableHead className="text-[#000000] text-xs font-semibold">DEADLINE / SUBMIT</TableHead>
                                 <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <TableHead className="text-right text-slate-600 text-xs">AKSI</TableHead>
+                                <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -252,8 +252,8 @@ export function CardRiwayatTable({
                                                     {getInitials(item.pegawai.nama)}
                                                 </div>
                                                 <div title={item.pegawai.nama} className="max-w-[150px]">
-                                                    <p className="font-semibold text-slate-700 truncate">{item.pegawai.nama}</p>
-                                                    <p className="text-[10px] text-slate-400 uppercase truncate">{item.pegawai.divisi}</p>
+                                                    <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                    <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                 </div>
                                             </div>
                                         </TableCell>

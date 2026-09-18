@@ -61,11 +61,11 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-slate-600 text-xs ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
             onClick={() => onSort(field)}
         >
             <div className={`flex items-center gap-1 ${className.includes("text-center") ? "justify-center" : "justify-start"}`}>
-                <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -227,7 +227,7 @@ export function KaryawanTable({
                         <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-100">
                                 <SortableHeader label="KARYAWAN" field="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <TableHead className="text-slate-600 text-xs">
+                                <TableHead className="text-[#000000] text-xs font-semibold">
                                     PENILAIAN KINERJA
                                     <span className="ml-1 text-gray-400">
                                         ({mode === "bulan" ? "Bulan Ini" : "1 Tahun"})
@@ -235,7 +235,7 @@ export function KaryawanTable({
                                 </TableHead>
                                 <SortableHeader label="DAILY ACTIVITY BERJALAN" field="aktivitasberjalan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="text-center" />
                                 <SortableHeader label="TOTAL DAILY ACTIVITY" field="totalaktivitas" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <TableHead className="text-right text-slate-600 text-xs">AKSI</TableHead>
+                                <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -274,8 +274,8 @@ export function KaryawanTable({
                                                     {getInitials(item.nama)}
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-gray-900">{item.nama}</p>
-                                                    <p className="text-xs text-muted-foreground">{item.divisi}</p>
+                                                    <p className="font-semibold text-gray-900 truncate">{item.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                    <p className="text-[0.75rem] text-muted-foreground truncate">{item.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
