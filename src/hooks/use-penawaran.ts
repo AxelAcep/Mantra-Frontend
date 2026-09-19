@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getDetailTrackingPenawaran,
+  getPenawaranIdByNomor,
   assignPreSales,
   updateStatusPermintaanMasuk,
   getPenawaranChat,
@@ -27,6 +28,17 @@ export function useDetailPenawaran(id: string) {
     queryKey: ["penawaran-detail", id],
     queryFn: () => getDetailTrackingPenawaran(id),
     enabled: !!id,
+  });
+}
+
+// ── Lookup by NomorPenawaran ─────────────────────────────────────────────
+
+export function usePenawaranIdByNomor(nomorPenawaran: string | undefined) {
+  return useQuery({
+    queryKey: ["penawaran-by-nomor", nomorPenawaran],
+    queryFn: () => getPenawaranIdByNomor(nomorPenawaran!),
+    enabled: !!nomorPenawaran && !nomorPenawaran.toUpperCase().includes("PENDING"),
+    staleTime: 5 * 60 * 1000,
   });
 }
 

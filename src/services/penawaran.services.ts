@@ -136,6 +136,20 @@ export async function getDetailTrackingPenawaran(
   return res.json();
 }
 
+// ── API: Lookup by NomorPenawaran ──────────────────────────────────────────
+
+export async function getPenawaranIdByNomor(
+  nomorPenawaran: string,
+): Promise<{ id: string; nomorPenawaran: string } | null> {
+  const query = new URLSearchParams({ nomorPenawaran });
+  const res = await fetchClient(
+    `/tracking-penawaran/by-nomor?${query.toString()}`,
+    { headers: authHeaders() },
+  );
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // ── API: Assign PreSales ───────────────────────────────────────────────────
 
 export async function assignPreSales(

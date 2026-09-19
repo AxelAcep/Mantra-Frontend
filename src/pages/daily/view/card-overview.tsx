@@ -1,6 +1,8 @@
 import { Badge } from "@/components/ui/badge"
-import { BadgeCheck, MessageSquare } from "lucide-react"
+import { BadgeCheck, ExternalLink, MessageSquare } from "lucide-react"
 import { Icons } from "@/assets"
+import { Link } from "react-router-dom"
+import { usePenawaranIdByNomor } from "@/hooks/use-penawaran"
 
 const KATEGORI_LABEL: Record<string, string> = {
     QUOTATION: "Quotation",
@@ -59,6 +61,7 @@ type Props = {
 export function OverviewCard({ isSupervised = false ,kategori, terkaitPO, status, isOverdue, unreadChat = 0, onChatClick, onEdit, alasanPenolakan, updatedAt, parent }: Props) {
     const displayStatus = isOverdue ? "OVERDUE" : status
     const displayLabel = isOverdue ? "Overdue" : STATUS_LABEL[status]
+    const { data: penawaranLink } = usePenawaranIdByNomor(terkaitPO)
 
     return (
         <div className="relative bg-gradient-to-br from-slate-50 to-blue-50 border border-gray-200 rounded-xl p-6 shadow-sm w-full">
@@ -116,10 +119,20 @@ export function OverviewCard({ isSupervised = false ,kategori, terkaitPO, status
                         {KATEGORI_LABEL[kategori] ?? kategori}
                     </span>
                 </div>
-                <div className="flex flex-col w-1/2 bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
-                    <label className="text-xs text-gray-400 mb-1">Nomor Referensi</label>
-                    <span className="text-sm font-semibold text-cyan-500">
-                        {terkaitPO ?? "-"}
+                <div className="flex flex-col w-1/2 bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm relative">
+                    <div className="flex items-center justify-between">
+                        <label className="text-xs text-gray-400 mb-1">Nomor Referensi</label>
+                        {terkaitPO && !terkaitPO.toUpperCase().includes("PENDING") && penawaranLink && (
+                            <Link
+                                to={`/penawaran/${penawaranLink.id}`}
+                                className="flex items-center gap-1 text-xs text-cyan-500 font-bold hover:underline"
+                            >
+                                <ExternalLink size={11} /> Kunjungi
+                            </Link>
+                        )}
+                    </div>
+                    <span className="text-sm font-semibold">
+                        {terkaitPO?.toUpperCase().includes("PENDING") ? "-" : (terkaitPO ?? "-")}
                     </span>
                 </div>
             </div>
