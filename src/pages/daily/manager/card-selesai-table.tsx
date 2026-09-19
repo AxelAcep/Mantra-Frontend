@@ -456,14 +456,14 @@ export function SelesaiTable({
                                                 {item.perusahaan}
                                             </TableCell>
                                             <TableCell>
-                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
+                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
                                                     {item.kategori?.replace(/_/g, " ")}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="text-gray-600 text-sm">
+                                            <TableCell className="text-sm">
                                                 {formatDateTime(item.targetSelesai)}
                                             </TableCell>
-                                            <TableCell className="text-cyan-600 text-sm">
+                                            <TableCell className="text-sm">
                                                 {formatDateTime(item.waktuSubmit)}
                                             </TableCell>
                                             <TableCell>

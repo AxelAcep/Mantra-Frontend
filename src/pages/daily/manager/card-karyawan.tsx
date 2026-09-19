@@ -292,14 +292,14 @@ export function KaryawanTable({
                                         {/* Aktivitas Berjalan */}
                                         <TableCell className="text-center">
                                             {item.aktivitasBerjalan > 0
-                                                ? <span className="font-semibold text-gray-900">{item.aktivitasBerjalan}</span>
+                                                ? <span className="text-gray-900">{item.aktivitasBerjalan}</span>
                                                 : <span className="text-gray-300">-</span>
                                             }
                                         </TableCell>
 
                                         {/* Total Aktivitas */}
                                         <TableCell>
-                                            <p className="font-bold text-gray-900">{item.totalAktivitas}</p>
+                                            <p className="text-gray-900">{item.totalAktivitas}</p>
                                             <p className="text-xs text-muted-foreground">aktivitas / tahun</p>
                                         </TableCell>
 

@@ -51,8 +51,7 @@ function formatTime(iso: string) {
 
 function VerifiedBadge() {
     return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 border border-green-200 text-green-600 text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap">
-            <BadgeCheck className="w-3.5 h-3.5 text-green-500 shrink-0" />
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-50 border border-green-200 text-green-600 text-xs tracking-wide whitespace-nowrap">
             Terverifikasi
         </span>
     )
@@ -289,13 +288,13 @@ export function RescheduleTable({
                             </TableHeader>
                             <TableBody>
                                 {isLoading && (
-                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">Memuat data...</TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-medium">Memuat data...</TableCell></TableRow>
                                 )}
                                 {isError && (
-                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-red-500 text-sm">Gagal memuat data.</TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-red-500 text-medium">Gagal memuat data.</TableCell></TableRow>
                                 )}
                                 {!isLoading && sortedItems.length === 0 && (
-                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">Tidak ada pengajuan reschedule.</TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-medium">Tidak ada pengajuan reschedule.</TableCell></TableRow>
                                 )}
                                 {sortedItems.map((item, idx) => {
                                     const avatar = getAvatarColor(item.activity.pegawai.nama)
@@ -325,18 +324,18 @@ export function RescheduleTable({
                                                     <div className="pl-12 text-xs text-muted-foreground italic">↳ sama</div>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-800 max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
-                                            <TableCell className="font-medium text-gray-800 max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
+                                            <TableCell className="font-medium text-gray-800 text-medium max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
+                                            <TableCell className="text-gray-600 text-medium">
                                                 <p>{formatDate(item.activity.targetSelesai)}</p>
-                                                <p className="text-xs">{formatTime(item.activity.targetSelesai)}</p>
+                                                <p>{formatTime(item.activity.targetSelesai)}</p>
                                             </TableCell>
-                                            <TableCell className="text-cyan-600 font-semibold">
+                                            <TableCell className="text-gray-600 text-medium">
                                                 <p>{formatDate(item.targetSelesaiBaru)}</p>
-                                                <p className="text-xs">{formatTime(item.targetSelesaiBaru)}</p>
+                                                <p>{formatTime(item.targetSelesaiBaru)}</p>
                                             </TableCell>
-                                            <TableCell className="text-gray-600 max-w-[200px]" title={item.alasan}>
-                                                <p className="truncate text-sm">{item.alasan}</p>
+                                            <TableCell className="text-gray-600 text-medium max-w-[200px]" title={item.alasan}>
+                                                <p className="truncate">{item.alasan}</p>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col gap-1 items-center">
@@ -364,7 +363,7 @@ export function RescheduleTable({
                                                     </button>
                                                     <button
                                                         onClick={() => navigate(`/dailyactivity/${item.activityId}`)}
-                                                        className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
+                                                        className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
                                                     >
                                                         Lihat Detail
                                                     </button>
