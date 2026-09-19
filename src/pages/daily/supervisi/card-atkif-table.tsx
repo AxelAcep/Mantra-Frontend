@@ -62,10 +62,10 @@ function formatDate(iso?: string) {
 // ─── Sort Icon ────────────────────────────────────────────────────────────────
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-    if (!active || !dir) return <ChevronsUpDown className="w-3 h-3 text-slate-400" />
+    if (!active || !dir) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
     return dir === "asc"
-        ? <ChevronUp className="w-3 h-3 text-cyan-600" />
-        : <ChevronDown className="w-3 h-3 text-cyan-600" />
+        ? <ChevronUp className="w-3.5 h-3.5 text-cyan-600" />
+        : <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
 }
 
 function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" }: {
@@ -75,11 +75,11 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" 
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-slate-600 text-xs ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
-                <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -235,29 +235,30 @@ export function CardAktifTable({
             </div>
 
             {/* Table */}
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto px-6">
+                <div className="w-full rounded-md border bg-white min-w-[800px]">
                 <Table className="w-full table-fixed">
                     <TableHeader>
-                        <TableRow className="bg-white border-b border-slate-100">
-                            <SortableHeader label="Karyawan" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[160px] pl-6" />
-                            <SortableHeader label="Kategori" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[130px]" />
-                            <TableHead className="text-slate-600 text-xs uppercase font-medium w-[220px]">Judul Aktivitas</TableHead>
-                            <TableHead className="text-slate-600 text-xs uppercase font-medium w-[110px]">No. Referensi</TableHead>
-                            <SortableHeader label="Tgl Selesai / Mulai" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <SortableHeader label="Status" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <TableHead className="text-right text-slate-600 text-xs uppercase font-medium pr-6 w-[100px]">Aksi</TableHead>
+                        <TableRow className="bg-slate-50 border-b border-slate-100">
+                        <SortableHeader label="Karyawan" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[160px] pl-6" />
+                        <SortableHeader label="Kategori" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[130px]" />
+                        <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[220px]">Judul Aktivitas</TableHead>
+                        <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[110px]">No. Referensi</TableHead>
+                        <SortableHeader label="Tgl Selesai / Mulai" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
+                        <SortableHeader label="Status" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
+                        <TableHead className="text-right text-[#000000] text-xs font-semibold uppercase pr-6 w-[100px]">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-16 text-slate-400">
+                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">
                                     Memuat data...
                                 </TableCell>
                             </TableRow>
                         ) : items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-16 text-slate-400">
+                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">
                                     {search ? "Tidak ada hasil yang cocok." : "Tidak ada aktivitas."}
                                 </TableCell>
                             </TableRow>
@@ -273,40 +274,40 @@ export function CardAktifTable({
                                     {/* Karyawan */}
                                     <TableCell className="pl-6">
                                         <div className="flex items-center gap-2.5">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
+                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                 {getInitials(item.pegawai.nama)}
                                             </div>
                                             <div>
-                                                <p className="text-xs font-semibold text-slate-700 leading-tight">{item.pegawai.nama}</p>
-                                                <p className="text-[10px] text-slate-400 uppercase">{item.pegawai.divisi}</p>
+                                                <p className="text-xs font-semibold text-gray-900 leading-tight">{item.pegawai.nama}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi}</p>
                                             </div>
                                         </div>
                                     </TableCell>
 
                                     {/* Kategori */}
                                     <TableCell>
-                                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
+                                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
                                             {item.kategori}
                                         </span>
                                     </TableCell>
 
                                     {/* Judul + Perusahaan (biru, kecil) */}
                                     <TableCell>
-                                        <p className="text-xs font-medium text-slate-800 line-clamp-1">{item.judul}</p>
+                                        <p className="text-medium font-medium text-gray-800 line-clamp-1">{item.judul}</p>
                                         {item.perusahaan && (
-                                            <p className="text-[10px] text-blue-500 mt-0.5 line-clamp-1">{item.perusahaan}</p>
+                                            <p className="text-[0.75rem] text-muted-foreground mt-0.5 line-clamp-1">{item.perusahaan}</p>
                                         )}
                                     </TableCell>
 
                                     {/* No. Referensi */}
-                                    <TableCell className="font-mono text-[12px] text-cyan-600">
+                                    <TableCell className="font-mono text-medium text-cyan-600">
                                         {item.terkaitPO || "-"}
                                     </TableCell>
 
                                     {/* Tgl Selesai / Mulai */}
                                     <TableCell>
-                                        <p className="text-[11px] font-medium text-slate-800">{formatDate(item.targetSelesai)}</p>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">{formatDate(item.waktuMulai)}</p>
+                                        <p className="text-medium text-gray-600">{formatDate(item.targetSelesai)}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">{formatDate(item.waktuMulai)}</p>
                                     </TableCell>
 
                                     {/* Status */}
@@ -331,7 +332,7 @@ export function CardAktifTable({
                                             )}
                                             <button
                                                 onClick={() => navigate(`/dailyactivity/supervisi/${item.id}`)}
-                                                className="text-cyan-600 text-xs font-medium hover:underline whitespace-nowrap"
+                                                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
                                             >
                                                 Lihat Detail
                                             </button>
@@ -342,6 +343,7 @@ export function CardAktifTable({
                         })}
                     </TableBody>
                 </Table>
+                </div>
             </div>
 
             {/* Pagination */}

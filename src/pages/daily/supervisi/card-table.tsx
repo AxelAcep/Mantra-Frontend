@@ -4,7 +4,7 @@ import {
     TableHeader, TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, ChevronsUpDown } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 import type { Activity, PaginatedActivity } from "../../../services/activity.services"
 import { CheckCircle, XCircle } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -13,7 +13,7 @@ import { DialogKonfirmasi } from "./dialog-konfirmasi"
 
 
 type SortKey = "kategori" | "terkaitPO" | "targetSelesai" | "status" | "perusahaan" | null
-type SortDir = "asc" | "desc"
+type SortDir = "asc" | "desc" | "" | undefined
 
 type Props = {
     data?: PaginatedActivity
@@ -76,18 +76,33 @@ const KATEGORI_LABEL: Record<string, string> = {
     LAIN_LAIN: "Lain-Lain",
 }
 
-function SortButton({ label, active, onClick }: {
+// ─── Sort Icon ────────────────────────────────────────────────────────────────
+
+function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
+    if (!active || dir === undefined) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+    return dir === "asc"
+        ? <ChevronUp className="w-3.5 h-3.5 text-cyan-600" />
+        : <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
+}
+
+function SortableHeader({ label, active, sortDir, onClick }: {
     label: string
-    sortKey: SortKey
     active: boolean
-    dir: SortDir
+    sortDir: SortDir
     onClick: () => void
 }) {
     return (
-        <button onClick={onClick} className="flex items-center gap-1 group">
-            {label}
-            <ChevronsUpDown className={`w-3 h-3 ${active ? "text-cyan-500" : "text-slate-300 group-hover:text-slate-400"}`} />
-        </button>
+        <TableHead
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
+            onClick={onClick}
+        >
+            <div className="flex items-center gap-1">
+                <span className={`uppercase font-semibold`}>
+                    {label}
+                </span>
+                <SortIcon active={active} dir={active ? sortDir : undefined} />
+            </div>
+        </TableHead>
     )
 }
 
@@ -118,7 +133,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
                     </button>
                     <button
                         onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                        className="text-cyan-600 font-medium hover:underline text-sm"
+                        className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
                     >
                         Lihat Detail →
                     </button>
@@ -157,7 +172,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
         return (
             <button
                 onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                className="text-cyan-600 font-medium hover:underline text-sm"
+                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
             >
                 Lihat Detail →
             </button>
@@ -171,7 +186,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
         return (
             <button
                 onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                className="text-cyan-600 font-medium hover:underline text-sm"
+                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
             >
                 Reschedule Ulang →
             </button>
@@ -181,7 +196,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
     return (
         <button
             onClick={() => navigate(`/dailyactivity/${item.id}`)}
-            className="text-cyan-600 font-medium hover:underline text-sm"
+            className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
         >
             Lihat Detail →
         </button>
@@ -234,38 +249,30 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
         <div className="rounded-md border bg-white">
             <Table>
                 <TableHeader>
-                    <TableRow className="bg-slate-50">
-                        <TableHead className="text-slate-600 text-xs">TANGGAL INPUT</TableHead>
-                        <TableHead className="text-slate-600 text-xs">JUDUL</TableHead>
-                        <TableHead className="text-slate-600 text-xs">
-                            <SortButton label="KATEGORI" sortKey="kategori" active={sortKey === "kategori"} dir={sortDir} onClick={() => handleSort("kategori")} />
-                        </TableHead>
-                        <TableHead className="text-slate-600 text-xs">
-                            <SortButton label="PERUSAHAAN" sortKey="perusahaan" active={sortKey === "perusahaan"} dir={sortDir} onClick={() => handleSort("perusahaan")} />
-                        </TableHead>
-                        <TableHead className="text-slate-600 text-xs">
-                            <SortButton label="DEADLINE" sortKey="targetSelesai" active={sortKey === "targetSelesai"} dir={sortDir} onClick={() => handleSort("targetSelesai")} />
-                        </TableHead>
-                        <TableHead className="text-slate-600 text-xs">
-                            <SortButton label="STATUS" sortKey="status" active={sortKey === "status"} dir={sortDir} onClick={() => handleSort("status")} />
-                        </TableHead>
-                        <TableHead className="text-right text-slate-600 text-xs">AKSI</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100">
+                        <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL INPUT</TableHead>
+                        <TableHead className="text-[#000000] text-xs font-semibold">JUDUL</TableHead>
+                        <SortableHeader label="KATEGORI" active={sortKey === "kategori"} sortDir={sortDir} onClick={() => handleSort("kategori")} />
+                        <SortableHeader label="PERUSAHAAN" active={sortKey === "perusahaan"} sortDir={sortDir} onClick={() => handleSort("perusahaan")} />
+                        <SortableHeader label="DEADLINE" active={sortKey === "targetSelesai"} sortDir={sortDir} onClick={() => handleSort("targetSelesai")} />
+                        <SortableHeader label="STATUS" active={sortKey === "status"} sortDir={sortDir} onClick={() => handleSort("status")} />
+                        <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-16 text-slate-400">Memuat data...</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">Memuat data...</TableCell>
                         </TableRow>
                     )}
                     {isError && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-16 text-rose-400">Gagal memuat data.</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-red-500 text-medium">Gagal memuat data.</TableCell>
                         </TableRow>
                     )}
                     {!isLoading && !isError && sorted.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-16 text-slate-400">Tidak ada data.</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">Tidak ada data.</TableCell>
                         </TableRow>
                     )}
                     {sorted.map((item) => {
@@ -275,14 +282,18 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                         return (
                             <TableRow key={item.id}>
                                 <TableCell>
-                                    <p className="text-sm text-muted-foreground leading-tight">{input.tanggal}</p>
+                                    <p className="text-medium text-muted-foreground leading-tight">{input.tanggal}</p>
                                     <p className="text-xs text-muted-foreground leading-tight">{input.waktu}</p>
                                 </TableCell>
-                                <TableCell className="font-medium text-slate-700 max-w-[200px] truncate">{item.judul}</TableCell>
-                                <TableCell className="text-sm text-muted-foreground">{KATEGORI_LABEL[item.kategori] ?? item.kategori}</TableCell>
-                                <TableCell className="text-sm text-muted-foreground">{item.perusahaan ?? "-"}</TableCell>
+                                <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate">{item.judul}</TableCell>
                                 <TableCell>
-                                    <p className={`text-sm leading-tight ${overdue ? "text-red-500 font-medium" : "text-muted-foreground"}`}>{deadline.tanggal}</p>
+                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                                        {KATEGORI_LABEL[item.kategori] ?? item.kategori}
+                                    </span>
+                                </TableCell>
+                                <TableCell className="text-medium text-muted-foreground">{item.perusahaan ?? "-"}</TableCell>
+                                <TableCell>
+                                    <p className={`text-medium leading-tight ${overdue ? "text-red-500 font-medium" : "text-muted-foreground"}`}>{deadline.tanggal}</p>
                                     <p className={`text-xs leading-tight ${overdue ? "text-red-400" : "text-muted-foreground"}`}>{deadline.waktu}</p>
                                 </TableCell>
                                 <TableCell>

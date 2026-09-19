@@ -53,10 +53,10 @@ function formatJam(iso?: string) {
 // ─── Sort Icon ────────────────────────────────────────────────────────────────
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-    if (!active || !dir) return <ChevronsUpDown className="w-3 h-3 text-slate-400" />
+    if (!active || !dir) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
     return dir === "asc"
-        ? <ChevronUp className="w-3 h-3 text-cyan-600" />
-        : <ChevronDown className="w-3 h-3 text-cyan-600" />
+        ? <ChevronUp className="w-3.5 h-3.5 text-cyan-600" />
+        : <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
 }
 
 function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" }: {
@@ -66,11 +66,11 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" 
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-slate-600 text-xs ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
-                <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -131,28 +131,29 @@ export function CardRiwayatTable({
             </div>
 
             {/* Table */}
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto px-6">
+                <div className="w-full rounded-md border bg-white min-w-[800px]">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-white border-b border-slate-100">
+                        <TableRow className="bg-slate-50 border-b border-slate-100">
                             <SortableHeader label="Karyawan" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="pl-6 w-[180px]" />
                             <SortableHeader label="Tanggal" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <TableHead className="text-slate-600 text-xs uppercase font-medium">Aktivitas</TableHead>
-                            <TableHead className="text-slate-600 text-xs uppercase font-medium w-[160px]">Perusahaan</TableHead>
+                            <TableHead className="text-[#000000] text-xs font-semibold uppercase">Aktivitas</TableHead>
+                            <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[160px]">Perusahaan</TableHead>
                             <SortableHeader label="Kategori" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <TableHead className="text-right text-slate-600 text-xs uppercase font-medium pr-6 w-[120px]">Aksi</TableHead>
+                            <TableHead className="text-right text-[#000000] text-xs font-semibold uppercase pr-6 w-[120px]">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-16 text-slate-400">
+                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-medium">
                                     Memuat data...
                                 </TableCell>
                             </TableRow>
                         ) : items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-16 text-slate-400">
+                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-medium">
                                     {search ? "Tidak ada hasil yang cocok." : "Tidak ada riwayat aktivitas."}
                                 </TableCell>
                             </TableRow>
@@ -163,37 +164,37 @@ export function CardRiwayatTable({
                                     {/* Karyawan */}
                                     <TableCell className="pl-6">
                                         <div className="flex items-center gap-2.5">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
+                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                 {getInitials(item.pegawai.nama)}
                                             </div>
                                             <div>
-                                                <p className="text-xs font-semibold text-slate-700 leading-tight">{item.pegawai.nama}</p>
-                                                <p className="text-[10px] text-slate-400 uppercase">{item.pegawai.divisi}</p>
+                                                <p className="text-xs font-semibold text-gray-900 leading-tight">{item.pegawai.nama}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi}</p>
                                             </div>
                                         </div>
                                     </TableCell>
 
                                     {/* Tanggal */}
                                     <TableCell>
-                                        <p className="text-xs font-medium text-slate-800">{formatTanggal(item.waktuMulai)}</p>
-                                        <p className="text-[11px] text-slate-400 mt-0.5">
+                                        <p className="text-medium text-gray-600">{formatTanggal(item.waktuMulai)}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
                                             {formatJam(item.waktuMulai)} - {formatJam(item.targetSelesai)}
                                         </p>
                                     </TableCell>
 
                                     {/* Aktivitas */}
                                     <TableCell className="max-w-[320px]">
-                                        <p className="text-xs font-semibold text-slate-800">{item.judul}</p>
-                                        <p className="text-[11px] text-cyan-600 mt-0.5 line-clamp-2">{item.deskripsi}</p>
+                                        <p className="text-medium font-semibold text-gray-900">{item.judul}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.deskripsi}</p>
                                     </TableCell>
 
                                     {/* Perusahaan */}
-                                    <TableCell className="text-xs text-slate-700">
+                                    <TableCell className="text-medium text-gray-600">
                                         {item.perusahaan || "-"}
                                     </TableCell>
 
                                     {/* Kategori */}
-                                    <TableCell className="text-xs text-slate-700">
+                                    <TableCell className="text-medium text-gray-600">
                                         {item.kategori}
                                     </TableCell>
 
@@ -201,7 +202,7 @@ export function CardRiwayatTable({
                                     <TableCell className="text-right pr-6">
                                         <button
                                             onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                                            className="text-cyan-600 text-xs font-medium hover:underline whitespace-nowrap"
+                                            className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
                                         >
                                             Lihat Detail →
                                         </button>
@@ -211,6 +212,7 @@ export function CardRiwayatTable({
                         })}
                     </TableBody>
                 </Table>
+                </div>
             </div>
 
             {/* Pagination */}
