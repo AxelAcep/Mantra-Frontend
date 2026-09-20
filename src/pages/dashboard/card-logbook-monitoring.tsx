@@ -68,42 +68,44 @@ export default function LogbookMonitoring() {
       <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[20%]">NAMA</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[15%]">DIVISI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[40%]">DAILY ACTIVITY</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[15%]">TERKAIT PROSES</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[10%] text-right">AKSI</TableHead>
+            <TableRow className="bg-slate-50 border-b border-slate-100">
+              <TableHead className="text-[#000000] text-xs font-semibold">NAMA</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">DIVISI</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">DAILY ACTIVITY</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">TERKAIT PROSES</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-slate-400 text-sm">
+                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground text-sm">
                   Memuat data...
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && logbookData.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-slate-400 text-sm">
+                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground text-sm">
                   Tidak ada aktivitas yang sedang berjalan.
                 </TableCell>
               </TableRow>
             )}
             {logbookData.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className="hover:bg-slate-50/50 transition-colors">
 
-                <TableCell className="font-bold text-slate-800 text-sm">
+                <TableCell className="font-semibold text-gray-900">
                   {row.name}
                 </TableCell>
 
-                <TableCell className="text-slate-500 text-sm">
-                  {row.division}
+                <TableCell>
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                    {row.division?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                  </span>
                 </TableCell>
 
-                <TableCell className="text-slate-600 text-sm">
+                <TableCell className="font-medium text-gray-800">
                   <div className="flex items-center gap-2">
                     <span className="truncate max-w-[250px]">{row.input}</span>
 
@@ -143,9 +145,9 @@ export default function LogbookMonitoring() {
                 </TableCell>
 
                 <TableCell>
-                  <Badge variant="outline" className="text-slate-500 font-normal rounded-full bg-slate-50 text-[10px] border-slate-200 shadow-none">
-                    {row.process}
-                  </Badge>
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                    {row.process?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                  </span>
                 </TableCell>
 
                 <TableCell className="text-right">

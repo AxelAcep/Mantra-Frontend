@@ -73,40 +73,42 @@ export default function DailyActivityReport() {
       <CardContent className="p-0">
         <Table className="table-fixed w-full">
           <TableHeader>
-            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[25%]">KARYAWAN</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[18%]">DIVISI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">OVERDUE</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">PROGRESS</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">SELESAI</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[11%] text-center">TOTAL</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 h-10 w-[13%] text-right">AKSI</TableHead>
+            <TableRow className="bg-slate-50 border-b border-slate-100">
+              <TableHead className="text-[#000000] text-xs font-semibold">KARYAWAN</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">DIVISI</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-center">OVERDUE</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-center">PROGRESS</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-center">SELESAI</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-center">TOTAL</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-slate-400 text-sm">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                   Memuat data...
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && activities.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-slate-400 text-sm">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                   Tidak ada data aktivitas.
                 </TableCell>
               </TableRow>
             )}
             {activities.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.id} className="hover:bg-slate-50/50 transition-colors">
 
-                <TableCell className="font-medium text-slate-800 text-sm truncate" title={row.nama}>
+                <TableCell className="font-semibold text-gray-900 truncate" title={row.nama}>
                   {row.nama}
                 </TableCell>
 
-                <TableCell className="text-slate-500 text-sm truncate" title={row.divisi}>
-                  {row.divisi}
+                <TableCell>
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                    {row.divisi?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                  </span>
                 </TableCell>
 
                 <TableCell>
@@ -125,15 +127,15 @@ export default function DailyActivityReport() {
                   )}
                 </TableCell>
 
-                <TableCell className="text-slate-600 font-medium text-sm text-center">
+                <TableCell className="font-medium text-gray-800 text-center">
                   {row.aktivitasBerjalan}
                 </TableCell>
 
-                <TableCell className="text-emerald-500 font-bold text-sm text-center">
+                <TableCell className="font-bold text-emerald-500 text-center">
                   {row.completedCount}
                 </TableCell>
 
-                <TableCell className="font-bold text-slate-800 text-sm text-center">
+                <TableCell className="font-semibold text-gray-800 text-center">
                   {row.totalAktivitas}
                 </TableCell>
 
