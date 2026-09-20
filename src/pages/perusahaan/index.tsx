@@ -41,7 +41,7 @@ function SortableHeader({
   return (
     <TableHead
       className={cn(
-        "cursor-pointer select-none group text-slate-600 text-xs",
+        "cursor-pointer select-none group text-[#000000] text-xs font-semibold",
         center && "text-center",
         className
       )}
@@ -49,7 +49,7 @@ function SortableHeader({
       title={title}
     >
       <div className={cn("flex items-center gap-1", center && "justify-center")}>
-        <span className={`uppercase font-medium ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+        <span className={`uppercase font-semibold`}>
           {label}
         </span>
         <SortIcon active={isActive} dir={isActive ? sortOrder : ""} />
@@ -228,13 +228,13 @@ export default function PerusahaanPage() {
                 <SortableHeader label="AKTIVITAS TERAKHIR" field="activity" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[15%]" />
                 <SortableHeader label="PENGADAAN BARANG" field="pengadaan" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[12%]" />
                 <SortableHeader label="TOTAL PROYEK" field="total" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[10%]" />
-                <TableHead className="text-right text-slate-600 text-xs w-[6%]">AKSI</TableHead>
+                <TableHead className="text-right text-[#000000] text-xs font-semibold w-[6%]">AKSI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedCompanies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-16 text-slate-400">
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                     Tidak ada perusahaan yang ditemukan.
                   </TableCell>
                 </TableRow>
@@ -242,21 +242,21 @@ export default function PerusahaanPage() {
                 paginatedCompanies.map((item, idx) => (
                   <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors [&_td]:py-4">
                     <TableCell className="max-w-[200px]" title={item.name}>
-                      <p className="font-medium text-slate-800 truncate">{item.name}</p>
+                      <p className="font-medium text-gray-800 truncate">{item.name}</p>
                     </TableCell>
                     <TableCell className="max-w-[200px]" title={item.address}>
-                      <p className="text-sm text-slate-500 truncate">{item.address}</p>
+                      <p className="text-sm text-gray-800 truncate">{item.address}</p>
                     </TableCell>
                     <TableCell className="whitespace-nowrap" title={item.phone}>
                       <div className="flex items-center gap-2">
                         <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="text-sm text-slate-600 truncate">{truncate(item.phone, 15)}</span>
+                        <span className="text-sm text-gray-800 truncate">{truncate(item.phone, 15)}</span>
                       </div>
                     </TableCell>
                     <TableCell className="whitespace-nowrap" title={item.activity}>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="text-sm text-slate-600 truncate">{item.activity}</span>
+                        <span className="text-sm text-gray-800 truncate">{item.activity}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
@@ -289,17 +289,17 @@ export default function PerusahaanPage() {
       </div>
 
       {/* Footer / Pagination */}
-      <div className="p-4 flex items-center justify-between border-t border-slate-100 text-xs text-slate-500 bg-white">
+      <div className="p-4 flex items-center justify-between border-t border-slate-50 text-sm text-slate-500 bg-white">
         <div>
           Menampilkan <span className="font-semibold text-slate-700">{filteredCompanies.length === 0 ? 0 : startIndex + 1}</span> sampai <span className="font-semibold text-slate-700">{Math.min(startIndex + ITEMS_PER_PAGE, filteredCompanies.length)}</span> dari <span className="font-semibold text-slate-700">{filteredCompanies.length}</span> perusahaan
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded hover:bg-slate-100 text-slate-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           {getPageNumbers().map((page, idx) => {
             if (page === "...") {
@@ -309,9 +309,9 @@ export default function PerusahaanPage() {
               <button
                 key={idx}
                 onClick={() => setCurrentPage(Number(page))}
-                className={`w-7 h-7 flex items-center justify-center rounded font-bold text-xs transition-all ${currentPage === page
-                  ? "bg-cyan-600 text-white shadow-sm"
-                  : "hover:bg-slate-100 text-slate-600"
+                className={`w-8 h-8 flex items-center justify-center rounded-md font-medium text-sm transition-colors ${currentPage === page
+                  ? "bg-cyan-500 text-white"
+                  : "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50"
                   }`}
               >
                 {page}
@@ -321,9 +321,9 @@ export default function PerusahaanPage() {
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages || totalPages === 0}
-            className="p-1.5 rounded hover:bg-slate-100 text-slate-400 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <ChevronRight size={16} />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>

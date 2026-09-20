@@ -29,10 +29,10 @@ function formatDate(dateStr?: string) {
 type SortDir = "asc" | "desc" | ""
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-    if (!active || !dir) return <ChevronsUpDown className="w-3 h-3 text-slate-400 shrink-0" />
+    if (!active || !dir) return <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
     return dir === "asc"
-        ? <ChevronUp className="w-3 h-3 text-cyan-600 shrink-0" />
-        : <ChevronDown className="w-3 h-3 text-cyan-600 shrink-0" />
+        ? <ChevronUp className="w-3.5 h-3.5 text-cyan-600" />
+        : <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
 }
 
 function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" }: {
@@ -42,11 +42,11 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" 
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-slate-500 font-semibold h-12 transition-colors ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
-                <span className={`uppercase text-xs ${isActive ? "text-cyan-600" : ""} group-hover:text-cyan-600 transition-colors`}>
+                <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
                 <SortIcon active={isActive} dir={isActive ? sortDir : ""} />
@@ -65,16 +65,16 @@ export interface UserTableProps {
 export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
     return (
         <>
-            <Table className="w-full table-fixed min-w-[1000px]">
+            <Table>
                 <TableHeader>
-                    <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[22%] px-6" />
-                        <SortableHeader label="DIVISI" field="divisi" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[14%]" />
-                        <SortableHeader label="EMAIL" field="email" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[21%]" />
-                        <SortableHeader label="ROLE" field="role" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[10%]" />
-                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[10%]" />
-                        <SortableHeader label="AKTIVITAS TERAKHIR" field="last_login" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} className="w-[15%]" />
-                        <TableHead className="text-xs font-semibold text-slate-500 h-12 text-right pl-2 pr-6 w-[8%]">AKSI</TableHead>
+                    <TableRow className="bg-slate-50 border-b border-slate-100">
+                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <SortableHeader label="DIVISI" field="divisi" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <SortableHeader label="EMAIL" field="email" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <SortableHeader label="ROLE" field="role" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <SortableHeader label="AKTIVITAS TERAKHIR" field="last_login" sortBy={sortBy} sortDir={sortDir as SortDir} onSort={onSort} />
+                        <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -82,23 +82,29 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                         const { tanggal, waktu } = formatDate(user.lastLogin)
                         const avatarColor = AVATAR_COLORS[index % AVATAR_COLORS.length]
                         return (
-                            <TableRow key={user.id} className="hover:bg-slate-50/50">
-                                <TableCell className="px-6 truncate">
+                            <TableRow key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                                <TableCell>
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${avatarColor}`}>
+                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatarColor}`}>
                                             {getInitials(user.pegawai.nama)}
                                         </div>
-                                        <span className="font-medium text-slate-700 truncate" title={user.pegawai.nama}>{user.pegawai.nama}</span>
+                                        <div title={user.pegawai.nama} className="max-w-[150px]">
+                                            <p className="font-semibold text-gray-900 truncate">{user.pegawai.nama}</p>
+                                        </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-slate-500 font-medium truncate" title={user.pegawai.divisi}>{user.pegawai.divisi}</TableCell>
-                                <TableCell className="text-slate-500 font-medium truncate" title={user.email}>{user.email}</TableCell>
-                                <TableCell className="truncate">
+                                <TableCell>
+                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                                        {user.pegawai.divisi?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                                    </span>
+                                </TableCell>
+                                <TableCell className="font-medium text-gray-800 truncate" title={user.email}>{user.email}</TableCell>
+                                <TableCell>
                                     <span className="text-xs font-semibold px-2 py-1 rounded-full bg-slate-100 text-slate-600">
                                         {user.role}
                                     </span>
                                 </TableCell>
-                                <TableCell className="truncate">
+                                <TableCell>
                                     {user.activeStatus ?? true ? (
                                         <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
                                             Aktif
@@ -109,16 +115,16 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                                         </span>
                                     )}
                                 </TableCell>
-                                <TableCell className="truncate">
-                                    <div className="flex flex-col truncate">
-                                        <span className="font-medium text-slate-700 truncate">{tanggal}</span>
-                                        {waktu && <span className="text-xs text-slate-400 mt-0.5 font-medium truncate">{waktu}</span>}
+                                <TableCell>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium text-gray-800">{tanggal}</span>
+                                        {waktu && <span className="text-xs text-gray-800 mt-0.5">{waktu}</span>}
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-right pl-2 pr-6">
-                                    <div className="flex items-center justify-end gap-3">
+                                <TableCell className="text-right">
+                                    <div className="flex items-center justify-end gap-2">
                                         <DialogEditKaryawan user={user}>
-                                            <button className="text-cyan-500 font-semibold hover:text-cyan-600 text-sm">
+                                            <button className="text-cyan-600 text-sm font-medium hover:underline">
                                                 Edit
                                             </button>
                                         </DialogEditKaryawan>
