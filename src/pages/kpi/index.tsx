@@ -9,6 +9,7 @@ import {
   TableHeader, TableRow,
 } from "@/components/ui/table"
 import { StatusBadge } from "@/pages/daily/manager/status-badge"
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 
 // ─── Donuts Chartsss ─────────────────────────────────────────────────────────────
 function DonutChart({ baik, cukup, buruk }: KPISummary) {
@@ -210,38 +211,27 @@ function ActivityTable({
   const SortableHeader = ({
     label,
     field,
-    widthClass,
     center,
   }: {
     label: string
     field: string
-    widthClass?: string
     center?: boolean
   }) => {
     const isSorted = sortBy === field
     return (
       <TableHead
-        className={`py-4 text-slate-600 text-xs font-medium uppercase tracking-wider ${widthClass || "px-6"} cursor-pointer group hover:text-cyan-600 transition-colors select-none`}
+        className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${center ? "text-center" : ""}`}
         onClick={() => onSort(field)}
       >
-        <div className={`flex items-center gap-1.5 ${center ? "justify-center" : ""}`}>
-          <span className={`${isSorted ? "text-cyan-600" : ""}`}>{label}</span>
-          <span className="flex flex-col text-[8px] gap-[2px] opacity-70">
-            <svg
-              className={`w-2.5 h-2.5 -mb-1 ${isSorted && sortDir === "asc" ? "text-cyan-600" : "text-slate-400 group-hover:text-cyan-600/50"}`}
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 4l-8 8h16z" />
-            </svg>
-            <svg
-              className={`w-2.5 h-2.5 ${isSorted && sortDir === "desc" ? "text-cyan-600" : "text-slate-400 group-hover:text-cyan-600/50"}`}
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 20l8-8H4z" />
-            </svg>
-          </span>
+        <div className={`flex items-center gap-1 ${center ? "justify-center" : ""}`}>
+          <span className="uppercase font-semibold">{label}</span>
+          {!isSorted || !sortDir ? (
+            <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+          ) : sortDir === "asc" ? (
+            <ChevronUp className="w-3.5 h-3.5 text-cyan-600" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
+          )}
         </div>
       </TableHead>
     )
@@ -338,64 +328,64 @@ function ActivityTable({
         </div>
       ) : (
         <div className="overflow-x-auto rounded-b-xl">
-          <Table className="table-fixed w-full min-w-[1000px]">
+          <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/50">
+              <TableRow className="bg-slate-50 border-b border-slate-100">
                 {isRiwayat ? (
                   <>
-                    <SortableHeader label="Tanggal" field="tanggal" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Aktivitas" field="judul" widthClass="px-6 w-[32%]" />
-                    <SortableHeader label="Perusahaan" field="perusahaan" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Kategori" field="kategori" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Penilaian" field="nilaiKPI" widthClass="px-4 w-[15%]" center />
+                    <SortableHeader label="TANGGAL" field="tanggal" />
+                    <SortableHeader label="AKTIVITAS" field="judul" />
+                    <SortableHeader label="PERUSAHAAN" field="perusahaan" />
+                    <SortableHeader label="KATEGORI" field="kategori" />
+                    <SortableHeader label="PENILAIAN" field="nilaiKPI" center />
                   </>
                 ) : (
                   <>
-                    <SortableHeader label="Kategori Pekerjaan" field="kategori" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Judul Aktivitas" field="judul" widthClass="px-6 w-[32%]" />
-                    <SortableHeader label="Nomor Referensi" field="terkaitPO" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Perusahaan" field="perusahaan" widthClass="px-6 w-[13%]" />
-                    <SortableHeader label="Status" field="status" widthClass="px-4 w-[15%]" center />
+                    <SortableHeader label="KATEGORI PEKERJAAN" field="kategori" />
+                    <SortableHeader label="JUDUL AKTIVITAS" field="judul" />
+                    <SortableHeader label="NOMOR REFERENSI" field="terkaitPO" />
+                    <SortableHeader label="PERUSAHAAN" field="perusahaan" />
+                    <SortableHeader label="STATUS" field="status" center />
                   </>
                 )}
-                <TableHead className="px-4 py-4 text-slate-600 text-xs font-medium uppercase tracking-wider text-right w-[14%]">Aksi</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-gray-50">
+            <TableBody>
               {data.map((row) => (
                 <TableRow key={row.id} className="hover:bg-slate-50/50 transition-colors group">
                   {isRiwayat ? (
                     <>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-gray-700 font-semibold text-xs mb-0.5">{formatDateFull(row.targetSelesai)}</div>
-                        <div className="text-[10px] text-slate-400 font-medium">{formatTimeOnly(row.waktuMulai)} - {formatTimeOnly(row.targetSelesai)}</div>
+                      <TableCell className="whitespace-nowrap">
+                        <div className="font-medium text-gray-800">{formatDateFull(row.targetSelesai)}</div>
+                        <div className="text-xs text-gray-800 mt-0.5">{formatTimeOnly(row.waktuMulai)} - {formatTimeOnly(row.targetSelesai)}</div>
                       </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <div className="text-gray-800 font-bold text-xs mb-0.5 line-clamp-1">{row.judul}</div>
-                        <div className="text-[10px] text-slate-400 line-clamp-1">{row.deskripsi}</div>
+                      <TableCell>
+                        <div className="font-medium text-gray-800 line-clamp-1">{row.judul}</div>
+                        <div className="text-xs text-gray-800 line-clamp-1 mt-0.5">{row.deskripsi}</div>
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-gray-700 font-medium text-xs line-clamp-1 mt-2">{row.perusahaan || "-"}</TableCell>
-                      <TableCell className="px-6 py-4 text-gray-700 font-medium text-xs capitalize">
-                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">
-                          {row.kategori.toLowerCase().replace(/_/g, " ")}
+                      <TableCell className="font-medium text-gray-800">{row.perusahaan || "-"}</TableCell>
+                      <TableCell>
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                          {row.kategori?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
                         </span>
                       </TableCell>
-                      <TableCell className="px-4 py-4 text-center"><KPIRatingBadge rating={row.nilaiKPI} /></TableCell>
+                      <TableCell className="text-center"><KPIRatingBadge rating={row.nilaiKPI} /></TableCell>
                     </>
                   ) : (
                     <>
-                      <TableCell className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold capitalize">
-                          {row.kategori.toLowerCase().replace(/_/g, " ")}
+                      <TableCell>
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                          {row.kategori?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
                         </span>
                       </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <div className="text-gray-800 font-bold text-xs mb-0.5 line-clamp-1">{row.judul}</div>
-                        <div className="text-[10px] text-slate-400 line-clamp-1">{row.deskripsi}</div>
+                      <TableCell>
+                        <div className="font-medium text-gray-800 line-clamp-1">{row.judul}</div>
+                        <div className="text-xs text-gray-800 line-clamp-1 mt-0.5">{row.deskripsi}</div>
                       </TableCell>
-                      <TableCell className="px-6 py-4 text-cyan-600 font-bold text-xs tracking-tight">{row.terkaitPO || "-"}</TableCell>
-                      <TableCell className="px-6 py-4 text-gray-700 font-medium text-xs line-clamp-1 mt-2">{row.perusahaan || "-"}</TableCell>
-                      <TableCell className="px-4 py-4 text-center">
+                      <TableCell className="font-mono text-medium text-gray-800">{row.terkaitPO?.toUpperCase().includes("PENDING") ? "-" : (row.terkaitPO || "-")}</TableCell>
+                      <TableCell className="font-medium text-gray-800">{row.perusahaan || "-"}</TableCell>
+                      <TableCell className="text-center">
                         <StatusBadge
                           status={
                             row.status === "ON_PROGRESS" && new Date() > new Date(row.targetSelesai)
@@ -406,15 +396,12 @@ function ActivityTable({
                       </TableCell>
                     </>
                   )}
-                  <TableCell className="px-4 py-4 text-right">
+                  <TableCell className="text-right">
                     <button
                       onClick={() => navigate(`/dailyactivity/${row.id}`)}
-                      className="text-cyan-500 text-xs font-bold hover:text-cyan-600 flex items-center gap-1 justify-end ml-auto"
+                      className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
                     >
                       Lihat Detail
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover:translate-x-0.5">
-                        <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
                     </button>
                   </TableCell>
                 </TableRow>
@@ -425,15 +412,15 @@ function ActivityTable({
       )}
 
       {totalPages > 1 && (
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-[10px] text-slate-400 font-medium">
-            Menampilkan <span className="text-slate-600 font-bold">{data.length}</span> dari <span className="text-slate-600 font-bold">{total}</span> data
+        <div className="px-6 py-4 border-t border-slate-50 flex items-center justify-between">
+          <p className="text-sm text-slate-500">
+            Menampilkan <span className="font-semibold text-slate-700">{data.length}</span> dari <span className="font-semibold text-slate-700">{total}</span> data
           </p>
           <div className="flex gap-1 items-center">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -454,12 +441,12 @@ function ActivityTable({
                 const showEllipsis = prev !== undefined && p - prev > 1;
                 return (
                   <span key={p} className="flex items-center gap-1">
-                    {showEllipsis && <span className="px-1 text-slate-400 text-xs font-bold">...</span>}
+                    {showEllipsis && <span className="px-1 text-slate-400 text-xs">...</span>}
                     <button
                       onClick={() => onPageChange(p)}
-                      className={`w-7 h-7 rounded-lg text-xs font-bold transition-all ${page === p
-                        ? "bg-cyan-500 text-white shadow-sm shadow-cyan-200"
-                        : "bg-white text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-100"
+                      className={`w-8 h-8 flex items-center justify-center font-medium rounded-md text-sm transition-colors ${page === p
+                        ? "bg-cyan-500 text-white"
+                        : "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50"
                         }`}
                     >
                       {p}
@@ -472,7 +459,7 @@ function ActivityTable({
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
