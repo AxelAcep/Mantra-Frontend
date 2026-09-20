@@ -68,6 +68,10 @@ const KATEGORI_OPTIONS = [
 
 // ─── Helpers ────────────────────────────────────────────────────────────────── mark
 
+function toTitleCase(str: string) {
+    return str.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function getInitials(name: string) {
     return name?.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase() || "??"
 }
@@ -266,7 +270,7 @@ export function CardRiwayatTable({
                                         {/* Kategori */}
                                         <TableCell>
                                             <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-xs font-semibold">
-                                                {item.kategori}
+                                                {toTitleCase(item.kategori)}
                                             </span>
                                         </TableCell>
 
@@ -286,7 +290,7 @@ export function CardRiwayatTable({
                                         </TableCell>
 
                                         {/* Deadline / Submit */}
-                                        <TableCell className="text-gray-600 text-medium">
+                                        <TableCell className="text-gray-800 text-medium">
                                             <p>{formatDateTime(item.targetSelesai)}</p>
                                             <p>{formatDateTime(item.waktuSubmit)}</p>
                                         </TableCell>

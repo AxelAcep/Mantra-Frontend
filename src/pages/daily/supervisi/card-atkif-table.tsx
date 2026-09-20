@@ -12,6 +12,7 @@ import type { SupervisiActivityItem } from "@/services/supervisi.services"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
+import { cn } from "@/lib/utils"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,10 @@ const STATUS_OPTIONS = [
 type SortDir = "asc" | "desc" | ""
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function toTitleCase(str: string) {
+    return str.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
 
 function getInitials(name: string) {
     return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()
@@ -68,17 +73,20 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
         : <ChevronDown className="w-3.5 h-3.5 text-cyan-600" />
 }
 
-function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" }: {
+function SortableHeader({ label, field, sortBy, sortDir, onSort, center = false }: {
     label: string; field: string; sortBy: string; sortDir: SortDir
-    onSort: (field: string) => void; className?: string
+    onSort: (field: string) => void; center?: boolean
 }) {
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
+            className={cn(
+                "cursor-pointer select-none group text-[#000000] text-xs font-semibold",
+                center && "text-center"
+            )}
             onClick={() => onSort(field)}
         >
-            <div className="flex items-center gap-1">
+            <div className={cn("flex items-center gap-1", center && "justify-center")}>
                 <span className={`uppercase font-semibold`}>
                     {label}
                 </span>
@@ -113,7 +121,7 @@ function ConfirmSupervisedModal({ open, isPending, onConfirm, onClose }: {
                 <DialogHeader className="mb-4">
                     <DialogTitle className="text-lg font-bold text-gray-900">Konfirmasi Supervised</DialogTitle>
                 </DialogHeader>
-                <p className="text-sm text-gray-600 mb-6">
+                <p className="text-sm text-gray-800 mb-6">
                     Apakah Anda yakin ingin menandai aktivitas ini sebagai{" "}
                     <span className="font-semibold text-cyan-600">sudah disupervisi</span>?
                     Tindakan ini tidak dapat dibatalkan.
@@ -123,7 +131,7 @@ function ConfirmSupervisedModal({ open, isPending, onConfirm, onClose }: {
                         variant="outline"
                         onClick={onClose}
                         disabled={isPending}
-                        className="border-gray-200 text-gray-600 font-semibold"
+                        className="border-gray-200 text-gray-800 font-semibold"
                     >
                         Batal
                     </Button>
@@ -237,28 +245,28 @@ export function CardAktifTable({
             {/* Table */}
             <div className="w-full overflow-x-auto px-6">
                 <div className="w-full rounded-md border bg-white min-w-[800px]">
-                <Table className="w-full table-fixed">
+                <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-100">
-                        <SortableHeader label="Karyawan" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[160px] pl-6" />
-                        <SortableHeader label="Kategori" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[130px]" />
-                        <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[220px]">Judul Aktivitas</TableHead>
-                        <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[110px]">No. Referensi</TableHead>
-                        <SortableHeader label="Tgl Selesai / Mulai" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                        <SortableHeader label="Status" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                        <TableHead className="text-right text-[#000000] text-xs font-semibold uppercase pr-6 w-[100px]">Aksi</TableHead>
+                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                        <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                        <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
+                        <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
+                        <SortableHeader label="DEADLINE / SUBMIT" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} center />
+                        <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">
+                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                                     Memuat data...
                                 </TableCell>
                             </TableRow>
                         ) : items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">
+                                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                                     {search ? "Tidak ada hasil yang cocok." : "Tidak ada aktivitas."}
                                 </TableCell>
                             </TableRow>
@@ -269,17 +277,17 @@ export function CardAktifTable({
                             return (
                                 <TableRow
                                     key={item.id}
-                                    className={`transition-colors border-b border-slate-50 hover:bg-slate-50/50`}
+                                    className="hover:bg-slate-50/50 transition-colors"
                                 >
                                     {/* Karyawan */}
-                                    <TableCell className="pl-6">
-                                        <div className="flex items-center gap-2.5">
-                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                 {getInitials(item.pegawai.nama)}
                                             </div>
-                                            <div>
-                                                <p className="text-xs font-semibold text-gray-900 leading-tight">{item.pegawai.nama}</p>
-                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi}</p>
+                                            <div title={item.pegawai.nama} className="max-w-[150px]">
+                                                <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                             </div>
                                         </div>
                                     </TableCell>
@@ -287,39 +295,41 @@ export function CardAktifTable({
                                     {/* Kategori */}
                                     <TableCell>
                                         <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
-                                            {item.kategori}
+                                            {toTitleCase(item.kategori)}
                                         </span>
                                     </TableCell>
 
-                                    {/* Judul + Perusahaan (biru, kecil) */}
-                                    <TableCell>
-                                        <p className="text-medium font-medium text-gray-800 line-clamp-1">{item.judul}</p>
-                                        {item.perusahaan && (
-                                            <p className="text-[0.75rem] text-muted-foreground mt-0.5 line-clamp-1">{item.perusahaan}</p>
-                                        )}
+                                    {/* Judul / Perusahaan */}
+                                    <TableCell title={`${item.judul} - ${item.perusahaan}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="max-w-[150px]">
+                                                <p className="text-gray-900 truncate">{item.judul}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.perusahaan}</p>
+                                            </div>
+                                        </div>
                                     </TableCell>
 
                                     {/* No. Referensi */}
-                                    <TableCell className="font-mono text-medium text-cyan-600">
-                                        {item.terkaitPO || "-"}
+                                    <TableCell className="font-mono text-medium max-w-[120px] truncate" title={item.terkaitPO || "-"}>
+                                        {item.terkaitPO?.toUpperCase().includes("PENDING") ? "-" : (item.terkaitPO || "-")}
                                     </TableCell>
 
                                     {/* Tgl Selesai / Mulai */}
                                     <TableCell>
-                                        <p className="text-medium text-gray-600">{formatDate(item.targetSelesai)}</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5">{formatDate(item.waktuMulai)}</p>
+                                        <p className="text-medium text-gray-800">{formatDate(item.targetSelesai)}</p>
+                                        <p className="text-xs text-gray-800 mt-0.5">{formatDate(item.waktuMulai)}</p>
                                     </TableCell>
 
                                     {/* Status */}
                                     <TableCell>
-                                        <div className="flex flex-col gap-1 items-start">
+                                        <div className="flex flex-col gap-1 items-center">
                                             <StatusBadge status={item.status} />
                                             {item.isSupervised && <VerifiedBadge />}
                                         </div>
                                     </TableCell>
 
                                     {/* Aksi */}
-                                    <TableCell className="text-right pr-6">
+                                    <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             {showSuperviseBtn && (
                                                 <button
@@ -332,7 +342,7 @@ export function CardAktifTable({
                                             )}
                                             <button
                                                 onClick={() => navigate(`/dailyactivity/supervisi/${item.id}`)}
-                                                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+                                                className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
                                             >
                                                 Lihat Detail
                                             </button>
@@ -347,15 +357,17 @@ export function CardAktifTable({
             </div>
 
             {/* Pagination */}
-            <div className="p-4 border-t border-slate-100">
-                <TablePagination
-                    page={page}
-                    totalPages={data?.totalPages ?? 1}
-                    total={data?.total ?? 0}
-                    showing={items.length}
-                    onPageChange={onPageChange}
-                />
-            </div>
+            {!isLoading && (
+                <div className="p-4 border-t border-slate-50">
+                    <TablePagination
+                        page={page}
+                        totalPages={data?.totalPages ?? 1}
+                        total={data?.total ?? 0}
+                        showing={items.length}
+                        onPageChange={onPageChange}
+                    />
+                </div>
+            )}
 
             {/* Modal */}
             <ConfirmSupervisedModal

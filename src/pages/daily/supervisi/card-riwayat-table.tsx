@@ -15,6 +15,10 @@ type SortDir = "asc" | "desc" | ""
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function toTitleCase(str: string) {
+    return str.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function getInitials(name: string) {
     return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()
 }
@@ -136,48 +140,48 @@ export function CardRiwayatTable({
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-100">
-                            <SortableHeader label="Karyawan" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="pl-6 w-[180px]" />
-                            <SortableHeader label="Tanggal" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <TableHead className="text-[#000000] text-xs font-semibold uppercase">Aktivitas</TableHead>
-                            <TableHead className="text-[#000000] text-xs font-semibold uppercase w-[160px]">Perusahaan</TableHead>
-                            <SortableHeader label="Kategori" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[140px]" />
-                            <TableHead className="text-right text-[#000000] text-xs font-semibold uppercase pr-6 w-[120px]">Aksi</TableHead>
+                            <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                            <SortableHeader label="TANGGAL" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                            <TableHead className="text-[#000000] text-xs font-semibold">AKTIVITAS</TableHead>
+                            <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
+                            <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                            <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-medium">
+                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-sm">
                                     Memuat data...
                                 </TableCell>
                             </TableRow>
                         ) : items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-medium">
+                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-sm">
                                     {search ? "Tidak ada hasil yang cocok." : "Tidak ada riwayat aktivitas."}
                                 </TableCell>
                             </TableRow>
                         ) : items.map((item) => {
                             const avatar = getAvatarColor(item.pegawai.nama)
                             return (
-                                <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                                <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                                     {/* Karyawan */}
-                                    <TableCell className="pl-6">
-                                        <div className="flex items-center gap-2.5">
-                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${avatar.bg} ${avatar.text}`}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                 {getInitials(item.pegawai.nama)}
                                             </div>
-                                            <div>
-                                                <p className="text-xs font-semibold text-gray-900 leading-tight">{item.pegawai.nama}</p>
-                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi}</p>
+                                            <div title={item.pegawai.nama} className="max-w-[150px]">
+                                                <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                             </div>
                                         </div>
                                     </TableCell>
 
                                     {/* Tanggal */}
                                     <TableCell>
-                                        <p className="text-medium text-gray-600">{formatTanggal(item.waktuMulai)}</p>
-                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                        <p className="text-medium text-gray-800">{formatTanggal(item.waktuMulai)}</p>
+                                        <p className="text-xs text-gray-800 mt-0.5">
                                             {formatJam(item.waktuMulai)} - {formatJam(item.targetSelesai)}
                                         </p>
                                     </TableCell>
@@ -189,22 +193,24 @@ export function CardRiwayatTable({
                                     </TableCell>
 
                                     {/* Perusahaan */}
-                                    <TableCell className="text-medium text-gray-600">
+                                    <TableCell className="text-medium text-gray-800">
                                         {item.perusahaan || "-"}
                                     </TableCell>
 
                                     {/* Kategori */}
-                                    <TableCell className="text-medium text-gray-600">
-                                        {item.kategori}
+                                    <TableCell>
+                                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-xs font-semibold">
+                                            {toTitleCase(item.kategori)}
+                                        </span>
                                     </TableCell>
 
                                     {/* Aksi */}
-                                    <TableCell className="text-right pr-6">
+                                    <TableCell className="text-right">
                                         <button
                                             onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                                            className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+                                            className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
                                         >
-                                            Lihat Detail →
+                                            Lihat Detail
                                         </button>
                                     </TableCell>
                                 </TableRow>
@@ -216,7 +222,7 @@ export function CardRiwayatTable({
             </div>
 
             {/* Pagination */}
-            <div className="p-4 border-t border-slate-100">
+            <div className="p-4 border-t border-slate-50">
                 <TablePagination
                     page={page}
                     totalPages={data?.totalPages ?? 1}

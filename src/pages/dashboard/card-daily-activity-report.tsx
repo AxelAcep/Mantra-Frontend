@@ -58,8 +58,8 @@ export default function DailyActivityReport() {
           <div className="w-px h-8 bg-slate-200"></div>
 
           <div className="text-center">
-            <p className="text-[10px] font-bold uppercase text-orange-400">Total Tugas Overdue</p>
-            <p className="text-lg font-bold text-orange-500">{stats?.overdue ?? 0}</p>
+            <p className="text-[10px] font-bold uppercase text-red-400">Total Tugas Overdue</p>
+            <p className="text-lg font-bold text-red-500">{stats?.overdue ?? 0}</p>
           </div>
           <div className="w-px h-8 bg-slate-200"></div>
 

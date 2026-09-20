@@ -143,7 +143,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
                     </button>
                     <button
                         onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                        className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+                        className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
                     >
                         Lihat Detail →
                     </button>
@@ -182,7 +182,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
         return (
             <button
                 onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+                className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
             >
                 Lihat Detail →
             </button>
@@ -196,7 +196,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
         return (
             <button
                 onClick={() => navigate(`/dailyactivity/${item.id}`)}
-                className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+                className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
             >
                 Reschedule Ulang →
             </button>
@@ -206,7 +206,7 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
     return (
         <button
             onClick={() => navigate(`/dailyactivity/${item.id}`)}
-            className="text-cyan-600 text-medium font-medium hover:underline ml-1 whitespace-nowrap"
+            className="text-cyan-600 text-sm font-medium hover:underline ml-1 whitespace-nowrap"
         >
             Lihat Detail →
         </button>
@@ -272,17 +272,17 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">Memuat data...</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">Memuat data...</TableCell>
                         </TableRow>
                     )}
                     {isError && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-10 text-red-500 text-medium">Gagal memuat data.</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-red-500 text-sm">Gagal memuat data.</TableCell>
                         </TableRow>
                     )}
                     {!isLoading && !isError && sorted.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">Tidak ada data.</TableCell>
+                            <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">Tidak ada data.</TableCell>
                         </TableRow>
                     )}
                     {sorted.map((item) => {
@@ -292,8 +292,8 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                         return (
                             <TableRow key={item.id}>
                                 <TableCell>
-                                    <p className="text-medium text-muted-foreground leading-tight">{input.tanggal}</p>
-                                    <p className="text-xs text-muted-foreground leading-tight">{input.waktu}</p>
+                                    <p className="text-medium text-gray-800 leading-tight">{input.tanggal}</p>
+                                    <p className="text-xs text-gray-800 leading-tight">{input.waktu}</p>
                                 </TableCell>
                                 <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate" title={item.judul}>{item.judul}</TableCell>
                                 <TableCell>
@@ -301,10 +301,10 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                                         {KATEGORI_LABEL[item.kategori] ?? item.kategori}
                                     </span>
                                 </TableCell>
-                                <TableCell className="text-medium text-muted-foreground max-w-[150px] truncate" title={item.perusahaan || "-"}>{item.perusahaan || "-"}</TableCell>
+                                <TableCell className="font-medium text-gray-800 max-w-[150px] truncate" title={item.perusahaan || "-"}>{item.perusahaan || "-"}</TableCell>
                                 <TableCell>
-                                    <p className={`text-medium leading-tight ${overdue ? "text-red-500 font-medium" : "text-muted-foreground"}`}>{deadline.tanggal}</p>
-                                    <p className={`text-xs leading-tight ${overdue ? "text-red-400" : "text-muted-foreground"}`}>{deadline.waktu}</p>
+                                    <p className={`text-medium leading-tight ${overdue ? "text-red-500 font-medium" : "text-gray-800"}`}>{deadline.tanggal}</p>
+                                    <p className={`text-xs leading-tight ${overdue ? "text-red-400" : "text-gray-800"}`}>{deadline.waktu}</p>
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`${overdue ? STATUS_STYLE.OVERDUE : STATUS_STYLE[item.status]} border-none shadow-none px-3`}>

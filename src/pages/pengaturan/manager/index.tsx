@@ -47,7 +47,7 @@ export default function PengaturanManagerPage() {
         id: user.id,
         nama: user.pegawai?.nama ?? "User",
         role: user.role ?? "MASTER",
-        divisi: user.pegawai?.divisi ?? "Manager",
+        divisi: (user.pegawai?.divisi ?? "Manager").replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()),
         email: user.email ?? "-"
     }
 

@@ -72,6 +72,10 @@ const STATUS_OPTIONS = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function toTitleCase(str: string) {
+    return str.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function getInitials(name: string) {
     return name?.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase() || "??"
 }
@@ -163,7 +167,7 @@ function ModalKonfirmasiSelesai({ open, isPending, onConfirm, onClose }: {
                 <DialogHeader className="mb-4">
                     <DialogTitle className="text-lg font-bold text-gray-900">Konfirmasi Aktivitas Selesai</DialogTitle>
                 </DialogHeader>
-                <p className="text-sm text-gray-600 mb-5">
+                <p className="text-sm text-gray-800 mb-5">
                     Apakah Anda yakin aktivitas ini telah benar-benar selesai dikerjakan?
                     Berikan penilaian performa karyawan sebelum melanjutkan.
                 </p>
@@ -173,7 +177,7 @@ function ModalKonfirmasiSelesai({ open, isPending, onConfirm, onClose }: {
                     {!nilai && <p className="text-xs text-gray-400 mt-1">Pilih salah satu penilaian untuk melanjutkan.</p>}
                 </div>
                 <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={handleClose} disabled={isPending} className="border-gray-200 text-gray-600 font-semibold">Tidak</Button>
+                    <Button variant="outline" onClick={handleClose} disabled={isPending} className="border-gray-200 text-gray-800 font-semibold">Tidak</Button>
                     <Button onClick={() => nilai && onConfirm(nilai)} disabled={isPending || !nilai}
                         className={cn(
                             "font-semibold transition-all shadow-sm",
@@ -414,7 +418,7 @@ export function CardAktifTable({
                                         {/* Kategori */}
                                         <TableCell>
                                             <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
-                                                {item.kategori}
+                                                {toTitleCase(item.kategori)}
                                             </span>
                                         </TableCell>
 
@@ -434,7 +438,7 @@ export function CardAktifTable({
                                         </TableCell>
 
                                         {/* Deadline / Submit */}
-                                        <TableCell className="text-gray-600 text-medium">
+                                        <TableCell className="text-gray-800 text-medium">
                                             <p>{formatDateTime(item.targetSelesai)}</p>
                                             <p>{formatDateTime(item.waktuSubmit)}</p>
                                         </TableCell>

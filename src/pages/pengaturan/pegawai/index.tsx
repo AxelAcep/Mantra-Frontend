@@ -33,7 +33,7 @@ export default function PengaturanPegawaiPage() {
     // Mapping data
     const userData = {
         nama: user.pegawai?.nama ?? "User",
-        role: user.pegawai?.divisi ?? user.role ?? "-",
+        role: (user.pegawai?.divisi ?? user.role ?? "-").replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()),
         email: user.email ?? "-"
     }
 

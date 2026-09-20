@@ -326,15 +326,15 @@ export function RescheduleTable({
                                             </TableCell>
                                             <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
                                             <TableCell className="font-medium text-gray-800 text-medium max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
-                                            <TableCell className="text-gray-600 text-medium">
+                                            <TableCell className="text-gray-800 text-medium">
                                                 <p>{formatDate(item.activity.targetSelesai)}</p>
                                                 <p>{formatTime(item.activity.targetSelesai)}</p>
                                             </TableCell>
-                                            <TableCell className="text-gray-600 text-medium">
+                                            <TableCell className="text-gray-800 text-medium">
                                                 <p>{formatDate(item.targetSelesaiBaru)}</p>
                                                 <p>{formatTime(item.targetSelesaiBaru)}</p>
                                             </TableCell>
-                                            <TableCell className="text-gray-600 text-medium max-w-[200px]" title={item.alasan}>
+                                            <TableCell className="text-gray-800 text-medium max-w-[200px]" title={item.alasan}>
                                                 <p className="truncate">{item.alasan}</p>
                                             </TableCell>
                                             <TableCell>

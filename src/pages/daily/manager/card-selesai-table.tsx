@@ -17,6 +17,10 @@ import {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function toTitleCase(str: string) {
+    return str.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
 function getInitials(name: string) {
     return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase()
 }
@@ -153,7 +157,7 @@ function NilaiKPISelector({
                                 "flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left",
                                 isActive
                                     ? `${opt.vBg} ${opt.vBorder} ${opt.vText} shadow-sm`
-                                    : "bg-white border-gray-100 text-gray-600 hover:border-gray-200"
+                                    : "bg-white border-gray-100 text-gray-800 hover:border-gray-200"
                             )}
                         >
                             <div className={cn(
@@ -218,7 +222,7 @@ function ModalKonfirmasiSelesai({
                     </DialogTitle>
                 </DialogHeader>
 
-                <p className="text-sm text-gray-600 mb-5">
+                <p className="text-sm text-gray-800 mb-5">
                     Apakah Anda yakin aktivitas ini telah benar-benar selesai dikerjakan?
                     Berikan penilaian performa karyawan sebelum melanjutkan.
                 </p>
@@ -244,7 +248,7 @@ function ModalKonfirmasiSelesai({
                         variant="outline"
                         onClick={handleClose}
                         disabled={isPending}
-                        className="border-gray-200 text-gray-600 font-semibold"
+                        className="border-gray-200 text-gray-800 font-semibold"
                     >
                         Tidak
                     </Button>
@@ -457,7 +461,7 @@ export function SelesaiTable({
                                             </TableCell>
                                             <TableCell>
                                                 <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
-                                                    {item.kategori?.replace(/_/g, " ")}
+                                                    {toTitleCase(item.kategori ?? "")}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-sm">
