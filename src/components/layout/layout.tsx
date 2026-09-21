@@ -27,6 +27,8 @@ export default function Layout() {
             setTitle("Pengadaan Barang");
         } else if (path.includes("/perusahaan")) {
             setTitle("Daftar Perusahaan");
+        } else if (path.includes("/daftar-barang")) {
+            setTitle("Daftar Barang");
         }
     }, [location.pathname]);
 

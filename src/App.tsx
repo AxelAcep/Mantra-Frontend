@@ -17,6 +17,7 @@ import POAktifPage from "./pages/dashboard-detail/po-aktif";
 import PengadaanBarangPage from "./pages/dashboard-detail/pengadaan-barang";
 import JadwalUlangPage from "./pages/dashboard-detail/jadwal-ulang";
 import ManajemenAkunPage from "./pages/manajemen-akun";
+import DaftarBarangPage from "./pages/daftar-barang";
 import Penawaran from "./pages/detail-pengadaan-barang/penawaran";
 import ActivityPagePegawai from "./pages/daily/pegawai";
 import ActivityPageAdmin from "./pages/daily/manager";
@@ -119,6 +120,7 @@ function App() {
           <Route path="dashboard/jadwal-ulang" element={<JadwalUlangPage />} />
           <Route path="manajemen-akun" element={<ManajemenAkunPage />} />
           <Route path="akunkaryawan" element={<ManajemenAkunPage />} />
+          <Route path="daftar-barang" element={<DaftarBarangPage />} />
           <Route path="dailyactivity" element={<DailyActivityWrapper />} />
           <Route path="dailyactivity/:id" element={<DetailActivityWrapper />} />
           <Route

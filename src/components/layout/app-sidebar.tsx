@@ -70,6 +70,7 @@ const getMenuOperasional = (
 
   if (role === "MASTER") {
     menu.push({ title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" });
+    menu.push({ title: "Daftar Barang", icon: Icons.Cart, url: "/daftar-barang" });
   }
 
   return menu;

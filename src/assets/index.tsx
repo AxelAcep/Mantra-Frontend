@@ -21,7 +21,7 @@ import IconKonfirmasiSelesai from "./Icon-KonfirmasiSelesai.svg";
 import IconJadwalUlang from "./Icon-JadwalUlang.svg";
 import IconLocation from "./Icon-Location.png";
 import IconPhone from "./Icon-Phone.png";
-import IconCart from "./Icon-Cart.png";
+import IconCart from "./Icon-Cart.svg";
 import IconMaintenance2 from "./Icon-Maintenance2.png";
 import IconLastActivity from "./Icon-LastActivity.png";
 import IconMaintenance3 from "./Icon-Maintenance3.png";
