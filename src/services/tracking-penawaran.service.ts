@@ -109,6 +109,8 @@ export type GetPenawaranListParams = {
   limit?: number;
   search?: string;
   step?: string;
+  // Filter by jenis pengadaan (e.g. "PAC Montair", "Generator FirePro").
+  jenisPenawaran?: string;
   // Cuma dipakai bareng step="BAST": "true" = Konfirmasi Selesai (lengkap),
   // "false" = Pembayaran (masih berjalan).
   bastLengkap?: "true" | "false";
@@ -148,6 +150,7 @@ export async function getPenawaranListAktif(
   if (params.search) query.set("search", params.search);
   if (params.step) query.set("step", params.step);
   if (params.bastLengkap) query.set("bastLengkap", params.bastLengkap);
+  if (params.jenisPenawaran) query.set("jenisPenawaran", params.jenisPenawaran);
   if (params.sortBy) query.set("sortBy", params.sortBy);
   if (params.sortDir) query.set("sortDir", params.sortDir);
 

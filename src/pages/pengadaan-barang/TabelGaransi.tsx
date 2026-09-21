@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
 import ProgressBadge from "./ProgressBadge";
 import { formatNomorPenawaran } from "@/lib/utils";
@@ -23,7 +24,7 @@ function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
           : "bg-amber-100 text-amber-700"
       }`}
     >
-      {tuntas ? "Garansi Sudah" : "Garansi Belum"}
+      {tuntas ? "Garansi Selesai" : "Garansi Belum"}
     </span>
   );
 }
@@ -31,28 +32,47 @@ function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
 export default function TabelGaransi() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [filterJenis, setFilterJenis] = useState<string>("Generator FirePro");
 
   const { data, isLoading, isError } = usePenawaranListAktif({
     page,
     limit: 10,
     search,
     step: "GARANSI",
+    jenisPenawaran: filterJenis,
   });
 
   return (
     <div>
-      {/* Search */}
-      <div className="px-6 py-4 border-b border-gray-100">
-        <input
-          type="text"
-          placeholder="Cari nomor PO, perusahaan, lokasi..."
-          value={search}
+      {/* Search + Filter */}
+      <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap gap-2">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Cari nomor PO, perusahaan, lokasi..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent placeholder:text-gray-300"
+          />
+        </div>
+
+        {/* Filter Jenis Pengadaan */}
+        <select
+          value={filterJenis}
           onChange={(e) => {
-            setSearch(e.target.value);
+            setFilterJenis(e.target.value);
             setPage(1);
           }}
-          className="w-full max-w-sm px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 placeholder:text-gray-300"
-        />
+          className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
+        >
+          <option value="Generator FirePro">Generator FirePro</option>
+          <option value="PAC Montair">PAC Montair</option>
+        </select>
       </div>
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
@@ -113,14 +133,22 @@ export default function TabelGaransi() {
                   </div>
                 </TableCell>
                 <TableCell className="text-gray-800">
-                  {item.garansiMulai ? (
+                  {item.garansiTuntas && !item.garansiMulai && !item.garansiSelesai ? (
+                    <span className="text-gray-800">Tidak Ada Garansi</span>
+                  ) : item.garansiMulai ? (
                     formatTanggal(item.garansiMulai)
                   ) : (
-                    <span className="text-muted-foreground">Belum dikonfigurasi</span>
+                    <span className="text-gray-800">Belum dikonfigurasi</span>
                   )}
                 </TableCell>
                 <TableCell className="text-gray-800">
-                  {formatTanggal(item.garansiSelesai)}
+                  {item.garansiTuntas && !item.garansiMulai && !item.garansiSelesai ? (
+                    <span className="text-gray-800">Tidak Ada Garansi</span>
+                  ) : item.garansiSelesai ? (
+                    formatTanggal(item.garansiSelesai)
+                  ) : (
+                    <span className="text-gray-800">Belum dikonfigurasi</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-center">
                   <ProgressBadge
