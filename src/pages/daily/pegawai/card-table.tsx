@@ -295,13 +295,13 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                                     <p className="text-medium text-gray-800 leading-tight">{input.tanggal}</p>
                                     <p className="text-xs text-gray-800 leading-tight">{input.waktu}</p>
                                 </TableCell>
-                                <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate" title={item.judul}>{item.judul}</TableCell>
+                                <TableCell className="text-gray-800 max-w-[200px] truncate" title={item.judul}>{item.judul}</TableCell>
                                 <TableCell>
                                     <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
                                         {KATEGORI_LABEL[item.kategori] ?? item.kategori}
                                     </span>
                                 </TableCell>
-                                <TableCell className="font-medium text-gray-800 max-w-[150px] truncate" title={item.perusahaan || "-"}>{item.perusahaan || "-"}</TableCell>
+                                <TableCell className="text-gray-800 max-w-[150px] truncate" title={item.perusahaan || "-"}>{item.perusahaan || "-"}</TableCell>
                                 <TableCell>
                                     <p className={`text-medium leading-tight ${overdue ? "text-red-500 font-medium" : "text-gray-800"}`}>{deadline.tanggal}</p>
                                     <p className={`text-xs leading-tight ${overdue ? "text-red-400" : "text-gray-800"}`}>{deadline.waktu}</p>

@@ -453,10 +453,10 @@ export function SelesaiTable({
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-800 max-w-[200px] truncate" title={item.judul}>
+                                            <TableCell className="text-gray-800 max-w-[200px] truncate" title={item.judul}>
                                                 {item.judul}
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-800 max-w-[150px] truncate" title={item.perusahaan}>
+                                            <TableCell className="text-gray-800 max-w-[150px] truncate" title={item.perusahaan}>
                                                 {item.perusahaan}
                                             </TableCell>
                                             <TableCell>

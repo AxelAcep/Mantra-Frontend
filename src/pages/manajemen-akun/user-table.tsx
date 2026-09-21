@@ -98,7 +98,7 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                                         {user.pegawai.divisi?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
                                     </span>
                                 </TableCell>
-                                <TableCell className="font-medium text-gray-800 truncate" title={user.email}>{user.email}</TableCell>
+                                <TableCell className="text-gray-800 truncate" title={user.email}>{user.email}</TableCell>
                                 <TableCell>
                                     <span className="text-xs font-semibold px-2 py-1 rounded-full bg-slate-100 text-slate-600">
                                         {user.role}
@@ -117,7 +117,7 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex flex-col">
-                                        <span className="font-medium text-gray-800">{tanggal}</span>
+                                        <span className="text-gray-800">{tanggal}</span>
                                         {waktu && <span className="text-xs text-gray-800 mt-0.5">{waktu}</span>}
                                     </div>
                                 </TableCell>

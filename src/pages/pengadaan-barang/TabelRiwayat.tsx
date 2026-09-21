@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePenawaranListRiwayat } from "@/hooks/use-create-penawaran";
 import { formatNomorPenawaran } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -137,110 +137,92 @@ export default function TableRiwayat() {
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
         <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
-              <th className="px-6 py-4">Nomor PO</th>
-              <th className="px-6 py-4">Perusahaan</th>
-              <th className="px-6 py-4">Jenis Pengadaan</th>
-              <th className="px-6 py-4">Tanggal Masuk</th>
-              <th className="px-6 py-4 text-center">Tahapan Saat Ini</th>
-              <th className="px-6 py-4 text-center">Status</th>
-              <th className="px-6 py-4 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50 text-sm">
-            {isLoading && (
-              <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-400 text-sm">
-                  Memuat data...
-                </td>
-              </tr>
-            )}
-            {isError && (
-              <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-red-400 text-sm">
-                  Gagal memuat data.
-                </td>
-              </tr>
-            )}
-            {!isLoading && !isError && data?.data.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-300 text-sm">
-                  Tidak ada data riwayat pengadaan.
-                </td>
-              </tr>
-            )}
-            {!isError && data?.data.map((item) => (
-              <tr key={item.id} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
-                <td className="px-6 font-semibold text-slate-600 uppercase">
-                  {formatNomorPenawaran(item.nomorPenawaran)}
-                </td>
-                <td className="px-6 font-semibold text-slate-600">
-                  {item.perusahaanName || "—"}
-                </td>
-                <td className="px-6">
-                  <div className="flex flex-wrap gap-1">
-                    {item.jenisPenawaran?.map((jenis) => (
-                      <span
-                        key={jenis}
-                        className="px-2 py-0.5 bg-gray-100 text-slate-600 rounded text-[10px] font-bold border border-gray-200 uppercase"
-                      >
-                        {jenis.replace("_", " ")}
-                      </span>
-                    )) || "—"}
-                  </div>
-                </td>
-                <td className="px-6 text-gray-500 font-medium">
-                  {formatTanggal(item.tanggalMasuk)}
-                </td>
-                <td className="px-6 text-center">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-slate-600 border border-gray-200 whitespace-nowrap">
-                    {formatStepName(item.stepSaatIni)}
-                  </span>
-                </td>
-                <td className="px-6 text-center">
-                  <OverallStatusBadge status={item.overallStatus} />
-                </td>
-                <td className="px-6 text-right">
-                  <Link
-                    to={`/penawaran/${item.id}`}
-                    className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
-                  >
-                    Lihat Detail <ArrowRight size={14} />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50 border-b border-slate-100">
+                <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">JENIS PENGADAAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL MASUK</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-center">TAHAPAN SAAT INI</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
+                    Memuat data...
+                  </TableCell>
+                </TableRow>
+              )}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-red-500 text-sm">
+                    Gagal memuat data.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !isError && data?.data.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
+                    Tidak ada data riwayat pengadaan.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isError && data?.data.map((item) => (
+                <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="text-gray-800">
+                    {formatNomorPenawaran(item.nomorPenawaran)}
+                  </TableCell>
+                  <TableCell className="font-semibold text-gray-800">
+                    {item.perusahaanName || "—"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {item.jenisPenawaran?.map((jenis) => (
+                        <span key={jenis} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                          {jenis.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                        </span>
+                      )) || "—"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-gray-800">
+                    {formatTanggal(item.tanggalMasuk)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold whitespace-nowrap">
+                      {formatStepName(item.stepSaatIni)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <OverallStatusBadge status={item.overallStatus} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link to={`/penawaran/${item.id}`} className="text-cyan-600 text-sm font-medium hover:underline whitespace-nowrap">
+                      Lihat Detail
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
 
       {/* Pagination */}
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            Menampilkan {data.data.length} dari {data.meta.total} data
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-50">
+          <p className="text-sm text-slate-500">
+            Menampilkan <span className="font-semibold text-slate-700">{data.data.length}</span> dari <span className="font-semibold text-slate-700">{data.meta.total}</span> data
           </p>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Sebelumnya
-            </button>
-            <span className="text-xs text-gray-500">
-              {page} / {data.meta.totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
-              disabled={page === data.meta.totalPages}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Berikutnya
-            </button>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
+            <span className="text-sm text-slate-500 px-2">{page} / {data.meta.totalPages}</span>
+            <button onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))} disabled={page === data.meta.totalPages}
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
           </div>
         </div>
       )}

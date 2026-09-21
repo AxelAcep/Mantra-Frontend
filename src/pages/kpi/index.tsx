@@ -357,14 +357,14 @@ function ActivityTable({
                   {isRiwayat ? (
                     <>
                       <TableCell className="whitespace-nowrap">
-                        <div className="font-medium text-gray-800">{formatDateFull(row.targetSelesai)}</div>
+                        <div className="text-gray-800">{formatDateFull(row.targetSelesai)}</div>
                         <div className="text-xs text-gray-800 mt-0.5">{formatTimeOnly(row.waktuMulai)} - {formatTimeOnly(row.targetSelesai)}</div>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-gray-800 line-clamp-1">{row.judul}</div>
+                        <div className="text-gray-800 line-clamp-1">{row.judul}</div>
                         <div className="text-xs text-gray-800 line-clamp-1 mt-0.5">{row.deskripsi}</div>
                       </TableCell>
-                      <TableCell className="font-medium text-gray-800">{row.perusahaan || "-"}</TableCell>
+                      <TableCell className="text-gray-800">{row.perusahaan || "-"}</TableCell>
                       <TableCell>
                         <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
                           {row.kategori?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
@@ -380,11 +380,11 @@ function ActivityTable({
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-gray-800 line-clamp-1">{row.judul}</div>
+                        <div className="text-gray-800 line-clamp-1">{row.judul}</div>
                         <div className="text-xs text-gray-800 line-clamp-1 mt-0.5">{row.deskripsi}</div>
                       </TableCell>
                       <TableCell className="font-mono text-medium text-gray-800">{row.terkaitPO?.toUpperCase().includes("PENDING") ? "-" : (row.terkaitPO || "-")}</TableCell>
-                      <TableCell className="font-medium text-gray-800">{row.perusahaan || "-"}</TableCell>
+                      <TableCell className="text-gray-800">{row.perusahaan || "-"}</TableCell>
                       <TableCell className="text-center">
                         <StatusBadge
                           status={

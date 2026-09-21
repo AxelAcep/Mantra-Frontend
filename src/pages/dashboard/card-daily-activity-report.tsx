@@ -127,7 +127,7 @@ export default function DailyActivityReport() {
                   )}
                 </TableCell>
 
-                <TableCell className="font-medium text-gray-800 text-center">
+                <TableCell className="text-gray-800 text-center">
                   {row.aktivitasBerjalan}
                 </TableCell>
 

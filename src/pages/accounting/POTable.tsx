@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAccountingPOList } from "@/hooks/use-accounting-dashboard";
 import type { StatusPembayaranPO } from "@/services/accounting-dashboard.service";
 import { formatNomorPenawaran } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 function formatTanggal(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -53,9 +53,10 @@ function StatusBadge({ status }: { status: StatusPembayaranPO }) {
 
 function ProgressBadge({ selesai, total }: { selesai: number; total: number }) {
   if (!total) return <span className="text-gray-300">—</span>;
+  const isComplete = selesai === total;
   return (
-    <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 whitespace-nowrap">
-      {selesai} DARI {total}
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border border-transparent whitespace-nowrap ${isComplete ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+      {selesai} Dari {total}
     </span>
   );
 }
@@ -103,75 +104,75 @@ export default function POTable() {
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
         <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1100px]">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
-                <th className="px-6 py-4">Nomor PO</th>
-                <th className="px-6 py-4">Perusahaan</th>
-                <th className="px-6 py-4 text-right">Dibayar / Nilai Proyek</th>
-                <th className="px-6 py-4 text-center">Progress Termin</th>
-                <th className="px-6 py-4">Termin Terdekat</th>
-                <th className="px-6 py-4 text-center">Status</th>
-                <th className="px-6 py-4 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50 text-sm">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50 border-b border-slate-100">
+                <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-right">DIBAYAR / NILAI PROYEK</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-center">PROGRESS TERMIN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">TERMIN TERDEKAT</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {isLoading && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-gray-400 text-sm">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                     Memuat data...
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
               {isError && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-red-400 text-sm">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-red-500 text-sm">
                     Gagal memuat data.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
               {!isLoading && !isError && data?.data.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-gray-300 text-sm">
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                     Tidak ada data PO Accounting.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
               {!isError && data?.data.map((item) => (
-                <tr key={item.trackingId} className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4">
-                  <td className="px-6 font-semibold text-slate-600 uppercase">
+                <TableRow key={item.trackingId} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="text-gray-800">
                     {formatNomorPenawaran(item.nomorPenawaran)}
-                  </td>
-                  <td className="px-6 font-semibold text-slate-600">
+                  </TableCell>
+                  <TableCell className="text-gray-800">
                     {item.perusahaanName || "—"}
-                  </td>
-                  <td className="px-6 text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     {item.estimasiHarga != null ? (
                       <>
-                        <p className="font-semibold text-slate-700 text-xs whitespace-nowrap">
+                        <p className="text-gray-800 text-xs whitespace-nowrap">
                           {formatRupiah(item.nominalDibayar ?? 0)}
-                          <span className="text-gray-400 font-normal"> / </span>
+                          <span className="text-gray-400"> / </span>
                           {formatRupiah(item.estimasiHarga)}
                         </p>
-                        <p className="text-[10px] font-bold text-cyan-600">
+                        <p className={`text-xs mt-0.5 ${item.persentaseDibayar >= 100 ? "text-emerald-500" : "text-amber-500"}`}>
                           {item.persentaseDibayar.toFixed(0)}% terbayar
                         </p>
                       </>
                     ) : (
                       <span className="text-gray-300">Belum Tersedia</span>
                     )}
-                  </td>
-                  <td className="px-6 text-center">
+                  </TableCell>
+                  <TableCell className="text-center">
                     <ProgressBadge selesai={item.terminSudah} total={item.totalTermin} />
-                  </td>
-                  <td className="px-6 text-gray-500">
+                  </TableCell>
+                  <TableCell>
                     {item.terminTerdekatDeadline ? (
                       <>
-                        <p className="font-semibold text-slate-700 text-xs">
+                        <p className="text-gray-800 text-xs">
                           {item.terminTerdekatNama}
                         </p>
                         <p
-                          className={`text-[10px] font-bold ${
+                          className={`text-xs mt-0.5 ${
                             item.terminTerdekatFlag === "LEWAT"
                               ? "text-red-500"
                               : item.terminTerdekatFlag === "1_MINGGU" ||
@@ -186,48 +187,33 @@ export default function POTable() {
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}
-                  </td>
-                  <td className="px-6 text-center">
+                  </TableCell>
+                  <TableCell className="text-center">
                     <StatusBadge status={item.statusPembayaran} />
-                  </td>
-                  <td className="px-6 text-right">
-                    <Link
-                      to={`/penawaran/${item.trackingId}`}
-                      className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
-                    >
-                      Lihat Detail <ArrowRight size={14} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link to={`/penawaran/${item.trackingId}`} className="text-cyan-600 text-sm font-medium hover:underline whitespace-nowrap">
+                      Lihat Detail
                     </Link>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            Menampilkan {data.data.length} dari {data.meta.total} data
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-50">
+          <p className="text-sm text-slate-500">
+            Menampilkan <span className="font-semibold text-slate-700">{data.data.length}</span> dari <span className="font-semibold text-slate-700">{data.meta.total}</span> data
           </p>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Sebelumnya
-            </button>
-            <span className="text-xs text-gray-500">
-              {page} / {data.meta.totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
-              disabled={page === data.meta.totalPages}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Berikutnya
-            </button>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
+            <span className="text-sm text-slate-500 px-2">{page} / {data.meta.totalPages}</span>
+            <button onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))} disabled={page === data.meta.totalPages}
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
           </div>
         </div>
       )}

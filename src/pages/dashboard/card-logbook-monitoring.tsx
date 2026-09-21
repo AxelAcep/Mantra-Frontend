@@ -105,7 +105,7 @@ export default function LogbookMonitoring() {
                   </span>
                 </TableCell>
 
-                <TableCell className="font-medium text-gray-800">
+                <TableCell className="text-gray-800">
                   <div className="flex items-center gap-2">
                     <span className="truncate max-w-[250px]">{row.input}</span>
 

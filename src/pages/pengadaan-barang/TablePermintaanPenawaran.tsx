@@ -1,8 +1,8 @@
 ﻿import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
 import { formatNomorPenawaran } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface UserSession {
   role?: string;
@@ -16,6 +16,21 @@ const getAuthData = () => {
     role: user.role ?? "",
   };
 };
+
+function formatStepName(step: string) {
+  const labels: Record<string, string> = {
+    PERMINTAAN_MASUK: "Permintaan Masuk",
+    PENYUSUNAN_BOQ: "Penyusunan BoQ",
+    REVIEW_INTERNAL: "Review Internal",
+    PERSETUJUAN_MANAJEMEN: "Persetujuan Manajemen",
+    FOLLOW_UP: "Follow Up Klien",
+    IMPLEMENTASI: "Implementasi",
+    BAST: "BAST",
+    PEMBAYARAN: "Accounting",
+    GARANSI: "Garansi",
+  };
+  return labels[step] || step.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
 
 function formatTanggal(iso: string) {
   return new Date(iso).toLocaleDateString("id-ID", {
@@ -64,139 +79,116 @@ export default function TablePermintaanPenawaran() {
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
         <div className="w-full rounded-md border border-slate-200 bg-white min-w-[1000px]">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100 [&_th]:py-3.5 text-slate-600 text-xs font-medium uppercase tracking-wider">
-              <th className="px-6 py-4">Tanggal Permintaan</th>
-              <th className="px-6 py-4">No. Penawaran</th>
-              <th className="px-6 py-4">Nama Perusahaan / Lokasi</th>
-              <th className="px-6 py-4">Pembuat Penawaran</th>
-              {isMaster && <th className="px-6 py-4">Harga</th>}
-              <th className="px-6 py-4">Jenis Pengadaan</th>
-              <th className="px-6 py-4 text-center">Tahapan</th>
-              <th className="px-6 py-4 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50 text-sm">
-            {isLoading && (
-              <tr>
-                <td
-                  colSpan={isMaster ? 8 : 7}
-                  className="px-6 py-10 text-center text-gray-400 text-sm"
-                >
-                  Memuat data...
-                </td>
-              </tr>
-            )}
-            {isError && (
-              <tr>
-                <td
-                  colSpan={isMaster ? 8 : 7}
-                  className="px-6 py-10 text-center text-red-400 text-sm"
-                >
-                  Gagal memuat data.
-                </td>
-              </tr>
-            )}
-            {!isLoading && !isError && data?.data.length === 0 && (
-              <tr>
-                <td
-                  colSpan={isMaster ? 8 : 7}
-                  className="px-6 py-10 text-center text-gray-300 text-sm"
-                >
-                  Tidak ada data penawaran.
-                </td>
-              </tr>
-            )}
-            {!isError && data?.data.map((item) => (
-              <tr
-                key={item.id}
-                className="hover:bg-slate-50/50 transition-colors border-b [&_td]:py-4"
-              >
-                <td className="px-6 text-gray-500">
-                  {formatTanggal(item.tanggalMasuk)}
-                </td>
-                <td className={`px-6 ${item.nomorPenawaran && !item.nomorPenawaran.startsWith("PENDING") ? "font-semibold text-slate-600" : "text-gray-500 font-medium"}`}>
-                  {formatNomorPenawaran(item.nomorPenawaran)}
-                </td>
-                <td className="h-full px-6 font-semibold text-slate-600 max-w-55">
-                  <div className="flex h-full flex-col justify-center">
-                    <div className="min-h-0 overflow-hidden text-ellipsis line-clamp-1">
-                      {item.perusahaanName || "-"}
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50 border-b border-slate-100">
+                <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL PERMINTAAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">NO. PENAWARAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">NAMA PERUSAHAAN / LOKASI</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold">PEMBUAT PENAWARAN</TableHead>
+                {isMaster && <TableHead className="text-[#000000] text-xs font-semibold">HARGA</TableHead>}
+                <TableHead className="text-[#000000] text-xs font-semibold">JENIS PENGADAAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-center">TAHAPAN</TableHead>
+                <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={isMaster ? 8 : 7} className="text-center py-10 text-muted-foreground text-sm">
+                    Memuat data...
+                  </TableCell>
+                </TableRow>
+              )}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={isMaster ? 8 : 7} className="text-center py-10 text-red-500 text-sm">
+                    Gagal memuat data.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !isError && data?.data.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={isMaster ? 8 : 7} className="text-center py-10 text-muted-foreground text-sm">
+                    Tidak ada data penawaran.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isError && data?.data.map((item) => (
+                <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="text-gray-800">
+                    {formatTanggal(item.tanggalMasuk)}
+                  </TableCell>
+                  <TableCell className={`text-gray-800`}>
+                    {formatNomorPenawaran(item.nomorPenawaran)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col justify-center max-w-[200px]">
+                      <span className="font-semibold text-gray-800 truncate">{item.perusahaanName || "-"}</span>
+                      {item.lokasiProyek && (
+                        <span className="text-[0.75rem] text-gray-800 truncate">({item.lokasiProyek})</span>
+                      )}
                     </div>
-
-                    {item.lokasiProyek && (
-                      <div className="min-h-0 overflow-hidden font-medium text-gray-500">
-                        <span className="line-clamp-1">
-                          ({item.lokasiProyek})
+                  </TableCell>
+                  <TableCell className="text-gray-800">
+                    {item.pembuatPenawaran?.nama || "-"}
+                  </TableCell>
+                  {isMaster && (
+                    <TableCell className="text-gray-800">
+                      {formatRupiah(item.estimasiHarga) || "-"}
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {item.jenisPenawaran?.map((jenis) => (
+                        <span key={jenis} className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                          {jenis.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
                         </span>
-                      </div>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 text-gray-500 font-medium">
-                  {item.pembuatPenawaran?.nama || "-"}
-                </td>
-                {isMaster && (
-                  <td className="px-6 font-medium text-gray-500">
-                    {formatRupiah(item.estimasiHarga) || "-"}
-                  </td>
-                )}
-                <td className="px-6">
-                  <div className="flex flex-wrap gap-1">
-                    {item.jenisPenawaran?.map((jenis) => (
-                      <span
-                        key={jenis}
-                        className="px-2 py-0.5 bg-gray-100 text-slate-600 rounded text-[10px] font-bold border border-gray-200 uppercase"
-                      >
-                        {jenis.replace("_", " ")}
+                      )) || "-"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {item.stepSaatIni ? (
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold whitespace-nowrap">
+                        {formatStepName(item.stepSaatIni)}
                       </span>
-                    )) || "-"}
-                  </div>
-                </td>
-                <td className="px-6 text-gray-500 font-medium text-center">
-                  {item.stepSaatIni ? item.stepSaatIni.replace(/_/g, " ") : "-"}
-                </td>
-                <td className="px-6 text-right">
-                  <Link
-                    className="inline-flex items-center gap-1 text-cyan-600 font-semibold hover:text-cyan-700 transition-colors"
-                    to={`/penawaran/${item.id}`}
-                  >
-                    Lihat Detail <ArrowRight size={14} />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    ) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link className="text-cyan-600 text-sm font-medium hover:underline whitespace-nowrap" to={`/penawaran/${item.id}`}>
+                      Lihat Detail
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
 
       {/* Pagination */}
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            Menampilkan {data.data.length} dari {data.meta.total} data
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-50">
+          <p className="text-sm text-slate-500">
+            Menampilkan <span className="font-semibold text-slate-700">{data.data.length}</span> dari <span className="font-semibold text-slate-700">{data.meta.total}</span> data
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              Sebelumnya
+              ‹
             </button>
-            <span className="text-xs text-gray-500">
+            <span className="text-sm text-slate-500 px-2">
               {page} / {data.meta.totalPages}
             </span>
             <button
-              onClick={() =>
-                setPage((p) => Math.min(data.meta.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
               disabled={page === data.meta.totalPages}
-              className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              Berikutnya
+              ›
             </button>
           </div>
         </div>

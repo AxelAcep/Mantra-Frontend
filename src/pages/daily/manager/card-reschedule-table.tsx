@@ -324,8 +324,8 @@ export function RescheduleTable({
                                                     <div className="pl-12 text-xs text-muted-foreground italic">↳ sama</div>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-800 text-medium max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
-                                            <TableCell className="font-medium text-gray-800 text-medium max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
+                                            <TableCell className="text-gray-800 max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
+                                            <TableCell className="text-gray-800 max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
                                             <TableCell className="text-gray-800 text-medium">
                                                 <p>{formatDate(item.activity.targetSelesai)}</p>
                                                 <p>{formatTime(item.activity.targetSelesai)}</p>

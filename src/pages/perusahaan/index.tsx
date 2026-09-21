@@ -242,7 +242,7 @@ export default function PerusahaanPage() {
                 paginatedCompanies.map((item, idx) => (
                   <TableRow key={idx} className="hover:bg-slate-50/50 transition-colors [&_td]:py-4">
                     <TableCell className="max-w-[200px]" title={item.name}>
-                      <p className="font-medium text-gray-800 truncate">{item.name}</p>
+                      <p className="text-gray-800 truncate">{item.name}</p>
                     </TableCell>
                     <TableCell className="max-w-[200px]" title={item.address}>
                       <p className="text-sm text-gray-800 truncate">{item.address}</p>
