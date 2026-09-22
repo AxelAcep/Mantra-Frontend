@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import ActivityLogSection from "./ActivityLogSection";
 import type { LogEntry } from "./ActivityLogSection";
 import SectionHeading from "./SectionHeading";
@@ -276,6 +277,22 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
       {/* ── Left Column ── */}
       <div className="col-span-12 lg:col-span-9 space-y-6">
         <SectionHeading title="Detail" />
+
+        {followUpData?.kondisiPengantaran === "SESUDAH_DP" && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
+            <AlertTriangle size={20} className="text-amber-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-amber-800">
+                Peringatan: Pengantaran Barang Ditahan
+              </p>
+              <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                Kondisi pengantaran barang ini adalah <strong>sesudah klien melakukan pembayaran DP</strong>.
+                Divisi Procurement GA <strong>tidak boleh melakukan pengantaran barang</strong> ke klien sampai
+                Kepala Divisi / Supervisi Finance telah menandai <strong>termin satu sebagai lunas</strong>.
+              </p>
+            </div>
+          </div>
+        )}
 
         <OrderInfoSection
           orderInfo={orderInfo}

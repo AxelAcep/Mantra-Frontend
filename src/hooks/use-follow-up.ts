@@ -7,6 +7,7 @@ import {
   updateStatusFollowUp,
   konfirmasiDokumenPO,
   batalkanFollowUp,
+  setKondisiPengantaran,
 } from "@/services/follow-up.services";
 
 export function useDetailFollowUp(trackingId: string | undefined) {
@@ -100,6 +101,19 @@ export function useBatalkanFollowUp(trackingId: string) {
     },
     onError: (error: Error) => {
       console.error("Batalkan follow up failed:", error.message);
+    },
+  });
+}
+
+export function useSetKondisiPengantaran(trackingId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: {
+      kondisiPengantaran: "SEBELUM_DP" | "SESUDAH_DP";
+    }) => setKondisiPengantaran(trackingId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["follow-up-detail", trackingId] });
     },
   });
 }
