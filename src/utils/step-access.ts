@@ -12,7 +12,7 @@ const FULL_ACCESS_DIVISI = ["MANAGER_OPERASIONAL", "DIREKTUR", "KOMISARIS"];
 
 const STEP_ALLOWED_DIVISI: Record<number, string[]> = {
   1: ["SALES", "ADMIN_SEKERTARIS", "PRESALES"], // Permintaan Masuk
-  2: ["SALES", "ADMIN_SEKERTARIS", "PRESALES"], // Penyusunan BoQ
+  2: ["SALES", "ADMIN_SEKERTARIS", "ADMIN_SEKERTARIAT", "PRESALES"], // Penyusunan BoQ
   3: ["ADMIN_SEKERTARIS", "ADMIN_SEKERTARIAT"], // Review Internal
   4: ["ADMIN_SEKERTARIS", "ADMIN_SEKERTARIAT"], // Persetujuan Manajemen
   5: ["SALES", "ADMIN_SEKERTARIAT", "FINANCE_ACCOUNTING"], // Follow Up

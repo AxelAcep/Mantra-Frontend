@@ -48,6 +48,14 @@ const KPI_STYLE: Record<string, string> = {
     BURUK: "bg-rose-50 text-rose-700 border-rose-200",
 }
 
+function toTitleCase(str: string): string {
+    return str
+        .toLowerCase()
+        .split("_")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ")
+}
+
 // ─── Info Box ─────────────────────────────────────────────────────────────────
 
 function InfoBox({
@@ -210,7 +218,7 @@ export function OverviewCard({
                 {isAdmin && divisi && (
                     <InfoBox
                         label="Divisi"
-                        value={divisi}
+                        value={toTitleCase(divisi)}
                     />
                 )}
                 {parent && (
