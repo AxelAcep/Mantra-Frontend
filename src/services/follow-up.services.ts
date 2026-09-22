@@ -78,6 +78,16 @@ export interface FollowUpResponse {
   sales?: { id: string; nama: string };
   activitySalesId?: string;
   activitySales?: ActivityDetail;
+  // Flow Stage 3→6: MO pilih Admin Proyek (belum ada daily) -> 2 daily
+  // pengecekan (Admin Proyek & Finance) -> konfirmasi Direktur/Komisaris ->
+  // baru daily "Upload Dokumen PO" (activityAdminProyek di atas) dibuat.
+  adminProyekId?: string;
+  adminProyek?: { id: string; nama: string };
+  activityPengecekanAdminProyekId?: string;
+  activityPengecekanAdminProyek?: ActivityDetail;
+  activityPengecekanFinanceId?: string;
+  activityPengecekanFinance?: ActivityDetail;
+  accDirekturKomisarisPO: boolean;
   status: string;
   stage: number;
   totalBast?: number | null;
@@ -127,6 +137,26 @@ export async function updateStatusFollowUp(
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal update status Follow Up.");
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function konfirmasiDokumenPO(
+  trackingId: string,
+  payload: { status: "DITERIMA" | "PERLU_TINDAKAN"; alasan?: string },
+): Promise<FollowUpResponse> {
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/follow-up/konfirmasi-dokumen-po`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal konfirmasi dokumen PO.");
   }
   const json = await res.json();
   return json.data;

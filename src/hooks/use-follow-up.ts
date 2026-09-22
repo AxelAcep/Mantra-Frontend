@@ -5,6 +5,7 @@ import {
   uploadDokumenFollowUp,
   deleteDokumenFollowUp,
   updateStatusFollowUp,
+  konfirmasiDokumenPO,
   batalkanFollowUp,
 } from "@/services/follow-up.services";
 
@@ -68,6 +69,22 @@ export function useUpdateStatusFollowUp(trackingId: string) {
     },
     onError: (error: Error) => {
       console.error("Update status follow up failed:", error.message);
+    },
+  });
+}
+
+export function useKonfirmasiDokumenPO(trackingId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: { status: "DITERIMA" | "PERLU_TINDAKAN"; alasan?: string }) =>
+      konfirmasiDokumenPO(trackingId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
+      qc.invalidateQueries({ queryKey: ["follow-up-detail", trackingId] });
+    },
+    onError: (error: Error) => {
+      console.error("Konfirmasi dokumen PO failed:", error.message);
     },
   });
 }

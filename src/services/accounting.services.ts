@@ -74,6 +74,25 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export type FlagTermin = "LEWAT" | "1_MINGGU" | "2_MINGGU" | "";
 
+export interface ItemTerminActivityDokumen {
+  id: string;
+  namaFile: string;
+  path: string;
+  uploadedBy: string;
+  pegawai?: { nama: string };
+  createdAt: string;
+}
+
+export interface ItemTerminActivity {
+  id: string;
+  judul: string;
+  deskripsi: string;
+  status: string;
+  targetSelesai?: string;
+  pegawai?: { nama?: string; divisi?: string };
+  dokumen?: ItemTerminActivityDokumen[];
+}
+
 export interface ItemTermin {
   id: string;
   terminPembayaranId: string;
@@ -89,7 +108,9 @@ export interface ItemTermin {
   // langsung punya daily, termin berikutnya baru dapet daily-nya (activityId
   // keisi) setelah termin sebelumnya tuntas (sudahDibayar DAN activitySelesai
   // dua-duanya). Kalau activityId masih kosong, termin ini belum "mulai".
+  // PIC daily-nya selalu Supervisi Finance Accounting (activity.pegawai).
   activityId?: string;
+  activity?: ItemTerminActivity | null;
   activitySelesai: boolean;
   createdAt: string;
   updatedAt: string;
