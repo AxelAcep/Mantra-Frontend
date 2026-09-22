@@ -6,6 +6,7 @@ import {
   useUploadDokumenFollowUp,
   useDeleteDokumenFollowUp,
   useBatalkanFollowUp,
+  useKonfirmasiDokumenPO,
 } from "@/hooks/use-follow-up";
 import ApprovalSectionFollowUp from "./ApprovalSectionFollowUp";
 import DocumentSectionFollowUp from "./DocumentSectionFollowUp";
@@ -63,8 +64,12 @@ export default function Step5({
   const uploadMut = useUploadDokumenFollowUp(trackingId);
   const deleteMut = useDeleteDokumenFollowUp(trackingId);
   const batalkanMut = useBatalkanFollowUp(trackingId);
+  const konfirmasiDokumenPOMut = useKonfirmasiDokumenPO(trackingId);
 
   const { pegawaiId, divisi, role } = getUserInfo();
+
+  const isDirekturKomisaris =
+    divisi === "DIREKTUR" || divisi === "KOMISARIS";
 
   const isManagerOps = divisi === "MANAGER_OPERASIONAL" || role === "MASTER";
   const isBerwenangBatalkan =
@@ -262,33 +267,40 @@ export default function Step5({
           logs={data.logs}
           customerName={customerName}
           salesName={salesName}
+          adminProyekNama={data.adminProyek?.nama}
+          financeNama={data.activityPengecekanFinance?.pegawai?.nama}
           isAdminSekertariat={isAdminSekertariat}
           isSalesPIC={isSalesPIC}
+          isDirekturKomisaris={isDirekturKomisaris}
           isUpdating={updateStatusMut.isPending}
+          isKonfirmasiDokumenPO={konfirmasiDokumenPOMut.isPending}
           onUpdateStage={(nextStage) =>
             updateStatusMut.mutate({ stage: nextStage })
           }
           onUpdateStatus={(nextStatus) =>
             updateStatusMut.mutate({ status: nextStatus })
           }
+          onKonfirmasiDokumenPO={(status, alasan) =>
+            konfirmasiDokumenPOMut.mutate({ status, alasan })
+          }
         />
 
         <SectionHeading title="Admin Proyek" />
         <ManagerProyekCard
           followUpId={data.id}
-          currentNama={
-            data.activityAdminProyek?.pegawai?.nama ?? "Pilih Admin Proyek"
-          }
+          currentNama={data.adminProyek?.nama ?? "Pilih Admin Proyek"}
           canEdit={
-            role === "MASTER" ||
-            divisi === "MANAGER_OPERASIONAL" ||
-            divisi === "DIREKTUR" ||
-            divisi === "KOMISARIS"
+            data.stage >= 3 &&
+            data.stage <= 4 &&
+            (role === "MASTER" ||
+              divisi === "MANAGER_OPERASIONAL" ||
+              divisi === "DIREKTUR" ||
+              divisi === "KOMISARIS")
           }
           onAssigned={refetch}
         />
 
-        {data.stage >= 3 && (
+        {data.stage >= 6 && (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <InputTotalBastFollowUp
@@ -328,6 +340,8 @@ export default function Step5({
           activityAdmin={data.activityAdmin}
           activitySales={data.activitySales}
           activityAdminProyek={data.activityAdminProyek}
+          activityPengecekanAdminProyek={data.activityPengecekanAdminProyek}
+          activityPengecekanFinance={data.activityPengecekanFinance}
           onChatClick={onChatClick}
           onUpload={(file) => uploadMut.mutate({ file })}
           onDelete={(id) => deleteMut.mutate(id)}

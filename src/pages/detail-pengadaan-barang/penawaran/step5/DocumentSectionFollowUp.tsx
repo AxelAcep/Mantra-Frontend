@@ -118,6 +118,30 @@ interface DocumentSectionFollowUpProps {
     };
   };
 
+  activityPengecekanAdminProyek?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
+  activityPengecekanFinance?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
   onChatClick: (activityId: string, activityJudul: string) => void;
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
@@ -129,6 +153,8 @@ export default function DocumentSectionFollowUp({
   activityAdmin,
   activitySales,
   activityAdminProyek,
+  activityPengecekanAdminProyek,
+  activityPengecekanFinance,
   onChatClick,
   onUpload,
   onDelete,
@@ -287,16 +313,24 @@ export default function DocumentSectionFollowUp({
     e.target.value = "";
   }
 
-  // Daily Activity:
-  // Admin Sekretariat -> Admin Proyek -> Sales PIC
+  // Daily Activity, urut kronologis flow:
+  // Admin Sekretariat -> Sales PIC -> Pengecekan PO (Admin Proyek & Finance) -> Upload PO (Admin Proyek)
   const activities = [
     ...(activityAdmin ? [{ ...activityAdmin, role: "Admin Sekretariat" }] : []),
+
+    ...(activitySales ? [{ ...activitySales, role: "Sales PIC" }] : []),
+
+    ...(activityPengecekanAdminProyek
+      ? [{ ...activityPengecekanAdminProyek, role: "Pengecekan PO (Admin Proyek)" }]
+      : []),
+
+    ...(activityPengecekanFinance
+      ? [{ ...activityPengecekanFinance, role: "Pengecekan PO (Finance)" }]
+      : []),
 
     ...(activityAdminProyek
       ? [{ ...activityAdminProyek, role: "Admin Proyek" }]
       : []),
-
-    ...(activitySales ? [{ ...activitySales, role: "Sales PIC" }] : []),
   ];
 
   const followUpStatus = (() => {

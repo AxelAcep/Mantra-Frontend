@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FileText,
@@ -19,6 +19,7 @@ import {
   useDeleteBarangImplementasi,
   useDetailImplementasi,
 } from "@/hooks/use-implementasi";
+import { useBarangList } from "@/hooks/use-barang";
 import {
   Dialog,
   DialogContent,
@@ -104,6 +105,104 @@ function getErrorMessage(err: any, fallback: string): string {
   return err?.response?.data?.message || err?.message || fallback;
 }
 
+// ─── Barang Autocomplete (search dropdown ke master Barang, murni text — gak ada relasi/FK) ──
+
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+  return debounced;
+}
+
+function BarangAutocomplete({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const debouncedValue = useDebouncedValue(value.trim(), 300);
+
+  // Cuma nge-search kalau dropdown lagi kebuka — hindari fetch pas komponen
+  // baru mount (misal pas mode edit, value udah keisi nama barang lama).
+  const { data, isFetching } = useBarangList(1, 20, isOpen ? debouncedValue : "", "", "");
+  const results = isOpen ? (data?.data ?? []) : [];
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div className="relative">
+        <Search
+          size={12}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+        <input
+          type="text"
+          value={value}
+          disabled={disabled}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          placeholder="Cari atau ketik nama barang..."
+          autoComplete="off"
+          className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg pl-8 pr-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
+        />
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          {isFetching ? (
+            <div className="px-3 py-2 text-[11px] text-gray-400">Mencari...</div>
+          ) : results.length === 0 ? (
+            <div className="px-3 py-2 text-[11px] text-gray-400">
+              {debouncedValue
+                ? "Tidak ada di master barang — tetap bisa dipakai sebagai teks bebas."
+                : "Ketik untuk mencari master barang..."}
+            </div>
+          ) : (
+            results.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  onChange(item.deskripsi);
+                  setIsOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 hover:bg-cyan-50 border-b border-gray-50 last:border-0 transition-colors"
+              >
+                <p className="text-xs font-bold text-slate-800">
+                  {item.deskripsi}
+                </p>
+                <p className="text-[10px] text-gray-400">
+                  {item.noBarang} · {item.satuan}
+                </p>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Form Card Component ───────────────────────────────────────────────────────
 
 interface FormCardProps {
@@ -155,13 +254,10 @@ function FormCard({
           <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
             Nama Barang *
           </label>
-          <input
-            type="text"
+          <BarangAutocomplete
             value={draft.namaBarang}
+            onChange={(v) => onUpdate({ namaBarang: v })}
             disabled={isSaving}
-            onChange={(e) => onUpdate({ namaBarang: e.target.value })}
-            placeholder="Masukkan nama barang..."
-            className="mt-1 w-full text-xs font-medium text-slate-800 border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cyan-400 disabled:opacity-60"
           />
         </div>
 
