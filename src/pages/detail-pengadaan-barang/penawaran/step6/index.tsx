@@ -14,6 +14,7 @@ import {
   useUpdateDetailImplementasi,
   useAssignPGAStaff,
 } from "@/hooks/use-implementasi";
+import { useDetailFollowUp } from "@/hooks/use-follow-up";
 import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
 import { usePegawaiByDivisi } from "@/hooks/use-penawaran";
 
@@ -98,6 +99,8 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
   const { data: instalasiDetail } = useDetailActivity(
     implData?.activityInstalasi?.id ?? "",
   );
+
+  const { data: followUpData } = useDetailFollowUp(trackingId);
 
   // ── Functions ──
 
@@ -235,6 +238,16 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
       });
     });
 
+    followUpData?.dokumen?.forEach((doc: any) => {
+      if (doc.kategori === "DOKUMEN_PO_PGA") {
+        docs.push({
+          name: doc.namaFile,
+          uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Admin PGA"} pada ${formatDateTime(doc.createdAt)} - Follow Up`,
+          path: doc.path,
+        });
+      }
+    });
+
     // Deduplicate by path
     const seenPaths = new Set<string>();
     const result: DokumenItem[] = [];
@@ -250,6 +263,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
     pembelianDetail,
     pengantaranDetail,
     instalasiDetail,
+    followUpData,
     implData?.activityPembelian?.judul,
     implData?.activityPengantaran?.judul,
     implData?.activityInstalasi?.judul,

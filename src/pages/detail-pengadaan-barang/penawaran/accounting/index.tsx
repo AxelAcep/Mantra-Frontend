@@ -1,5 +1,6 @@
 import React from "react";
 import { useAccounting } from "@/hooks/use-accounting";
+import { useDetailFollowUp } from "@/hooks/use-follow-up";
 import TerminSection from "./TerminSection";
 import DocumentSection from "./DocumentsSection";
 import ActivitySidebar from "./ActivitySidebar";
@@ -31,8 +32,21 @@ interface Props {
 
 export default function Step8({ trackingId }: Props) {
   const { data, isLoading, isError } = useAccounting(trackingId);
+  const { data: followUpData } = useDetailFollowUp(trackingId);
 
   const { divisi } = getUserInfo();
+
+  const financeDocs = React.useMemo(() => {
+    if (!followUpData?.dokumen) return [];
+    return followUpData.dokumen
+      .filter((doc: any) => doc.kategori === "DOKUMEN_PO_FINANCE")
+      .map((doc: any) => ({
+        id: doc.id,
+        namaFile: doc.namaFile,
+        path: doc.path,
+        createdAt: doc.createdAt,
+      }));
+  }, [followUpData]);
 
   const canBayar = [
     "FINANCE_ACCOUNTING",
@@ -70,10 +84,8 @@ export default function Step8({ trackingId }: Props) {
 
           <div className="mt-6">
             <DocumentSection
-              dokumen={[]}
-              onUpload={() => {}}
-              onDelete={() => {}}
-              isUploading={false}
+              dokumen={financeDocs}
+              readOnly
             />
           </div>
         </div>
