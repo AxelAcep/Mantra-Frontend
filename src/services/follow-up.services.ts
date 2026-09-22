@@ -83,6 +83,7 @@ export interface FollowUpResponse {
   totalBast?: number | null;
   totalBastPAC?: number | null;
   totalBastFire?: number | null;
+  kondisiPengantaran?: "SEBELUM_DP" | "SESUDAH_DP" | null;
   logs: LogFollowUp[];
   logAktivitas: LogFollowUp[];
   dokumen: FollowUpDokumen[] | null;
@@ -257,6 +258,7 @@ export interface FollowUpResponse {
   status: string;
   stage: number;
   TotalBAST?: number | null;
+  kondisiPengantaran?: "SEBELUM_DP" | "SESUDAH_DP" | null;
   logs: LogFollowUp[];
   logAktivitas: LogFollowUp[];
   dokumen: FollowUpDokumen[] | null;
@@ -281,6 +283,26 @@ export async function inputBASTFollowup(
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.error ?? "Gagal update Total BAST.");
+  }
+  const json = await res.json();
+  return json.data;
+}
+
+export async function setKondisiPengantaran(
+  trackingId: string,
+  payload: { kondisiPengantaran: "SEBELUM_DP" | "SESUDAH_DP" },
+): Promise<FollowUpResponse> {
+  const res = await fetchClient(
+    `/tracking-penawaran/${trackingId}/follow-up/kondisi-pengantaran`,
+    {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error ?? "Gagal update kondisi pengantaran.");
   }
   const json = await res.json();
   return json.data;

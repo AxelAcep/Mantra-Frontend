@@ -13,6 +13,7 @@ import ActivityLogSectionFollowUp from "./ActivityLogSectionFollowUp";
 import AdminProyekUpload from "./AdminProyekUpload";
 import ManagerProyekCard from "./AssignAdminProyekCard";
 import InputTotalBastFollowUp from "./InputTotalBastFollowUp";
+import KondisiPengantaranCard from "./KondisiPengantaranCard";
 import BatalkanPermintaanCard from "./BatalkanPermintaanCard";
 import { detectBastKategori } from "@/utils/bast-kategori";
 
@@ -289,15 +290,24 @@ export default function Step5({
 
         {data.stage >= 3 && (
           <>
-            <InputTotalBastFollowUp
-              trackingId={trackingId}
-              jenisPenawaran={tracking?.jenisPenawaran ?? []}
-              totalBast={data.totalBast}
-              totalBastPAC={data.totalBastPAC}
-              totalBastFire={data.totalBastFire}
-              canInput={isAdminProyekOrBerwenang}
-              onUpdated={refetch}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <InputTotalBastFollowUp
+                trackingId={trackingId}
+                jenisPenawaran={tracking?.jenisPenawaran ?? []}
+                totalBast={data.totalBast}
+                totalBastPAC={data.totalBastPAC}
+                totalBastFire={data.totalBastFire}
+                canInput={isAdminProyekOrBerwenang}
+                onUpdated={refetch}
+              />
+
+              <KondisiPengantaranCard
+                trackingId={trackingId}
+                kondisiPengantaran={data.kondisiPengantaran}
+                canInput={isAdminProyekOrBerwenang}
+                onUpdated={refetch}
+              />
+            </div>
 
             <SectionHeading title="Upload Dokumen PO" />
             <AdminProyekUpload
