@@ -26,7 +26,7 @@ export default function TableKonfirmasiSelesai() {
       <div className="px-6 py-4 border-b border-gray-100">
         <input
           type="text"
-          placeholder="Cari nomor PO, jenis barang..."
+          placeholder="Cari nomor PO, nomor WO, nomor penawaran, jenis barang..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -42,6 +42,7 @@ export default function TableKonfirmasiSelesai() {
             <TableHeader>
               <TableRow className="bg-slate-50 border-b border-slate-100">
               <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">NOMOR WO</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">NAMA PERUSAHAAN</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">JENIS BARANG</TableHead>
               <TableHead className="text-center text-[#000000] text-xs font-semibold">PROGRESS ENTRY</TableHead>
@@ -52,21 +53,21 @@ export default function TableKonfirmasiSelesai() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                   Memuat data...
                 </TableCell>
               </TableRow>
             )}
             {isError && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-red-500 text-sm">
+                <TableCell colSpan={7} className="text-center py-10 text-red-500 text-sm">
                   Gagal memuat data.
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && !isError && data?.data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
                   Tidak ada data BAST yang sudah lengkap.
                 </TableCell>
               </TableRow>
@@ -74,7 +75,10 @@ export default function TableKonfirmasiSelesai() {
             {!isError && data?.data.map((item) => (
               <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                 <TableCell className="text-gray-800">
-                  {formatNomorPenawaran(item.nomorPenawaran)}
+                  {item.nomorPO || formatNomorPenawaran(item.nomorPenawaran)}
+                </TableCell>
+                <TableCell className="text-gray-800">
+                  {item.nomorWO || "—"}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-800">
                   {item.perusahaanName || "—"}
