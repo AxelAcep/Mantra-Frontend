@@ -27,7 +27,7 @@ export default function ApprovalSectionPersetujuan({
   const isSelesai = data.status === "SELESAI";
   const isPerluTindakan = data.status === "PERLU_TINDAKAN";
 
-  const accLog = data.logAktivitas?.find(
+  const accLog = data.logs?.find(
     (log) => log.aksi === "Approve Direktur/Komisaris",
   );
 
@@ -78,10 +78,10 @@ export default function ApprovalSectionPersetujuan({
               Perlu Tindakan
             </p>
             {(() => {
-              const tolakLog = [...(data.logAktivitas ?? [])]
+              const tolakLog = [...(data.logs ?? [])]
                 .reverse()
-                .find((l) => l.aksi.startsWith("Perlu Tindakan:"));
-              return tolakLog ? (
+                .find((l) => l.aksi === "Perlu Tindakan");
+              return tolakLog?.keterangan ? (
                 <p className="text-xs text-amber-600">{tolakLog.keterangan}</p>
               ) : null;
             })()}

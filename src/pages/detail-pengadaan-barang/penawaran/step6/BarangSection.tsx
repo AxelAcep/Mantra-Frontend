@@ -13,6 +13,14 @@ import {
   MessageCircle,
   Loader2,
 } from "lucide-react";
+
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 import {
   useAddBarangImplementasi,
   useUpdateBarangImplementasi,
@@ -832,8 +840,7 @@ export default function BarangSection({
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
                       {activityPembelian.pegawai?.nama ?? "—"} ·{" "}
-                      {activityPembelian.pegawai?.divisi?.replace("_", " ") ??
-                        "—"}{" "}
+                      {toTitleCase(activityPembelian.pegawai?.divisi ?? "—")}{" "}
                       ·{" "}
                       {activityPembelian.targetSelesai
                         ? new Date(
@@ -886,7 +893,7 @@ export default function BarangSection({
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
                               {child.pegawai?.nama ?? "—"} ·{" "}
-                              {child.pegawai?.divisi?.replace("_", " ") ?? "—"}{" "}
+                              {toTitleCase(child.pegawai?.divisi ?? "—")}
                               ·{" "}
                               {child.targetSelesai
                                 ? new Date(

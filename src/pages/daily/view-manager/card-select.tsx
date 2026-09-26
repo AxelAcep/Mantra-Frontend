@@ -3,6 +3,13 @@ import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 import {
   Command,
   CommandEmpty,
@@ -53,7 +60,7 @@ export function PegawaiSelect({
           {selectedPegawai ? (
             <>
               {selectedPegawai.nama}
-              <span className="ml-2 text-xs text-gray-500">({selectedPegawai.divisi})</span>
+              <span className="ml-2 text-xs text-gray-500">({toTitleCase(selectedPegawai.divisi)})</span>
             </>
           ) : (
             "Pilih pegawai..."
@@ -85,7 +92,7 @@ export function PegawaiSelect({
                   />
                   <div className="flex flex-col items-start">
                     <span className="font-medium">{item.nama}</span>
-                    <span className="text-xs text-gray-500">{item.divisi}</span>
+                    <span className="text-xs text-gray-500">{toTitleCase(item.divisi)}</span>
                   </div>
                 </CommandItem>
               ))}

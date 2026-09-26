@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Activity, ChevronDown } from "lucide-react";
 
+function toTitleCase(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface LogEntry {
   id: number;
   user: string;
@@ -48,7 +55,7 @@ export default function ActivityLogSectionReviewInternal({
                 </div>
                 <div className="pb-4 min-w-0">
                   <p className="text-xs font-semibold text-slate-700 leading-tight">
-                    {log.user}
+                    {toTitleCase(log.user)}
                   </p>
                   <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
                     {log.action}

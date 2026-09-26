@@ -18,6 +18,13 @@ import {
 } from "@/hooks/use-activity";
 import type { Chat } from "../../../services/activity.services";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function HighlightText({ text, query }: { text: string; query: string }) {
   if (!query) return <>{text}</>;
   const parts = text.split(new RegExp(`(${query})`, "gi"));
@@ -398,7 +405,7 @@ export function ChatPanel({
                                   {chat.pegawai.nama}
                                 </span>
                                 <span className="text-[10px] text-slate-400 font-normal">
-                                  {chat.pegawai.divisi}
+                                  {toTitleCase(chat.pegawai.divisi)}
                                 </span>
                               </div>
                             )}

@@ -2,6 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Download, ArrowRight, CheckCircle2 } from "lucide-react";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface ActivityDokumen {
   id: string;
   namaFile: string;
@@ -64,7 +71,7 @@ export default function DocumentSectionBast({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activityAdminProyek.pegawai?.nama ?? "—"} ·{" "}
-                    {activityAdminProyek.pegawai?.divisi ?? "—"} ·{" "}
+                    {toTitleCase(activityAdminProyek.pegawai?.divisi ?? "—")} ·{" "}
                     {activityAdminProyek.targetSelesai
                       ? new Date(
                           activityAdminProyek.targetSelesai,

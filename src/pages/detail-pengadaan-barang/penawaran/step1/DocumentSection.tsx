@@ -9,6 +9,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import type { PenawaranDokumen } from "@/services/penawaran.services";
+
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 import {
   useUploadPenawaranDokumen,
   useDeletePenawaranDokumen,
@@ -145,7 +152,7 @@ export default function DocumentSection({
                   </p>
                   <p className="text-xs text-gray-400">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                         "id-ID",

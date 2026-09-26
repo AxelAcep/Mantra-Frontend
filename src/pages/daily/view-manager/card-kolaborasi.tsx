@@ -2,6 +2,13 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<string, string> = {
@@ -107,7 +114,7 @@ export function KolaborasiCardAdmin({ kolaborator = [], onLihatDetail }: Props) 
                                 <FieldBox label="Nama Karyawan" value={kol.pegawai.nama} />
 
                                 {/* Divisi */}
-                                <FieldBox label="Divisi" value={kol.pegawai.divisi} />
+                                <FieldBox label="Divisi" value={toTitleCase(kol.pegawai.divisi)} />
 
                                 {/* Judul */}
                                 <FieldBox label="Judul" value={kol.judul} />

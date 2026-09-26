@@ -325,7 +325,7 @@ export default function DetailSectionBoQ({
               <span>Waktu Pengerjaan</span>
             </div>
             <span
-              className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
+              className={`text-[11px] px-3 py-1 rounded-full font-bold tracking-tight ${statusColor}`}
             >
               {workingTime?.status ?? "-"}
             </span>

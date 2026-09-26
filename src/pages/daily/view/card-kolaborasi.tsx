@@ -3,6 +3,13 @@ import { ChevronDown, ChevronUp, Plus, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { useTambahKolaborator } from "@/hooks/use-activity"
@@ -121,7 +128,7 @@ export function KolaborasiCard({ activityId, kolaborator, activityStatus, onLiha
                                 {/* Divisi */}
                                 <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
                                     <p className="text-xs text-gray-400 mb-1">Divisi</p>
-                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.divisi}>{kol.pegawai.divisi}</p>
+                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.divisi}>{toTitleCase(kol.pegawai.divisi)}</p>
                                 </div>
 
                                 {/* Judul */}

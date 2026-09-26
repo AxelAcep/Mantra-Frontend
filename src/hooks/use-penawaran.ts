@@ -224,6 +224,7 @@ export function useUpdateNomorPenawaran(trackingId: string) {
       updateNomorPenawaran(trackingId, nomorPenawaran),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["penawaran-detail", trackingId] });
+      qc.invalidateQueries({ queryKey: ["boq-detail", trackingId] });
     },
   });
 }

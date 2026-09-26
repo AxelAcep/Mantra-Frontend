@@ -3,6 +3,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, ArrowRight, MessageCircle } from "lucide-react";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
 interface LogbookCardProps {
@@ -57,7 +64,7 @@ export default function LogbookCard({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                           "id-ID",
@@ -105,7 +112,7 @@ export default function LogbookCard({
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
                           {child.pegawai?.nama ?? "—"} ·{" "}
-                          {child.pegawai?.divisi?.replace("_", " ") ?? "—"} ·{" "}
+                          {toTitleCase(child.pegawai?.divisi ?? "—")} ·{" "}
                           {child.targetSelesai
                             ? new Date(child.targetSelesai).toLocaleDateString(
                                 "id-ID",

@@ -10,6 +10,13 @@ import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import { useUnreadChatCount } from "@/hooks/use-activity";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface DocumentSectionBoQProps {
   trackingId: string;
   status?: string;
@@ -143,7 +150,7 @@ export default function DocumentSectionBoQ({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {activity.pegawai?.divisi ?? "—"} ·{" "}
+                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                           "id-ID",

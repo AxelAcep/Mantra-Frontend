@@ -133,7 +133,9 @@ export default function Step4({ trackingId, onStatusChange }: Props) {
       return {
         id: i + 1,
         user: log.namaPegawai || "System",
-        action: log.aksi || "-",
+        action: log.keterangan
+          ? `${log.aksi}: ${log.keterangan}`
+          : log.aksi || "-",
         time: d.toLocaleTimeString("id-ID", {
           hour: "2-digit",
           minute: "2-digit",

@@ -2,6 +2,13 @@ import React, { useRef } from "react";
 import { FileText, Upload, Download, Trash2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 interface DokumenItem {
   id: string;
   namaFile: string;
@@ -77,7 +84,7 @@ export default function DocumentSectionPersetujuan({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activityAdmin.pegawai?.nama ?? "—"} ·{" "}
-                    {activityAdmin.pegawai?.divisi ?? "—"} ·{" "}
+                    {toTitleCase(activityAdmin.pegawai?.divisi ?? "—")} ·{" "}
                     {activityAdmin.targetSelesai
                       ? new Date(
                         activityAdmin.targetSelesai,

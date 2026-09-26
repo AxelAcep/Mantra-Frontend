@@ -171,7 +171,9 @@ export default function Step2({
       return {
         id: index + 1,
         user: log.namaPegawai || "System",
-        action: log.aksi || "Activity",
+        action: log.keterangan
+          ? `${log.aksi}: ${log.keterangan}`
+          : log.aksi || "Activity",
         time: formattedTime,
         date: formattedDate,
         type: "system",

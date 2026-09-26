@@ -8,6 +8,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+function toTitleCase(str: string) {
+    return str
+        .toLowerCase()
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
 type AssignPhase = "pembelian" | "pengantaran" | "instalasi";
@@ -97,7 +104,7 @@ export default function AssignPGAModal({
                         {staff.nama}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Divisi {staff.divisi.replace("_", " ")}
+                        Divisi {toTitleCase(staff.divisi)}
                       </p>
                     </div>
                   </label>

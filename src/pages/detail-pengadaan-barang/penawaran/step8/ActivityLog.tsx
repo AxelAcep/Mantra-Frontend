@@ -1,5 +1,12 @@
 import React from "react";
 
+function toTitleCase(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export interface GaransiLogItem {
   id: number;
   user: string;
@@ -76,7 +83,7 @@ export default function ActivityLogSectionGaransi({
                         {item.description}
                       </p>
                       <p className="text-[10px] text-slate-400 font-medium">
-                        {item.user}
+                        {toTitleCase(item.user)}
                       </p>
                     </div>
                     <p className="text-[10px] text-slate-400 font-bold whitespace-nowrap">

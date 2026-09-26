@@ -17,6 +17,13 @@ function getInitials(nama: string) {
     .toUpperCase();
 }
 
+function toTitleCase(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function InfoCard({
   title,
   name,
@@ -44,8 +51,8 @@ function InfoCard({
           <p className="text-sm font-bold text-slate-800 leading-tight">
             {name}
           </p>
-          <p className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-tight">
-            {sub}
+          <p className="text-xs text-gray-400 font-medium mt-1 tracking-tight">
+            {toTitleCase(sub)}
           </p>
         </div>
       </div>
@@ -135,8 +142,8 @@ function AssignCard({
             <p className="text-[0.75rem] font-bold text-slate-800 leading-tight">
               {currentPegawai.nama}
             </p>
-            <p className="text-[0.65rem] text-gray-400 font-medium mt-1 uppercase tracking-tight">
-              {currentPegawai.divisi ?? divisi}
+            <p className="text-[0.65rem] text-gray-400 font-medium mt-1 tracking-tight">
+              {toTitleCase(currentPegawai.divisi ?? divisi)}
             </p>
           </div>
         </div>
@@ -267,7 +274,7 @@ function WorkTimeCard({
           <span>Waktu Pengerjaan</span>
         </div>
         <span
-          className={`text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-tight ${statusColor}`}
+          className={`text-[11px] px-3 py-1 rounded-full font-bold tracking-tight ${statusColor}`}
         >
           {statusLabel}
         </span>

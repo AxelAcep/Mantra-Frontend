@@ -365,7 +365,7 @@ export async function updateNomorPenawaran(
   id: string,
   nomorPenawaran: string,
 ): Promise<void> {
-  const res = await fetchClient(`/tracking-penawaran/${id}/detail`, {
+  const res = await fetchClient(`/tracking-penawaran/${id}/boq/nomor`, {
     method: "PATCH",
     headers: authHeaders(),
     body: JSON.stringify({ nomorPenawaran }),
