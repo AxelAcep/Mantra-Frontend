@@ -82,20 +82,22 @@ export default function DaftarBarangPage() {
                         <div className="py-16 text-center text-slate-400 font-medium">Tidak ada data ditemukan.</div>
                     )}
                     {data && data.data.length > 0 && (
-                        <BarangTable
-                            items={data.data}
-                            sortBy={sortBy}
-                            sortDir={sortDir}
-                            onSort={(field) => {
-                                if (sortBy === field) {
-                                    setSortDir((d) => (d === "asc" ? "desc" : "asc"))
-                                } else {
-                                    setSortBy(field)
-                                    setSortDir("asc")
-                                }
-                                setPage(1)
-                            }}
-                        />
+                        <div className="mx-6 my-4 rounded-md border border-slate-200 overflow-hidden">
+                            <BarangTable
+                                items={data.data}
+                                sortBy={sortBy}
+                                sortDir={sortDir}
+                                onSort={(field) => {
+                                    if (sortBy === field) {
+                                        setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+                                    } else {
+                                        setSortBy(field)
+                                        setSortDir("asc")
+                                    }
+                                    setPage(1)
+                                }}
+                            />
+                        </div>
                     )}
 
                     <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
