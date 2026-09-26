@@ -51,20 +51,6 @@ export function ChatList({ threads, selectedId, onSelect, isLoading }: Props) {
                         />
                     </div>
 
-                    <div className="border-b border-slate-100 -mx-5 px-5">
-                        <div className="flex gap-6">
-                            <button
-                                className="py-3 text-[13px] whitespace-nowrap border-b-2 border-cyan-600 text-cyan-600 font-bold transition-colors flex items-center gap-2 -mb-px"
-                            >
-                                Daily Activity
-                                {unreadTotal > 0 && (
-                                    <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-4.5 min-w-[18px] flex items-center justify-center px-1 shadow-sm">
-                                        {unreadTotal}
-                                    </span>
-                                )}
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
                 {/* List Area Inside Card */}

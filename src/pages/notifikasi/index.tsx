@@ -2,14 +2,15 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useHeaderTitle } from "@/components/layout/layout";
 import { useUnreadNotifikasiCount } from "@/hooks/use-notifikasi";
-import { useTotalUnreadChatCount } from "@/hooks/use-activity";
+import { useTotalUnreadChatCount, useReadAllChat, useActivityKonfirmasiKolaborasi } from "@/hooks/use-activity";
 import { useMasterReschedule, useMasterSelesai } from "@/hooks/use-master-activity";
 import { useSupervisiActivityAktif } from "@/hooks/use-supervisi";
-import { useActivityKonfirmasiKolaborasi } from "@/hooks/use-activity";
 import { ApprovalTab } from "./approval";
 import { AktivitasTab } from "./aktivitas";
 import ChatPage from "./chat";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 export default function NotifikasiPage() {
     const { setTitle } = useHeaderTitle();
@@ -31,6 +32,7 @@ export default function NotifikasiPage() {
     // ── Badge Counts ──
     const { data: unreadNotifikasi = 0 } = useUnreadNotifikasiCount();
     const { data: totalUnreadChat = 0 } = useTotalUnreadChatCount();
+    const readAllMutation = useReadAllChat();
 
     // Approvals counts (query if Master or Supervisi)
     const { data: rescheduleData } = useMasterReschedule(1, 1, "", isMaster);
@@ -74,29 +76,44 @@ export default function NotifikasiPage() {
         <div className="flex flex-col h-[calc(100vh-64px)] w-full bg-[#FBFCFD] overflow-y-auto">
             {/* Header section consistent with design */}
             <div className="bg-slate-50 px-6 pt-3 border-b border-slate-100 shrink-0">
-                {/* Tabs selection bar */}
-                <div className="flex gap-6 border-b border-gray-200">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.value}
-                            onClick={() => setActiveTab(tab.value)}
-                            className={`py-3 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors flex items-center gap-2
-                                ${activeTab === tab.value
-                                    ? "border-cyan-500 text-cyan-500 font-medium"
-                                    : "border-transparent text-gray-500 hover:text-gray-700"
-                                }`}
+                <div className="flex items-center justify-between">
+                    {/* Tabs selection bar */}
+                    <div className="flex gap-6 border-b border-gray-200">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.value}
+                                onClick={() => setActiveTab(tab.value)}
+                                className={`py-3 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors flex items-center gap-2
+                                    ${activeTab === tab.value
+                                        ? "border-cyan-500 text-cyan-500 font-medium"
+                                        : "border-transparent text-gray-500 hover:text-gray-700"
+                                    }`}
+                            >
+                                <span>{tab.label}</span>
+                                {tab.badge > 0 && (
+                                    <Badge
+                                        variant="destructive"
+                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                                    >
+                                        {tab.badge}
+                                    </Badge>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+
+                    {activeTab === "chat" && totalUnreadChat > 0 && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 gap-2 px-4 text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-700 transition-all rounded-lg bg-white"
+                            onClick={() => readAllMutation.mutate()}
+                            disabled={readAllMutation.isPending}
                         >
-                            <span>{tab.label}</span>
-                            {tab.badge > 0 && (
-                                <Badge
-                                    variant="destructive"
-                                    className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
-                                >
-                                    {tab.badge}
-                                </Badge>
-                            )}
-                        </button>
-                    ))}
+                            <Check className="w-4 h-4 text-slate-400" />
+                            <span className="text-xs font-medium">Tandai semua telah dibaca</span>
+                        </Button>
+                    )}
                 </div>
             </div>
 

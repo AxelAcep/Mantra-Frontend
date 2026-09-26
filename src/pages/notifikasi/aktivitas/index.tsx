@@ -110,7 +110,7 @@ export function AktivitasTab() {
                         </SelectItem>
                         <SelectItem value="penawaran" className="cursor-pointer">
                             <div className="flex items-center justify-between w-full gap-2">
-                                <span>Penawaran</span>
+                                <span>Pengadaan Barang</span>
                                 {penawaranUnread > 0 && (
                                     <Badge
                                         variant="destructive"
