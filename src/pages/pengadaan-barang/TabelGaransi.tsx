@@ -51,7 +51,7 @@ export default function TabelGaransi() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Cari nomor PO, perusahaan, lokasi..."
+            placeholder="Cari nomor PO, nomor WO, nomor penawaran, perusahaan, lokasi..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -81,6 +81,7 @@ export default function TabelGaransi() {
             <TableHeader>
               <TableRow className="bg-slate-50 border-b border-slate-100">
               <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
+              <TableHead className="text-[#000000] text-xs font-semibold">NOMOR WO</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">NAMA PERUSAHAAN</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">JENIS PENGADAAN</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">GARANSI MULAI</TableHead>
@@ -93,21 +94,21 @@ export default function TabelGaransi() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground text-sm">
                   Memuat data...
                 </TableCell>
               </TableRow>
             )}
             {isError && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-red-500 text-sm">
+                <TableCell colSpan={9} className="text-center py-10 text-red-500 text-sm">
                   Gagal memuat data.
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && !isError && data?.data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground text-sm">
                   Tidak ada data garansi.
                 </TableCell>
               </TableRow>
@@ -115,7 +116,10 @@ export default function TabelGaransi() {
             {!isError && data?.data.map((item) => (
               <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                 <TableCell className="text-gray-800">
-                  {formatNomorPenawaran(item.nomorPenawaran)}
+                  {item.nomorPO || formatNomorPenawaran(item.nomorPenawaran)}
+                </TableCell>
+                <TableCell className="text-gray-800">
+                  {item.nomorWO || "—"}
                 </TableCell>
                 <TableCell className="font-semibold text-gray-800">
                   {item.perusahaanName || "—"}

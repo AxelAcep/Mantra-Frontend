@@ -76,6 +76,9 @@ export type PenawaranListItem = {
   terminDibayar?: number;
   // Tab "Pengadaan Aktif": tahap Implementasi saat ini.
   implementasiTahap?: "PEMBELIAN_BARANG" | "PENGANTARAN" | "INSTALASI";
+  // Nomor PO dan WO — bisa dicari lewat search bar di tabel pengadaan.
+  nomorPO?: string;
+  nomorWO?: string;
   // Tab "BAST" / "Konfirmasi Selesai": BAST udah terpenuhi apa belum, +
   // progress "sudah berapa dari berapa" entry.
   bastLengkap?: boolean;
