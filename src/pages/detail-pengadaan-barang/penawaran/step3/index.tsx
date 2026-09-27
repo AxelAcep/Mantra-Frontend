@@ -41,12 +41,11 @@ export default function Step3({ trackingId }: Props) {
 
   const { divisi, role } = getUserInfo();
 
-  const isAdminSekertariat = divisi === "ADMIN_SEKERTARIAT";
+  const isAdminSekertaris = divisi === "ADMIN_SEKERTARIS";
   const isManajerOps = divisi === "MANAGER_OPERASIONAL";
+  const isSupervisiSales = role === "SUPERVISI" && divisi === "SALES";
   const isSalesPresalesSupervisi =
-    divisi === "SALES" ||
-    divisi === "PRESALES" ||
-    (role === "SUPERVISI" && divisi === "SALES");
+    divisi === "SALES" || divisi === "PRESALES" || isSupervisiSales;
 
   if (loading) {
     return (
@@ -80,9 +79,9 @@ export default function Step3({ trackingId }: Props) {
     adminDailyStatus === "SELESAI" ||
     adminDailyStatus === "DITERIMA";
 
-  // Admin Sekertariat: bisa ACC/Tolak hanya kalau ON_PROGRESS & daily selesai & belum acc
+  // Admin Sekertaris: bisa ACC/Tolak hanya kalau ON_PROGRESS & daily selesai & belum acc
   const canAdminAcc =
-    isAdminSekertariat &&
+    isAdminSekertaris &&
     !data.accAdminDirektur &&
     isOnProgress &&
     adminDailySelesai;
@@ -92,6 +91,17 @@ export default function Step3({ trackingId }: Props) {
     isManajerOps &&
     data.accAdminDirektur &&
     !data.accManajerOps &&
+    isOnProgress;
+
+  // Supervisi Sales: gate manual (mirip Direktur/Komisaris di Persetujuan
+  // Manajemen) -- baru bisa approve/tolak kalau Admin Sekertaris & Manajer
+  // Ops udah dua-duanya acc (biasanya otomatis begitu daily selesai), belum
+  // pernah di-acc Supervisi Sales, dan masih ON_PROGRESS.
+  const canSupervisiSalesAcc =
+    isSupervisiSales &&
+    data.accAdminDirektur &&
+    data.accManajerOps &&
+    !data.accSupervisiSales &&
     isOnProgress;
 
   // Sales/Presales/Supervisi: konfirmasi ulang hanya kalau PERLU_TINDAKAN
@@ -143,6 +153,7 @@ export default function Step3({ trackingId }: Props) {
           data={data}
           canAdminAcc={canAdminAcc}
           canManajerAcc={canManajerAcc}
+          canSupervisiSalesAcc={canSupervisiSalesAcc}
           canKonfirmasiUlang={canKonfirmasiUlang}
           isUpdating={isUpdating}
           adminDailySelesai={adminDailySelesai}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -7,6 +8,9 @@ import {
   Pencil,
   Check,
   X,
+  FileText,
+  ArrowRight,
+  CheckCircle2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { ItemTermin, FlagTermin } from "@/services/accounting.services";
@@ -15,6 +19,53 @@ import {
   useUpdateAccounting,
   useBayarItemTermin,
 } from "@/hooks/use-accounting";
+
+// Kartu daily (Activity) penagihan termin — PIC-nya selalu Supervisi Finance
+// Accounting. Pola sama kayak Logbook Operasional di BAST/Follow Up.
+function DailyTerminCard({ item }: { item: ItemTermin }) {
+  const navigate = useNavigate();
+  const activity = item.activity;
+  if (!activity) return null;
+
+  return (
+    <div className="border border-gray-100 rounded-xl overflow-hidden">
+      <div className="p-3 bg-slate-50/60 border-b border-gray-100/80 flex justify-between items-center">
+        <div className="flex items-center gap-2 font-bold text-slate-800 text-[11px]">
+          <FileText size={14} className="text-gray-500" />
+          Daily Penagihan Termin
+        </div>
+        {activity.status === "DITERIMA" ? (
+          <span className="flex items-center gap-1 bg-green-50 text-green-600 px-2 py-1 rounded text-[9px] font-semibold">
+            <CheckCircle2 size={11} /> Diterima
+          </span>
+        ) : (
+          <span className="text-[9px] font-semibold px-2 py-1 rounded border bg-amber-50 text-amber-600 border-amber-100">
+            {activity.status.replace(/_/g, " ")}
+          </span>
+        )}
+      </div>
+      <div className="p-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-slate-800 truncate">
+            {activity.judul}
+          </p>
+          <p className="text-[10px] text-gray-400 mt-0.5">
+            {activity.pegawai?.nama ?? "-"} · {activity.pegawai?.divisi ?? "-"}
+            {activity.targetSelesai
+              ? ` · Target ${new Date(activity.targetSelesai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}`
+              : ""}
+          </p>
+        </div>
+        <button
+          onClick={() => navigate(`/dailyactivity/${activity.id}`)}
+          className="text-cyan-500 font-bold text-[10px] flex items-center gap-1 hover:text-cyan-600 shrink-0"
+        >
+          Lihat Detail <ArrowRight size={12} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -763,6 +814,13 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
                               </p>
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Daily penagihan termin — PIC-nya Supervisi Finance Accounting */}
+                      {item.activity && !isEditing && (
+                        <div className="mt-2">
+                          <DailyTerminCard item={item} />
                         </div>
                       )}
 

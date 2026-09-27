@@ -25,7 +25,7 @@ export default function DocumentSection({
 }: Props) {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) onUpload(file);
+    if (file) onUpload?.(file);
   }
 
   return (
@@ -85,7 +85,7 @@ export default function DocumentSection({
             <div className="flex items-center gap-2">
               {!readOnly && (
                 <button
-                  onClick={() => onDelete(doc.id)}
+                  onClick={() => onDelete?.(doc.id)}
                   className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                 >
                   <Trash2 size={18} />

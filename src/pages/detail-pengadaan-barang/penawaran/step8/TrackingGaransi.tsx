@@ -264,7 +264,7 @@ export default function TrackingGaransiSection({
         </div>
         <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-3">
           <div
-            className="h-full bg-yellow-400 rounded-full"
+            className={`h-full rounded-full ${progressPercent >= 100 ? "bg-green-500" : "bg-yellow-400"}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
