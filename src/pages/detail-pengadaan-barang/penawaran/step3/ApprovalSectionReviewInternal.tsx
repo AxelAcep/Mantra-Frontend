@@ -14,6 +14,7 @@ interface Props {
   data: ReviewInternalResponse;
   canAdminAcc: boolean;
   canManajerAcc: boolean;
+  canSupervisiSalesAcc: boolean;
   canKonfirmasiUlang: boolean;
   isUpdating: boolean;
   adminDailySelesai: boolean;
@@ -91,11 +92,16 @@ function renderBadge(state: "DISETUJUI" | "MENUNGGU" | "DITOLAK") {
 
 export default function ApprovalSectionReviewInternal({
   data,
+  canSupervisiSalesAcc,
+  isUpdating,
+  onAcc,
   onPerluTindakan,
   onLihatDaily,
 }: Props) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [showTolakSalesInput, setShowTolakSalesInput] = useState(false);
+  const [alasanTolakSales, setAlasanTolakSales] = useState("");
 
   const adminDailyStatus = data.activityAdmin?.status;
 
@@ -112,12 +118,27 @@ export default function ApprovalSectionReviewInternal({
     return "MENUNGGU";
   })();
 
+  // Beda dari 2 badge di atas (yang ngikut status daily) -- Supervisi Sales
+  // gak punya daily, gate-nya murni field accSupervisiSales dari backend
+  // (harus dipencet manual, mirip accDirekturKomisaris di Persetujuan Manajemen).
+  const salesBadgeState = data.accSupervisiSales ? "DISETUJUI" : "MENUNGGU";
+
   const AccAdminDirektur = adBadgeState === "DISETUJUI";
   const AccManagerOperasinal = moBadgeState === "DISETUJUI";
+  const AccSupervisiSales = salesBadgeState === "DISETUJUI";
 
   const approvedCount =
-    (AccAdminDirektur ? 1 : 0) + (AccManagerOperasinal ? 1 : 0);
+    (AccAdminDirektur ? 1 : 0) +
+    (AccManagerOperasinal ? 1 : 0) +
+    (AccSupervisiSales ? 1 : 0);
   const boq = data.trackingPenawaran;
+
+  function handleTolakSalesSubmit() {
+    if (!alasanTolakSales.trim()) return;
+    onPerluTindakan(alasanTolakSales.trim());
+    setAlasanTolakSales("");
+    setShowTolakSalesInput(false);
+  }
 
   return (
     <>
@@ -128,12 +149,12 @@ export default function ApprovalSectionReviewInternal({
             Persetujuan Review Internal
           </div>
           <span
-            className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${approvedCount === 2
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold border ${approvedCount === 3
                 ? "bg-green-50 text-green-600 border-green-100"
                 : "bg-amber-50 text-amber-600 border-amber-100"
               }`}
           >
-            {approvedCount} dari 2 menyetujui
+            {approvedCount} dari 3 menyetujui
           </span>
         </div>
 
@@ -297,6 +318,79 @@ export default function ApprovalSectionReviewInternal({
                 </button>
               </div>
             )} */}
+          </div>
+
+          {/* Supervisi Sales — gak ada daily, harus dipencet manual (mirip
+              Direktur/Komisaris di Persetujuan Manajemen) */}
+          <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
+            <div className="flex gap-4">
+              <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
+                SS
+              </div>
+              <div className="flex-1 flex flex-col gap-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">
+                      Supervisi Sales
+                    </p>
+                    <p className="text-xs text-gray-400 font-medium mt-0.5">
+                      Menunggu persetujuan Supervisi Sales
+                    </p>
+                  </div>
+                  {renderBadge(salesBadgeState)}
+                </div>
+              </div>
+            </div>
+
+            {canSupervisiSalesAcc && !showTolakSalesInput && (
+              <div className="mt-5 ml-14 flex gap-3">
+                <button
+                  onClick={onAcc}
+                  disabled={isUpdating}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm disabled:opacity-60"
+                >
+                  {isUpdating ? "Memproses..." : "Setujui"}
+                </button>
+                <button
+                  onClick={() => setShowTolakSalesInput(true)}
+                  disabled={isUpdating}
+                  className="bg-white border border-amber-200 text-amber-500 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-amber-50 transition-colors disabled:opacity-60"
+                >
+                  Perlu Tindakan
+                </button>
+              </div>
+            )}
+
+            {canSupervisiSalesAcc && showTolakSalesInput && (
+              <div className="mt-5 ml-14 space-y-2 max-w-md">
+                <textarea
+                  value={alasanTolakSales}
+                  onChange={(e) => setAlasanTolakSales(e.target.value)}
+                  placeholder="Tuliskan alasan penolakan..."
+                  rows={3}
+                  className="w-full text-sm border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                />
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => {
+                      setShowTolakSalesInput(false);
+                      setAlasanTolakSales("");
+                    }}
+                    disabled={isUpdating}
+                    className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleTolakSalesSubmit}
+                    disabled={!alasanTolakSales.trim() || isUpdating}
+                    className="px-4 py-2 text-sm font-semibold bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+                  >
+                    {isUpdating ? "Memproses..." : "Kirim"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

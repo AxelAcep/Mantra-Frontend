@@ -24,6 +24,8 @@ const STEP_ALLOWED_DIVISI: Record<number, string[]> = {
 
 const ADMIN_PROYEK_STEPS = [5, 6, 7, 8];
 
+const REVIEW_INTERNAL_STEP = 3;
+
 export function canViewPengadaanStep(
   step: number,
   role: string,
@@ -31,17 +33,29 @@ export function canViewPengadaanStep(
 ): boolean {
   if (role === "MASTER") return true;
   if (FULL_ACCESS_DIVISI.includes(divisi)) return true;
+  // Supervisi Sales -- approver gate di Review Internal, boleh liat SEMUA
+  // tracking di step ini, gak cuma yang sales-nya terkait dia (beda sama
+  // isRelatedSales di bawah, yang di-scope per-tracking).
+  if (
+    step === REVIEW_INTERNAL_STEP &&
+    role === "SUPERVISI" &&
+    divisi === "SALES"
+  )
+    return true;
   return (STEP_ALLOWED_DIVISI[step] ?? []).includes(divisi);
 }
 
-// Sama kayak canViewPengadaanStep, ditambah pengecualian Admin Proyek buat
-// step Follow Up/Implementasi/BAST/Garansi.
+// Sama kayak canViewPengadaanStep, ditambah pengecualian: Admin Proyek buat
+// step Follow Up/Implementasi/BAST/Garansi, dan Sales terkait (marketingId
+// tracking ini) buat step Review Internal.
 export function canViewPengadaanStepWithAdminProyek(
   step: number,
   role: string,
   divisi: string,
   isAdminProyek: boolean,
+  isRelatedSales = false,
 ): boolean {
   if (canViewPengadaanStep(step, role, divisi)) return true;
-  return ADMIN_PROYEK_STEPS.includes(step) && isAdminProyek;
+  if (ADMIN_PROYEK_STEPS.includes(step) && isAdminProyek) return true;
+  return step === REVIEW_INTERNAL_STEP && isRelatedSales;
 }

@@ -16,6 +16,12 @@ interface ApprovalSectionFollowUpProps {
   salesName: string;
   adminProyekNama?: string;
   financeNama?: string;
+  adminSekertarisNama?: string;
+  // Status daily aktif di rantai Stage 4 (Admin Proyek -> Finance -> Admin
+  // Sekertaris) -- dipakai buat nampilin lagi di sub-langkah mana sekarang.
+  pengecekanAdminProyekStatus?: string;
+  pengecekanFinanceStatus?: string;
+  mintaTTDStatus?: string;
   isAdminSekertariat: boolean;
   isSalesPIC: boolean;
   isDirekturKomisaris: boolean;
@@ -38,6 +44,10 @@ export default function ApprovalSectionFollowUp({
   salesName,
   adminProyekNama,
   financeNama,
+  adminSekertarisNama,
+  pengecekanAdminProyekStatus,
+  pengecekanFinanceStatus,
+  mintaTTDStatus,
   isAdminSekertariat,
   isSalesPIC,
   isDirekturKomisaris,
@@ -86,9 +96,9 @@ export default function ApprovalSectionFollowUp({
       status: timelineStatus2,
     },
     {
-      title: "Pengecekan Dokumen PO (Admin Proyek & Finance)",
+      title: "Pengecekan Dokumen PO (Admin Proyek → Finance → Admin Sekertaris)",
       description:
-        "Admin Proyek dan Finance Supervisi masing-masing cek kelengkapan PO customer & kesiapan data",
+        "Berurutan: Admin Proyek cek kelengkapan PO, lanjut Finance, lanjut Admin Sekertaris minta TTD Direktur",
       date: "",
       status: timelineStatus3,
     },
@@ -275,11 +285,20 @@ export default function ApprovalSectionFollowUp({
                 Menunggu Pengecekan Dokumen PO
               </h4>
               <p className="text-xs text-amber-700 font-medium mt-0.5">
-                Daily pengecekan{" "}
-                {adminProyekNama ? `Admin Proyek (${adminProyekNama})` : "Admin Proyek"}{" "}
-                dan {financeNama ? `Finance (${financeNama})` : "Finance"} harus
-                dua-duanya selesai & disetujui sebelum lanjut ke konfirmasi
-                Direktur.
+                {(() => {
+                  const isDiterima = (s?: string) =>
+                    s === "DITERIMA" || s === "SELESAI";
+                  if (!isDiterima(pengecekanAdminProyekStatus)) {
+                    return `Menunggu Admin Proyek${adminProyekNama ? ` (${adminProyekNama})` : ""} menyelesaikan pengecekan.`;
+                  }
+                  if (!isDiterima(pengecekanFinanceStatus)) {
+                    return `Admin Proyek selesai. Menunggu Finance${financeNama ? ` (${financeNama})` : ""} menyelesaikan pengecekan.`;
+                  }
+                  if (!isDiterima(mintaTTDStatus)) {
+                    return `Finance selesai. Menunggu Admin Sekertaris${adminSekertarisNama ? ` (${adminSekertarisNama})` : ""} minta TTD Direktur.`;
+                  }
+                  return "Semua daily pengecekan selesai, lanjut ke konfirmasi Direktur.";
+                })()}
               </p>
             </div>
           </div>

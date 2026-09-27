@@ -83,10 +83,14 @@ export interface FollowUpResponse {
   // baru daily "Upload Dokumen PO" (activityAdminProyek di atas) dibuat.
   adminProyekId?: string;
   adminProyek?: { id: string; nama: string };
+  // Rantai berurutan: Admin Proyek -> Finance -> Admin Sekertaris (minta TTD
+  // Direktur) -- masing-masing baru dapet daily setelah yang sebelumnya DITERIMA.
   activityPengecekanAdminProyekId?: string;
   activityPengecekanAdminProyek?: ActivityDetail;
   activityPengecekanFinanceId?: string;
   activityPengecekanFinance?: ActivityDetail;
+  activityMintaTTDDirekturId?: string;
+  activityMintaTTDDirektur?: ActivityDetail;
   accDirekturKomisarisPO: boolean;
   status: string;
   stage: number;

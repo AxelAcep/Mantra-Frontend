@@ -80,6 +80,9 @@ export interface ReviewInternalResponse {
   } | null;
   accAdminDirektur: boolean;
   accManajerOps: boolean;
+  // Gate manual (mirip accDirekturKomisaris di Persetujuan Manajemen) — harus
+  // dipencet tombol approve oleh Supervisi Sales, gak ke-auto-set.
+  accSupervisiSales: boolean;
   status: string;
   logAktivitas: LogReviewInternal[];
   dokumen: ReviewInternalDokumen[] | null;

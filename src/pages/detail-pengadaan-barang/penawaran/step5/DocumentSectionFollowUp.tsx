@@ -142,6 +142,18 @@ interface DocumentSectionFollowUpProps {
     };
   };
 
+  activityMintaTTDDirektur?: {
+    id: string;
+    judul: string;
+    status: string;
+    createdAt: string;
+    targetSelesai?: string;
+    pegawai?: {
+      nama?: string;
+      divisi?: string;
+    };
+  };
+
   onChatClick: (activityId: string, activityJudul: string) => void;
   onUpload: (file: File) => void;
   onDelete: (id: string) => void;
@@ -155,6 +167,7 @@ export default function DocumentSectionFollowUp({
   activityAdminProyek,
   activityPengecekanAdminProyek,
   activityPengecekanFinance,
+  activityMintaTTDDirektur,
   onChatClick,
   onUpload,
   onDelete,
@@ -326,6 +339,10 @@ export default function DocumentSectionFollowUp({
 
     ...(activityPengecekanFinance
       ? [{ ...activityPengecekanFinance, role: "Pengecekan PO (Finance)" }]
+      : []),
+
+    ...(activityMintaTTDDirektur
+      ? [{ ...activityMintaTTDDirektur, role: "Admin Sekertaris (Minta TTD Direktur)" }]
       : []),
 
     ...(activityAdminProyek

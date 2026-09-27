@@ -203,9 +203,19 @@ export default function PenawaranPage() {
 
   // "Admin Proyek" — bukan divisi tetap, tapi pegawai spesifik yang
   // di-assign ke tracking ini (via AssignAdminProyek di step Follow Up).
+  // Pakai adminProyekId (ke-isi langsung begitu pertama kali di-assign,
+  // Stage 3->4) -- BUKAN activityAdminProyek (itu baru ke-isi belakangan di
+  // Stage 6 pas daily Upload Dokumen PO dibuat, jadi Admin Proyek yang
+  // bersangkutan gak dapet akses sama sekali selama Stage 3-5 kalau pakai itu).
   const isAdminProyek =
     !!userInfo.pegawaiId &&
-    followUpData?.activityAdminProyek?.pegawai?.id === userInfo.pegawaiId;
+    followUpData?.adminProyekId === userInfo.pegawaiId;
+
+  // Sales terkait (marketingId tracking ini) — dikasih akses ke Review
+  // Internal (step 3) sama kayak Supervisi Sales (yang udah dicek langsung
+  // lewat role+divisi di canViewPengadaanStep), tapi ini per-tracking.
+  const isRelatedSales =
+    !!userInfo.pegawaiId && penawaran?.marketingId === userInfo.pegawaiId;
 
   function hasStepPermission(step: number): boolean {
     return canViewPengadaanStepWithAdminProyek(
@@ -213,6 +223,7 @@ export default function PenawaranPage() {
       userInfo.role,
       userInfo.divisi,
       isAdminProyek,
+      isRelatedSales,
     );
   }
 
@@ -385,37 +396,6 @@ export default function PenawaranPage() {
           >
             Sebelumnya
           </Button>
-
-          {/* Step 5 action buttons tetap ada */}
-          {activeStep === 5 && step5Info?.canAcc && (
-            <>
-              <Button
-                onClick={() => openRevisionModal("step5")}
-                disabled={step5Info.isUpdating}
-                variant="outline"
-                className="border-red-300 text-red-600 hover:bg-red-50"
-              >
-                Perlu Tindakan
-              </Button>
-              <Button
-                onClick={step5Info.onAcc}
-                disabled={step5Info.isUpdating}
-                className="bg-emerald-400 hover:bg-emerald-600"
-              >
-                {step5Info.isUpdating ? "Memproses..." : "Approve"}
-              </Button>
-            </>
-          )}
-
-          {activeStep === 5 && step5Info?.canKonfirmasiUlang && (
-            <Button
-              onClick={step5Info.onKonfirmasiUlang}
-              disabled={step5Info.isUpdating}
-              className="bg-emerald-400 hover:bg-emerald-600"
-            >
-              {step5Info.isUpdating ? "Memproses..." : "Konfirmasi Ulang"}
-            </Button>
-          )}
 
           <Button
             onClick={() => setActiveStep((p) => Math.min(9, p + 1))}

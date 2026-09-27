@@ -269,6 +269,10 @@ export default function Step5({
           salesName={salesName}
           adminProyekNama={data.adminProyek?.nama}
           financeNama={data.activityPengecekanFinance?.pegawai?.nama}
+          adminSekertarisNama={data.activityMintaTTDDirektur?.pegawai?.nama}
+          pengecekanAdminProyekStatus={data.activityPengecekanAdminProyek?.status}
+          pengecekanFinanceStatus={data.activityPengecekanFinance?.status}
+          mintaTTDStatus={data.activityMintaTTDDirektur?.status}
           isAdminSekertariat={isAdminSekertariat}
           isSalesPIC={isSalesPIC}
           isDirekturKomisaris={isDirekturKomisaris}
@@ -342,6 +346,7 @@ export default function Step5({
           activityAdminProyek={data.activityAdminProyek}
           activityPengecekanAdminProyek={data.activityPengecekanAdminProyek}
           activityPengecekanFinance={data.activityPengecekanFinance}
+          activityMintaTTDDirektur={data.activityMintaTTDDirektur}
           onChatClick={onChatClick}
           onUpload={(file) => uploadMut.mutate({ file })}
           onDelete={(id) => deleteMut.mutate(id)}
