@@ -107,7 +107,7 @@ function MonthCard({ month, isSaving, onSaveTanggal }: MonthCardProps) {
 
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <p className="text-[9px] text-gray-400 font-medium uppercase tracking-tight">
+          <p className="text-[9px] text-gray-400 font-medium tracking-tight">
             Tanggal Kunjungan
           </p>
           {canEditTanggal && !isEditing && (
