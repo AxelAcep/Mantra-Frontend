@@ -3,6 +3,7 @@ export const DIVISI_OPTIONS = [
     { value: "DIREKTUR", label: "Direktur" },
     { value: "SEKERTARIS", label: "Sekertaris" },
     { value: "ADMIN_SEKERTARIAT", label: "Admin Sekertariat" },
+    { value: "ADMIN_SEKERTARIS", label: "Admin Sekertaris" },
     { value: "MANAGER_OPERASIONAL", label: "Manager Operasional" },
     { value: "MONITORING_CONTROL_ADVISOR", label: "Monitoring Control Advisor" },
     { value: "PROCUREMENT_GA", label: "Procurement & GA" },

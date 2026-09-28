@@ -24,10 +24,10 @@ function SectionHeading({ title }: { title: string }) {
 function SubHeading({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-3 mb-1">
-      <h2 className="font-bold text-sm text-cyan-600 uppercase tracking-tight">
+      <h2 className="font-bold text-sm text-slate-800 uppercase tracking-tight">
         {title}
       </h2>
-      <div className="h-px bg-cyan-100 flex-1" />
+      <div className="h-px bg-slate-200 flex-1" />
     </div>
   );
 }

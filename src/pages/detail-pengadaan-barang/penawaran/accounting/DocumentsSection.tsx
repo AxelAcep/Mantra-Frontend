@@ -32,7 +32,7 @@ export default function DocumentSection({
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 bg-white border-b border-gray-100/80 flex justify-between items-center">
         <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
-          <FileText size={16} className="text-cyan-500" /> Dokumen Pendukung
+          <FileText size={16} className="text-gray-500" /> Dokumen Pendukung
         </div>
 
         {!readOnly && (
@@ -63,7 +63,7 @@ export default function DocumentSection({
             className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyan-50 rounded-lg text-cyan-500">
+              <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
                 <FileText size={18} />
               </div>
 

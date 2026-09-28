@@ -1,5 +1,5 @@
-import React from "react";
-import { FileText, Download } from "lucide-react";
+import React, { useRef } from "react";
+import { FileText, Download, Upload } from "lucide-react";
 import SectionHeading from "./SectionHeading";
 
 // ─── TYPES ──────────────────────────────────────────────────────────────────
@@ -8,15 +8,24 @@ export interface DokumenItem {
   name: string;
   uploader: string;
   path: string;
+  divisi?: string;
 }
 
 interface DokumenSectionProps {
   dokumen: DokumenItem[];
+  onUpload?: (file: File) => void;
+  isUploading?: boolean;
 }
 
 // ─── COMPONENT ──────────────────────────────────────────────────────────────
 
-export default function DokumenSection({ dokumen }: DokumenSectionProps) {
+export default function DokumenSection({
+  dokumen,
+  onUpload,
+  isUploading,
+}: DokumenSectionProps) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="pt-2">
       <SectionHeading title="Dokumen" />
@@ -26,6 +35,26 @@ export default function DokumenSection({ dokumen }: DokumenSectionProps) {
             <FileText size={16} className="text-gray-500" />
             Dokumen Pendukung
           </div>
+          {onUpload && (
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={isUploading}
+              className="text-cyan-500 text-xs font-bold flex items-center gap-1 hover:underline disabled:opacity-50"
+            >
+              <Upload size={14} />
+              {isUploading ? "Mengupload..." : "Upload File"}
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            className="hidden"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp,.svg,.zip,.rar"
+            onChange={(e) => {
+              if (e.target.files?.[0]) onUpload?.(e.target.files[0]);
+              e.target.value = "";
+            }}
+          />
         </div>
 
         {dokumen.length === 0 ? (

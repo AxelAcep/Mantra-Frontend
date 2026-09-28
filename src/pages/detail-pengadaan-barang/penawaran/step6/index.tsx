@@ -16,7 +16,7 @@ import {
   useAssignPGAStaff,
 } from "@/hooks/use-implementasi";
 import { useDetailFollowUp } from "@/hooks/use-follow-up";
-import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
+import { useUnreadChatCount, useDetailActivity, useUploadDokumen } from "@/hooks/use-activity";
 import { usePegawaiByDivisi } from "@/hooks/use-penawaran";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
@@ -102,6 +102,10 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
   );
 
   const { data: followUpData } = useDetailFollowUp(trackingId);
+
+  // Upload dokumen ke activity pembelian (phase pertama implementasi)
+  const pembelianActivityId = implData?.activityPembelian?.id ?? "";
+  const uploadMut = useUploadDokumen(pembelianActivityId);
 
   // ── Functions ──
 
@@ -212,6 +216,8 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         })
       : [];
 
+  const HIDDEN_DIVISI_FOR_ADMIN_PROYEK = ["PROCUREMENT_GA", "FINANCE_ACCOUNTING"];
+
   const combinedDokumen: DokumenItem[] = React.useMemo(() => {
     const docs: DokumenItem[] = [];
 
@@ -220,6 +226,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         name: doc.namaFile,
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPembelian?.judul || "Pembelian Barang"}`,
         path: doc.path,
+        divisi: doc.pegawai?.divisi || "",
       });
     });
 
@@ -228,6 +235,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         name: doc.namaFile,
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPengantaran?.judul || "Pengantaran"}`,
         path: doc.path,
+        divisi: doc.pegawai?.divisi || "",
       });
     });
 
@@ -236,6 +244,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         name: doc.namaFile,
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityInstalasi?.judul || "Instalasi"}`,
         path: doc.path,
+        divisi: doc.pegawai?.divisi || "",
       });
     });
 
@@ -245,6 +254,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           name: doc.namaFile,
           uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Admin PGA"} pada ${formatDateTime(doc.createdAt)} - Follow Up`,
           path: doc.path,
+          divisi: doc.pegawai?.divisi || "",
         });
       }
     });
@@ -258,6 +268,13 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         result.push(d);
       }
     });
+
+    // Admin Proyek: sembunyikan dokumen dari divisi tertentu
+    if (isAdminProyek) {
+      return result.filter(
+        (d) => !HIDDEN_DIVISI_FOR_ADMIN_PROYEK.includes(d.divisi ?? ""),
+      );
+    }
 
     return result;
   }, [
@@ -318,7 +335,11 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           onAssignPGA={onOpenAssignModal}
         />
 
-        <DokumenSection dokumen={combinedDokumen} />
+        <DokumenSection
+          dokumen={combinedDokumen}
+          onUpload={(file) => uploadMut.mutate(file)}
+          isUploading={uploadMut.isPending}
+        />
       </div>
 
       {/* ── Right Column: Log Aktivitas ── */}

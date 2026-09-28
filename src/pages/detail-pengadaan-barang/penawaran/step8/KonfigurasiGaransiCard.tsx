@@ -126,7 +126,7 @@ export default function KonfigurasiGaransiCard({
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mt-6">
-      <div className="flex items-center gap-2 mb-1 text-cyan-600">
+      <div className="flex items-center gap-2 mb-1 text-slate-800">
         <Settings size={16} strokeWidth={2.5} />
         <h3 className="font-bold text-slate-800 text-sm">
           Konfigurasi Garansi

@@ -243,7 +243,7 @@ function WorkTimeCard({
       ? isOverdue
         ? "Overdue"
         : "Proses"
-      : activity?.status === "SELESAI"
+      : activity?.status === "SELESAI" || activity?.status === "DITERIMA"
         ? "Selesai"
         : (activity?.status ?? "-");
 

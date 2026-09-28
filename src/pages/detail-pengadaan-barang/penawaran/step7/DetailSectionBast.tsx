@@ -120,7 +120,7 @@ export default function DetailSectionBast({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-cyan-100 transition-all">
-          <div className="flex items-center gap-2 mb-4 text-cyan-600">
+          <div className="flex items-center gap-2 mb-4 text-slate-800">
             <Hash size={16} strokeWidth={2.5} />
             <p className="text-[10px] font-bold uppercase tracking-tight">
               Nomor BAST
@@ -145,7 +145,7 @@ export default function DetailSectionBast({
         </div>
 
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-cyan-100 transition-all">
-          <div className="flex items-center gap-2 mb-4 text-cyan-600">
+          <div className="flex items-center gap-2 mb-4 text-slate-800">
             <Calendar size={16} strokeWidth={2.5} />
             <p className="text-[10px] font-bold uppercase tracking-tight">
               Tanggal Terbit
@@ -166,7 +166,7 @@ export default function DetailSectionBast({
         </div>
 
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-cyan-100 transition-all">
-          <div className="flex items-center gap-2 mb-4 text-cyan-600">
+          <div className="flex items-center gap-2 mb-4 text-slate-800">
             <Calendar size={16} strokeWidth={2.5} />
             <p className="text-[10px] font-bold uppercase tracking-tight">
               Tanggal Serah Terima

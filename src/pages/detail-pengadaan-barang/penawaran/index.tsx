@@ -402,12 +402,7 @@ export default function PenawaranPage() {
             disabled={isNextBlocked}
             className="bg-cyan-500 hover:bg-cyan-600"
           >
-            {getNextButtonLabel(
-              activeStep,
-              isPermintaanSelesai,
-              isBoQSelesai,
-              isReviewInternalSelesai,
-            )}
+            Selanjutnya
           </Button>
         </div>
       </div>

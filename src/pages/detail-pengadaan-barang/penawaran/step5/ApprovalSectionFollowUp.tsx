@@ -305,17 +305,17 @@ export default function ApprovalSectionFollowUp({
         )}
 
         {stage === 5 && (
-          <div className="bg-purple-50/60 border border-purple-100 rounded-xl p-4 space-y-3">
+          <div className="bg-cyan-50/60 border border-cyan-100 rounded-xl p-4 space-y-3">
             <div className="flex items-start gap-3">
               <AlertCircle
                 size={20}
-                className="text-purple-500 shrink-0 mt-0.5"
+                className="text-cyan-500 shrink-0 mt-0.5"
               />
               <div>
-                <h4 className="font-bold text-purple-800 text-sm">
+                <h4 className="font-bold text-cyan-800 text-sm">
                   Menunggu Konfirmasi Direktur/Komisaris
                 </h4>
-                <p className="text-xs text-purple-700 font-medium mt-0.5">
+                <p className="text-xs text-cyan-700 font-medium mt-0.5">
                   Daily pengecekan Admin Proyek & Finance sudah selesai.
                   {isDirekturKomisaris
                     ? " Silakan konfirmasi dokumen PO di bawah ini."

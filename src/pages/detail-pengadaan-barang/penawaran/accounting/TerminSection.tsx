@@ -467,7 +467,7 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
               />
             </div>
             <span
-              className={`text-[10px] font-bold ${totalDraftPersen > 100 ? "text-red-500" : "text-cyan-600"
+              className={`text-[10px] font-bold ${totalDraftPersen > 100 ? "text-red-500" : "text-slate-600"
                 }`}
             >
               {totalDraftPersen.toFixed(0)}% / 100%
@@ -522,13 +522,13 @@ export default function TerminSection({ trackingId, items, canBayar }: Props) {
         </p>
       </div>
 
-      <div className="bg-cyan-50/50 border border-cyan-100/50 rounded-lg p-3 flex justify-between items-center mb-8">
-        <p className="text-[10px] font-bold text-cyan-600">
+      <div className="bg-slate-50/50 border border-gray-100 rounded-lg p-3 flex justify-between items-center mb-8">
+        <p className="text-[10px] font-bold text-slate-600">
           {aktifIndex >= 0
             ? `Posisi saat ini berada di Termin ${aktifIndex + 1} dari total ${items.length} termin pembayaran.`
             : "Semua termin telah lunas."}
         </p>
-        <p className="text-[10px] font-bold text-cyan-600">
+        <p className="text-[10px] font-bold text-slate-600">
           Terbayar {terbayar.toFixed(0)}% dari {totalPersen.toFixed(0)}%
         </p>
       </div>
