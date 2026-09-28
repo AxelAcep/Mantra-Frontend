@@ -51,9 +51,9 @@ export default function ListPengadaan() {
   const [activeTab, setActiveTab] = useState<TabName>("Permintaan Penawaran");
   const navigate = useNavigate();
 
-  const { role, divisi } = getAuthData();
+  const { divisi } = getAuthData();
   const canCreatePenawaran =
-    role === "MASTER" || divisi?.toUpperCase() === "SALES";
+    divisi?.toUpperCase() === "SALES";
 
   const renderTable = () => {
     switch (activeTab) {

@@ -68,7 +68,10 @@ const getMenuOperasional = (
     });
   }
 
-  if (role === "MASTER") {
+  const canAccessDaftarBarang =
+    role === "MASTER" ||
+    (divisi === "PROCUREMENT_GA" && (role === "SUPERVISI" || role === "PROJEK"));
+  if (canAccessDaftarBarang) {
     menu.push({ title: "Daftar Perusahaan", icon: Icons.DaftarPerusahaan, url: "/perusahaan" });
     menu.push({ title: "Daftar Barang", icon: Icons.Cart, url: "/daftar-barang" });
   }
