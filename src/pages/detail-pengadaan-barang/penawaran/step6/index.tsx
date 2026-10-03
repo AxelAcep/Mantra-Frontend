@@ -70,7 +70,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
     userInfo.divisi === "PROCUREMENT_GA" && userInfo.role === "SUPERVISI";
 
   const canEditPOAndWaktu = isMasterOrManager || isAdminProyek;
-  const canEditWO = isMasterOrManager || isKepalaPGA;
+  const canEditWO = userInfo.role === "MASTER" || isAdminProyek;
   const canAssignPGA = isKepalaPGA;
 
   // ── States ──

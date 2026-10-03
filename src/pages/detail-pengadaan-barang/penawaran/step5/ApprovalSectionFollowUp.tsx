@@ -22,7 +22,7 @@ interface ApprovalSectionFollowUpProps {
   pengecekanAdminProyekStatus?: string;
   pengecekanFinanceStatus?: string;
   mintaTTDStatus?: string;
-  isAdminSekertariat: boolean;
+  isAdminSekertaris: boolean;
   isSalesPIC: boolean;
   isDirekturKomisaris: boolean;
   isUpdating: boolean;
@@ -48,7 +48,7 @@ export default function ApprovalSectionFollowUp({
   pengecekanAdminProyekStatus,
   pengecekanFinanceStatus,
   mintaTTDStatus,
-  isAdminSekertariat,
+  isAdminSekertaris,
   isSalesPIC,
   isDirekturKomisaris,
   isKonfirmasiDokumenPO,
@@ -85,7 +85,7 @@ export default function ApprovalSectionFollowUp({
   const followUpStages: FollowUpStage[] = [
     {
       title: "Penawaran Terkirim ke Customer",
-      description: `Menunggu pengiriman dokumen penawaran lengkap via email ke ${customerName} oleh Admin Sekretariat`,
+      description: `Menunggu pengiriman dokumen penawaran lengkap via email ke ${customerName} oleh Admin Sekertaris`,
       date: "",
       status: timelineStatus1,
     },
@@ -202,7 +202,7 @@ export default function ApprovalSectionFollowUp({
         </div>
 
         {/* Action Button Section */}
-        {stage === 1 && isAdminSekertariat && (
+        {stage === 1 && isAdminSekertaris && (
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-amber-50/50 border border-amber-100 rounded-xl p-4">
             <div className="flex items-start gap-3">
               <AlertCircle

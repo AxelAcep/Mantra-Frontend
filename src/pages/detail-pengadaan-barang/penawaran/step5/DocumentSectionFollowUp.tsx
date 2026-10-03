@@ -327,9 +327,9 @@ export default function DocumentSectionFollowUp({
   }
 
   // Daily Activity, urut kronologis flow:
-  // Admin Sekretariat -> Sales PIC -> Pengecekan PO (Admin Proyek & Finance) -> Upload PO (Admin Proyek)
+  // Admin Sekertaris -> Sales PIC -> Pengecekan PO (Admin Proyek & Finance) -> Upload PO (Admin Proyek)
   const activities = [
-    ...(activityAdmin ? [{ ...activityAdmin, role: "Admin Sekretariat" }] : []),
+    ...(activityAdmin ? [{ ...activityAdmin, role: "Admin Sekertaris" }] : []),
 
     ...(activitySales ? [{ ...activitySales, role: "Sales PIC" }] : []),
 

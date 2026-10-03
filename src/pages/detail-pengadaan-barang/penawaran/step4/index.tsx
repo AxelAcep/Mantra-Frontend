@@ -157,8 +157,6 @@ export default function Step4({ trackingId, onStatusChange }: Props) {
       createdAt: doc.createdAt || "",
     })) ?? [];
 
-  const isApproved = data.accDirekturKomisaris === true;
-
   return (
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-9 space-y-6">
@@ -174,19 +172,17 @@ export default function Step4({ trackingId, onStatusChange }: Props) {
           onKonfirmasiUlang={handlers.onKonfirmasiUlang}
         />
 
-        {/* Hanya tampilkan dokumen & card daily setelah approve */}
-        {isApproved && (
-          <>
-            <SectionHeading title="Dokumen" />
-            <DocumentSectionPersetujuan
-              dokumen={mappedDokumen}
-              onUpload={(file) => uploadMut.mutate({ file })}
-              onDelete={(id) => deleteMut.mutate(id)}
-              isUploading={uploadMut.isPending}
-              activityAdmin={data.activityAdmin} // kirim data daily
-            />
-          </>
-        )}
+        {/* Dokumen & card daily tampil sejak step 4 dimulai — daily admin
+            sekertaris kini dibuat begitu tracking masuk step 4 (pengingat
+            approval direktur), jadi kartunya harus terlihat sebelum approve. */}
+        <SectionHeading title="Dokumen" />
+        <DocumentSectionPersetujuan
+          dokumen={mappedDokumen}
+          onUpload={(file) => uploadMut.mutate({ file })}
+          onDelete={(id) => deleteMut.mutate(id)}
+          isUploading={uploadMut.isPending}
+          activityAdmin={data.activityAdmin} // kirim data daily
+        />
       </div>
 
       <div className="col-span-12 lg:col-span-3">

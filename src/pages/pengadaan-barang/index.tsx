@@ -19,7 +19,7 @@ type TabName =
   | "Garansi"
   | "Riwayat";
 
-const tabs: TabName[] = [
+const ALL_TABS: TabName[] = [
   "Permintaan Penawaran",
   "PO Aktif",
   "BAST",
@@ -27,6 +27,11 @@ const tabs: TabName[] = [
   "Garansi",
   "Riwayat",
 ];
+
+// Karyawan (role KARYAWAN) hanya melihat tab PO Aktif — endpoint tab lain
+// tetap dibatasi role ≥ SUPERVISI di backend, dan matriks akses step mereka
+// (mis. PROCUREMENT_GA) hanya mencakup tahap implementasi.
+const KARYAWAN_TABS: TabName[] = ["PO Aktif"];
 
 interface UserSession {
   role?: string;
@@ -48,7 +53,12 @@ const getAuthData = () => {
 };
 
 export default function ListPengadaan() {
-  const [activeTab, setActiveTab] = useState<TabName>("Permintaan Penawaran");
+  const { role } = getAuthData();
+  const isKaryawan = role === "KARYAWAN";
+  const tabs: TabName[] = isKaryawan ? KARYAWAN_TABS : ALL_TABS;
+  const [activeTab, setActiveTab] = useState<TabName>(
+    isKaryawan ? "PO Aktif" : "Permintaan Penawaran",
+  );
   const navigate = useNavigate();
 
   const { divisi } = getAuthData();

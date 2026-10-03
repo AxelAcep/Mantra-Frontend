@@ -79,7 +79,7 @@ export default function Step5({
     role === "MASTER";
   const canBatalkan = isBerwenangBatalkan && data?.status === "ON_PROGRESS";
   const isSalesPIC = data
-    ? pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIAT"
+    ? pegawaiId === data.salesId && divisi !== "ADMIN_SEKERTARIS" && divisi !== "ADMIN_SEKERTARIAT"
     : false;
 
   const isKonfirmasiSelesai = data?.status === "KONFIRMASI_SELESAI";
@@ -140,7 +140,7 @@ export default function Step5({
   const customerPhone = tracking?.customerPhone || "-";
   const customerEmail = tracking?.customerEmail || "-";
 
-  const isAdminSekertariat = divisi === "ADMIN_SEKERTARIAT";
+  const isAdminSekertaris = divisi === "ADMIN_SEKERTARIS";
 
   // Admin Proyek yang beneran ditugaskan (bukan cuma divisi PAC/FIRE
   // sembarang), atau MO/Direktur/Komisaris/Master — sinkron sama guard di
@@ -275,7 +275,7 @@ export default function Step5({
           pengecekanAdminProyekStatus={data.activityPengecekanAdminProyek?.status}
           pengecekanFinanceStatus={data.activityPengecekanFinance?.status}
           mintaTTDStatus={data.activityMintaTTDDirektur?.status}
-          isAdminSekertariat={isAdminSekertariat}
+          isAdminSekertaris={isAdminSekertaris}
           isSalesPIC={isSalesPIC}
           isDirekturKomisaris={isDirekturKomisaris}
           isUpdating={updateStatusMut.isPending}
