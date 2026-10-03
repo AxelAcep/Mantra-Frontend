@@ -32,7 +32,10 @@ function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
 export default function TabelGaransi() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [filterJenis, setFilterJenis] = useState<string>("Generator FirePro");
+  // 3 filter kategori garansi: PAC Montair (termasuk Chiller & AC Split/
+  // Standing), Generator FirePro (termasuk Conventional/Addressable/
+  // StandAlone-BTA), dan Battery (Battery & UPS).
+  const [filterJenis, setFilterJenis] = useState<string>("PAC Montair");
 
   const { data, isLoading, isError } = usePenawaranListAktif({
     page,
@@ -70,8 +73,9 @@ export default function TabelGaransi() {
           }}
           className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
         >
-          <option value="Generator FirePro">Generator FirePro</option>
           <option value="PAC Montair">PAC Montair</option>
+          <option value="Generator FirePro">Generator FirePro</option>
+          <option value="Battery">Battery</option>
         </select>
       </div>
 

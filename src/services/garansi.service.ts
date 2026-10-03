@@ -82,7 +82,7 @@ export interface GaransiMonth {
   updatedAt: string;
 }
 
-export type KategoriBastGaransi = "PAC" | "FIRE" | "UMUM";
+export type KategoriBastGaransi = "PAC" | "FIRE" | "BATTERY" | "UMUM";
 
 export interface GaransiResponse {
   id: string;
@@ -111,6 +111,8 @@ export type KategoriGaransi =
   | "PAC_LUAR_KOTA"
   | "FIRE_DALAM_KOTA"
   | "FIRE_LUAR_KOTA"
+  | "BATTERY_DALAM_KOTA"
+  | "BATTERY_LUAR_KOTA"
   | "UMUM"
   | "TIDAK_ADA";
 
@@ -119,6 +121,8 @@ export const KATEGORI_GARANSI_LABELS: Record<KategoriGaransi, string> = {
   PAC_LUAR_KOTA: "PAC Luar Kota",
   FIRE_DALAM_KOTA: "Fire Dalam Kota",
   FIRE_LUAR_KOTA: "Fire Luar Kota",
+  BATTERY_DALAM_KOTA: "Battery Dalam Kota",
+  BATTERY_LUAR_KOTA: "Battery Luar Kota",
   UMUM: "Garansi Bulanan",
   TIDAK_ADA: "Tidak Ada Garansi",
 };
@@ -128,6 +132,8 @@ export const KATEGORI_GARANSI_JUMLAH: Record<KategoriGaransi, string> = {
   PAC_LUAR_KOTA: "2x/tahun (6 bulan interval)",
   FIRE_DALAM_KOTA: "4x/tahun (3 bulan interval)",
   FIRE_LUAR_KOTA: "2x/tahun (6 bulan interval)",
+  BATTERY_DALAM_KOTA: "4x/tahun (3 bulan interval)",
+  BATTERY_LUAR_KOTA: "2x/tahun (6 bulan interval)",
   UMUM: "12x/tahun (1/bulan)",
   TIDAK_ADA: "Tanpa garansi",
 };
@@ -139,6 +145,7 @@ export function allowedKategoriGaransi(
 ): KategoriGaransi[] {
   if (kategoriBast === "PAC") return ["PAC_DALAM_KOTA", "PAC_LUAR_KOTA", "TIDAK_ADA"];
   if (kategoriBast === "FIRE") return ["FIRE_DALAM_KOTA", "FIRE_LUAR_KOTA", "TIDAK_ADA"];
+  if (kategoriBast === "BATTERY") return ["BATTERY_DALAM_KOTA", "BATTERY_LUAR_KOTA", "TIDAK_ADA"];
   return ["UMUM", "TIDAK_ADA"];
 }
 

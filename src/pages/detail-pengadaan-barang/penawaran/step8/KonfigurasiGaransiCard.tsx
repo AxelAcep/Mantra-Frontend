@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, ArrowLeft, ArrowRight, ShieldCheck, Flame, Calendar, X } from "lucide-react";
+import { Settings, ArrowLeft, ArrowRight, ShieldCheck, Flame, Calendar, X, BatteryCharging, BatteryMedium } from "lucide-react";
 import {
   type KategoriGaransi,
   type KategoriBastGaransi,
@@ -28,6 +28,8 @@ const KATEGORI_ICON: Record<KategoriGaransi, React.ReactNode> = {
   PAC_LUAR_KOTA: <ShieldCheck size={20} />,
   FIRE_DALAM_KOTA: <Flame size={20} />,
   FIRE_LUAR_KOTA: <Flame size={20} />,
+  BATTERY_DALAM_KOTA: <BatteryCharging size={20} />,
+  BATTERY_LUAR_KOTA: <BatteryMedium size={20} />,
   UMUM: <Calendar size={20} />,
   TIDAK_ADA: <X size={20} />,
 };
@@ -37,6 +39,8 @@ const KATEGORI_COLOR: Record<KategoriGaransi, string> = {
   PAC_LUAR_KOTA: "text-blue-500 border-blue-100 hover:border-blue-300",
   FIRE_DALAM_KOTA: "text-orange-600 border-orange-200 hover:border-orange-400",
   FIRE_LUAR_KOTA: "text-orange-500 border-orange-100 hover:border-orange-300",
+  BATTERY_DALAM_KOTA: "text-emerald-600 border-emerald-200 hover:border-emerald-400",
+  BATTERY_LUAR_KOTA: "text-teal-600 border-teal-100 hover:border-teal-300",
   UMUM: "text-cyan-600 border-cyan-200 hover:border-cyan-400",
   TIDAK_ADA: "text-slate-500 border-slate-200 hover:border-slate-400",
 };
@@ -118,6 +122,8 @@ export default function KonfigurasiGaransiCard({
       PAC_LUAR_KOTA: 2,
       FIRE_DALAM_KOTA: 4,
       FIRE_LUAR_KOTA: 2,
+      BATTERY_DALAM_KOTA: 4,
+      BATTERY_LUAR_KOTA: 2,
       UMUM: 12,
     };
     const perTahun = map[selectedKategori] ?? 0;

@@ -295,7 +295,13 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
       <div className="col-span-12 lg:col-span-9 space-y-6">
         <SectionHeading title="Detail" />
 
-        {followUpData?.kondisiPengantaran === "SESUDAH_DP" && (
+        {/* Alert pengantaran ditahan (kondisi SESUDAH_DP): tampil HANYA
+            selama hold masih berlaku. Begitu Divisi Finance menandai termin
+            1 lunas, daily pengantaran Kadiv PGA otomatis dibuat
+            (implData.activityPengantaran terisi) — alert disembunyikan agar
+            tidak ambigu dengan kondisi yang sudah dilepas. */}
+        {followUpData?.kondisiPengantaran === "SESUDAH_DP" &&
+          !implData?.activityPengantaran && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
             <AlertTriangle size={20} className="text-amber-500 mt-0.5 shrink-0" />
             <div>

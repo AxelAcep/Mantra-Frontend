@@ -32,9 +32,19 @@ function FieldBox({ label, value }: { label: string; value: string }) {
 interface CardAktivitasProps {
     item: NotifikasiItem;
     onRead: () => void;
+    // Dua link aksi untuk notifikasi tipe PENAWARAN: detail proses pengadaan
+    // (/penawaran/{id}) dan daily activity yang di-assign (/dailyactivity/{id}).
+    onOpenPenawaran?: () => void;
+    onOpenDaily?: () => void;
 }
 
-export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
+export function CardAktivitas({ item, onRead, onOpenPenawaran, onOpenDaily }: CardAktivitasProps) {
+    const isPengadaan = item.tipe === "PENAWARAN";
+    // Notifikasi yang terikat pada daily activity (tipe PENAWARAN yang punya
+    // activity) menampilkan Deadline; notif event (approval, konfigurasi,
+    // dsb. — tanpa daily) tidak.
+    const hasDaily = !!item.activityId;
+
     const checkIsOverdue = () => {
         if (!item.activity) return false;
         const isPast = new Date(item.activity.targetSelesai) < new Date();
@@ -77,10 +87,11 @@ export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
                 isUnread ? "bg-[#F2FAFD] border-[#E0F2FE]/70" : "border-slate-200"
             )}
         >
-            {/* Left border indicator */}
+            {/* Left border indicator — slate-400 (abu sedang) supaya tetap
+                terlihat jelas di atas background card putih saat sudah dibaca */}
             <div className={cn(
                 "absolute left-3 top-3 bottom-3 w-1.5 rounded-full",
-                isUnread ? "bg-cyan-500" : "bg-slate-350"
+                isUnread ? "bg-cyan-500" : "bg-slate-400"
             )} />
 
             <div>
@@ -90,15 +101,36 @@ export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
                         "px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide",
                         isUnread ? "bg-cyan-100 text-cyan-600" : "bg-slate-100 text-slate-500"
                     )}>
-                        Daily Activity
+                        {isPengadaan ? "Pengadaan Barang" : "Daily Activity"}
                     </span>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={onRead}
-                            className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
-                        >
-                            Lihat Detail
-                        </button>
+                    <div className="flex items-center gap-3">
+                        {isPengadaan ? (
+                            <>
+                                {item.trackingPenawaranId && onOpenPenawaran && (
+                                    <button
+                                        onClick={onOpenPenawaran}
+                                        className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
+                                    >
+                                        Detail Pengadaan
+                                    </button>
+                                )}
+                                {item.activityId && onOpenDaily && (
+                                    <button
+                                        onClick={onOpenDaily}
+                                        className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
+                                    >
+                                        Daily Activity
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            <button
+                                onClick={onRead}
+                                className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
+                            >
+                                Lihat Detail
+                            </button>
+                        )}
                         <span className="text-slate-400 font-light text-[10px]">
                             {getTimeAgo(item.createdAt)}
                         </span>
@@ -106,39 +138,102 @@ export function CardAktivitas({ item, onRead }: CardAktivitasProps) {
                 </div>
 
                 {/* Expanded Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 pt-3 border-t border-slate-100">
-                    {/* Nama / Divisi */}
-                    <FieldBox
-                        label="Nama / Divisi"
-                        value={
-                            item.activity?.parent?.pegawai
-                                ? `${item.activity.parent.pegawai.nama} / ${item.activity.parent.pegawai.divisi}`
-                                : item.activity?.pegawai
-                                    ? `${item.activity.pegawai.nama} / ${item.activity.pegawai.divisi}`
-                                    : "-"
-                        }
-                    />
+                <div
+                    className={cn(
+                        "grid grid-cols-1 gap-3 mt-4 pt-3 border-t border-slate-100",
+                        // Kartu pengadaan tanpa daily activity (event notif)
+                        // hanya punya 3 field — grid ikut menyesuaikan.
+                        isPengadaan && !hasDaily ? "md:grid-cols-3" : "md:grid-cols-4",
+                    )}
+                >
+                    {isPengadaan ? (
+                        <>
+                            {/* Nomor Penawaran — placeholder "PENDING-..." (nomor
+                                belum dibuatkan oleh PreSales) ditampilkan "-" */}
+                            <FieldBox
+                                label="Nomor Penawaran"
+                                value={
+                                    item.terkaitPO && !item.terkaitPO.includes("PENDING")
+                                        ? item.terkaitPO
+                                        : "-"
+                                }
+                            />
 
-                    {/* Judul */}
-                    <FieldBox label="Judul" value={item.activity?.judul || item.judul} />
+                            {/* Perusahaan */}
+                            <FieldBox label="Perusahaan" value={item.perusahaan || "-"} />
 
-                    {/* Kategori */}
-                    <FieldBox
-                        label="Kategori"
-                        value={KATEGORI_LABEL[item.activity?.kategori || ""] || item.activity?.kategori || "-"}
-                    />
+                            {/* Lokasi Proyek */}
+                            <FieldBox label="Lokasi Proyek" value={item.lokasiProyek || "-"} />
 
-                    {/* Deadline */}
-                    <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
-                        <p className="text-xs text-gray-400 mb-1">Deadline</p>
-                        <span className={cn(
-                            "text-sm font-semibold block truncate",
-                            isOverdue ? "text-red-500 font-bold" : "text-gray-800"
-                        )}>
-                            {formatDeadline(item.activity?.targetSelesai, isOverdue)}
-                        </span>
-                    </div>
+                            {/* Deadline — hanya untuk notifikasi yang punya
+                                daily activity; notif event (tanpa daily)
+                                tidak menampilkan deadline. */}
+                            {hasDaily && (
+                                <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
+                                    <p className="text-xs text-gray-400 mb-1">Deadline</p>
+                                    <span className={cn(
+                                        "text-sm font-semibold block truncate",
+                                        isOverdue ? "text-red-500 font-bold" : "text-gray-800"
+                                    )}>
+                                        {formatDeadline(item.activity?.targetSelesai, isOverdue)}
+                                    </span>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            {/* Nama / Divisi */}
+                            <FieldBox
+                                label="Nama / Divisi"
+                                value={
+                                    item.activity?.parent?.pegawai
+                                        ? `${item.activity.parent.pegawai.nama} / ${item.activity.parent.pegawai.divisi}`
+                                        : item.activity?.pegawai
+                                            ? `${item.activity.pegawai.nama} / ${item.activity.pegawai.divisi}`
+                                            : "-"
+                                }
+                            />
+
+                            {/* Judul */}
+                            <FieldBox label="Judul" value={item.activity?.judul || item.judul} />
+
+                            {/* Kategori */}
+                            <FieldBox
+                                label="Kategori"
+                                value={KATEGORI_LABEL[item.activity?.kategori || ""] || item.activity?.kategori || "-"}
+                            />
+
+                            {/* Deadline */}
+                            <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
+                                <p className="text-xs text-gray-400 mb-1">Deadline</p>
+                                <span className={cn(
+                                    "text-sm font-semibold block truncate",
+                                    isOverdue ? "text-red-500 font-bold" : "text-gray-800"
+                                )}>
+                                    {formatDeadline(item.activity?.targetSelesai, isOverdue)}
+                                </span>
+                            </div>
+                        </>
+                    )}
                 </div>
+
+                {/* Tahapan proses pengadaan (tipe PENAWARAN) — mis. Presales
+                    di tahap Penyusunan BOQ */}
+                {isPengadaan && item.tahapan && (
+                    <p className="text-xs text-gray-500 mt-3">
+                        Tahap Proses Pengadaan:{" "}
+                        <span className="font-semibold text-slate-700">{item.tahapan}</span>
+                    </p>
+                )}
+
+                {/* Deskripsi pekerjaan (tipe PENAWARAN): apa yang harus dilakukan.
+                    Indikator kiri card (biru = belum dibaca / abu-abu = sudah
+                    dibaca) dipakai bersama dengan daily activity agar konsisten. */}
+                {isPengadaan && (item.pesan || item.activity?.deskripsi) && (
+                    <p className="text-sm text-gray-600 mt-3 pt-3 border-t border-slate-100 leading-relaxed">
+                        {item.pesan || item.activity?.deskripsi}
+                    </p>
+                )}
             </div>
         </div>
     );

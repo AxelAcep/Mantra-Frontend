@@ -63,6 +63,13 @@ export interface NotifikasiItem {
     pesan: string;
     isRead: boolean;
     createdAt: string;
+    // Konteks proses pengadaan barang (tipe PENAWARAN)
+    tipe?: string;
+    terkaitPO?: string;
+    perusahaan?: string;
+    lokasiProyek?: string;
+    trackingPenawaranId?: string;
+    tahapan?: string;
 }
 
 export interface PaginatedNotifikasi {

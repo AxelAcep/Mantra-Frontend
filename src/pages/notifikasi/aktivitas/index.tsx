@@ -6,7 +6,6 @@ import {
 } from "@/hooks/use-notifikasi";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     ChevronLeft,
     ChevronRight,
@@ -70,6 +69,13 @@ export function AktivitasTab() {
         }
     };
 
+    // Untuk notifikasi tipe PENAWARAN: mark-read + navigate ke rute yang
+    // dipilih (detail proses pengadaan / daily activity yang di-assign).
+    const handleOpen = (id: string, target: string) => {
+        readNotifMutation.mutate(id);
+        navigate(target);
+    };
+
     const isToday = (dateStr: string) => {
         if (!dateStr) return false;
         const d = new Date(dateStr);
@@ -82,47 +88,45 @@ export function AktivitasTab() {
         setPage(1);
     }, [selectedFilter]);
 
+    // "Lihat Selengkapnya" menyesuaikan tab aktif: Daily Activity → halaman
+    // daily activity (filter overdue), Pengadaan Barang → halaman daftar
+    // pengadaan barang (/pengadaan-barang).
+    const lihatSelengkapnyaTarget =
+        selectedFilter === "penawaran"
+            ? "/pengadaan-barang"
+            : "/dailyactivity?tab=aktif&page=1&status=OVERDUE";
+
     const todayNotifications = notifikasi.filter(item => isToday(item.createdAt));
     const olderNotifications = notifikasi.filter(item => !isToday(item.createdAt));
 
     return (
         <div className="flex flex-col gap-4 p-6 bg-[#FBFCFD] min-h-[calc(100vh-140px)]">
-            {/* Row 2: Filter */}
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">Tampilkan</span>
-                <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-                    <SelectTrigger className="text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg h-9 px-3 focus:ring-2 focus:ring-cyan-500 cursor-pointer shadow-sm hover:border-slate-300 transition-colors w-[220px]">
-                        <SelectValue placeholder="Pilih Kategori" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white" position="popper">
-                        <SelectItem value="daily-activity" className="cursor-pointer">
-                            <div className="flex items-center justify-between w-full gap-2">
-                                <span>Daily Activity</span>
-                                {dailyActivityUnread > 0 && (
-                                    <Badge
-                                        variant="destructive"
-                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
-                                    >
-                                        {dailyActivityUnread}
-                                    </Badge>
-                                )}
-                            </div>
-                        </SelectItem>
-                        <SelectItem value="penawaran" className="cursor-pointer">
-                            <div className="flex items-center justify-between w-full gap-2">
-                                <span>Pengadaan Barang</span>
-                                {penawaranUnread > 0 && (
-                                    <Badge
-                                        variant="destructive"
-                                        className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
-                                    >
-                                        {penawaranUnread}
-                                    </Badge>
-                                )}
-                            </div>
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+            {/* Row 2: Filter tabs (mirip tab Approval/Aktivitas/Chat di halaman notifikasi) */}
+            <div className="flex items-center gap-6 border-b border-slate-100">
+                {[
+                    { value: "daily-activity", label: "Daily Activity", badge: dailyActivityUnread },
+                    { value: "penawaran", label: "Pengadaan Barang", badge: penawaranUnread },
+                ].map((tab) => (
+                    <button
+                        key={tab.value}
+                        onClick={() => setSelectedFilter(tab.value)}
+                        className={`py-3 text-sm whitespace-nowrap border-b-2 -mb-px transition-colors flex items-center gap-2 bg-transparent border-x-0 border-t-0 cursor-pointer
+                            ${selectedFilter === tab.value
+                                ? "border-cyan-500 text-cyan-500 font-medium"
+                                : "border-transparent text-gray-500 hover:text-gray-700"
+                            }`}
+                    >
+                        <span>{tab.label}</span>
+                        {tab.badge > 0 && (
+                            <Badge
+                                variant="destructive"
+                                className="rounded-full px-2 py-0.5 text-[10px] bg-red-100 text-red-600 border-none hover:bg-red-100 font-semibold"
+                            >
+                                {tab.badge}
+                            </Badge>
+                        )}
+                    </button>
+                ))}
             </div>
 
             {/* List Contents */}
@@ -146,7 +150,7 @@ export function AktivitasTab() {
                             <div className="flex justify-between items-center">
                                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hari Ini</h3>
                                 <button
-                                    onClick={() => navigate("/dailyactivity?tab=aktif&page=1&status=OVERDUE")}
+                                    onClick={() => navigate(lihatSelengkapnyaTarget)}
                                     className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
                                 >
                                     Lihat Selengkapnya
@@ -157,6 +161,16 @@ export function AktivitasTab() {
                                     key={item.id}
                                     item={item}
                                     onRead={() => handleRead(item.id, item.activityId)}
+                                    onOpenPenawaran={
+                                        item.trackingPenawaranId
+                                            ? () => handleOpen(item.id, `/penawaran/${item.trackingPenawaranId}`)
+                                            : undefined
+                                    }
+                                    onOpenDaily={
+                                        item.activityId
+                                            ? () => handleOpen(item.id, `/dailyactivity/${item.activityId}`)
+                                            : undefined
+                                    }
                                 />
                             ))}
                         </div>
@@ -169,7 +183,7 @@ export function AktivitasTab() {
                                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kemarin & Sebelumnya</h3>
                                 {todayNotifications.length === 0 && (
                                     <button
-                                        onClick={() => navigate("/dailyactivity?tab=aktif&page=1&status=OVERDUE")}
+                                        onClick={() => navigate(lihatSelengkapnyaTarget)}
                                         className="text-xs font-semibold text-cyan-600 hover:text-cyan-700 hover:underline bg-transparent border-none cursor-pointer"
                                     >
                                         Lihat Selengkapnya
@@ -181,6 +195,16 @@ export function AktivitasTab() {
                                     key={item.id}
                                     item={item}
                                     onRead={() => handleRead(item.id, item.activityId)}
+                                    onOpenPenawaran={
+                                        item.trackingPenawaranId
+                                            ? () => handleOpen(item.id, `/penawaran/${item.trackingPenawaranId}`)
+                                            : undefined
+                                    }
+                                    onOpenDaily={
+                                        item.activityId
+                                            ? () => handleOpen(item.id, `/dailyactivity/${item.activityId}`)
+                                            : undefined
+                                    }
                                 />
                             ))}
                         </div>

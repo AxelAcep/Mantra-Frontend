@@ -158,9 +158,14 @@ export default function Step5({
     divisi === "KOMISARIS" ||
     divisi === "MONITORING_CONTROL_ADVISOR";
 
-  const isDualBast = detectBastKategori(tracking?.jenisPenawaran).length === 2;
-  const isTotalBastFilled = isDualBast
-    ? data.totalBastPAC != null && data.totalBastFire != null
+  // >1 kategori garansi terdeteksi (PAC/FIRE/BATTERY, maksimal 3) -> total
+  // BAST per kategori; kalau cuma 1 -> total generik.
+  const multiBastKategori = detectBastKategori(tracking?.jenisPenawaran);
+  const isMultiBast = multiBastKategori.length > 1;
+  const isTotalBastFilled = isMultiBast
+    ? (!multiBastKategori.includes("PAC") || data.totalBastPAC != null) &&
+      (!multiBastKategori.includes("FIRE") || data.totalBastFire != null) &&
+      (!multiBastKategori.includes("BATTERY") || data.totalBastBattery != null)
     : data.totalBast != null;
 
   const mappedLogs =
@@ -315,6 +320,7 @@ export default function Step5({
                 totalBast={data.totalBast}
                 totalBastPAC={data.totalBastPAC}
                 totalBastFire={data.totalBastFire}
+                totalBastBattery={data.totalBastBattery}
                 canInput={isAdminProyekOrBerwenang}
                 onUpdated={refetch}
               />

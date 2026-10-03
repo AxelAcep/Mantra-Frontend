@@ -97,6 +97,7 @@ export interface FollowUpResponse {
   totalBast?: number | null;
   totalBastPAC?: number | null;
   totalBastFire?: number | null;
+  totalBastBattery?: number | null;
   kondisiPengantaran?: "SEBELUM_DP" | "SESUDAH_DP" | null;
   logs: LogFollowUp[];
   logAktivitas: LogFollowUp[];
@@ -304,7 +305,7 @@ export async function inputBASTFollowup(
   trackingId: string,
   payload:
     | { total_bast: number }
-    | { total_bast_pac?: number; total_bast_fire?: number },
+    | { total_bast_pac?: number; total_bast_fire?: number; total_bast_battery?: number },
 ): Promise<FollowUpResponse> {
   const res = await fetchClient(
     `/tracking-penawaran/${trackingId}/follow-up/bast`,

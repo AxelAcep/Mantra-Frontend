@@ -15,6 +15,7 @@ const NAMA_BULAN_PANJANG = [
 const TAB_LABEL: Record<string, string> = {
   PAC: "PAC",
   FIRE: "FirePro",
+  BATTERY: "Battery",
   UMUM: "Garansi",
 };
 
