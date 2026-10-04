@@ -30,6 +30,7 @@ function SectionHeading({ title }: { title: string }) {
 
 interface Step8Props {
   trackingId: string;
+  canManage?: boolean;
 }
 
 // Isi satu tab Garansi (dipakai baik ada 1 Garansi doang maupun pas lagi
@@ -40,12 +41,14 @@ function GaransiTabContent({
   konfigurasiTimeline,
   updatingTanggal,
   updateTanggalKunjungan,
+  canManage,
 }: {
   garansi: GaransiResponse;
   konfiguring: boolean;
   konfigurasiTimeline: ReturnType<typeof useGaransi>["konfigurasiTimeline"];
   updatingTanggal: boolean;
   updateTanggalKunjungan: ReturnType<typeof useGaransi>["updateTanggalKunjungan"];
+  canManage?: boolean;
 }) {
   const months = garansi.months ?? [];
 
@@ -103,11 +106,24 @@ function GaransiTabContent({
         <div>
           <SectionHeading title="Detail" />
           {garansi.status === "BELUM_DIKONFIGURASI" ? (
-            <KonfigurasiGaransiCard
-              kategoriBast={garansi.kategoriBast}
-              isSaving={konfiguring}
-              onSubmit={konfigurasiTimeline}
-            />
+            canManage ? (
+              <KonfigurasiGaransiCard
+                kategoriBast={garansi.kategoriBast}
+                isSaving={konfiguring}
+                onSubmit={konfigurasiTimeline}
+              />
+            ) : (
+              <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mt-6">
+                <h3 className="font-bold text-slate-800 text-sm mb-2">
+                  Garansi Belum Dikonfigurasi
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Timeline garansi belum dikonfigurasi. Hanya Admin Proyek,
+                  Master, atau Manager Operasional yang dapat mengkonfigurasi
+                  garansi.
+                </p>
+              </div>
+            )
           ) : garansi.kategoriGaransi === "TIDAK_ADA" ? (
             <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-6 mt-6">
               <h3 className="font-bold text-slate-800 text-sm mb-2">
@@ -125,6 +141,7 @@ function GaransiTabContent({
               months={months}
               updatingTanggal={updatingTanggal}
               kategoriGaransi={garansi.kategoriGaransi}
+              canManage={canManage}
               onSaveTanggal={updateTanggalKunjungan}
             />
           )}
@@ -148,7 +165,7 @@ function GaransiTabContent({
   );
 }
 
-export default function Step8({ trackingId }: Step8Props) {
+export default function Step8({ trackingId, canManage }: Step8Props) {
   const {
     garansis,
     loading,
@@ -219,6 +236,7 @@ export default function Step8({ trackingId }: Step8Props) {
         konfigurasiTimeline={konfigurasiTimeline}
         updatingTanggal={updatingTanggal}
         updateTanggalKunjungan={updateTanggalKunjungan}
+        canManage={canManage}
       />
     </div>
   );

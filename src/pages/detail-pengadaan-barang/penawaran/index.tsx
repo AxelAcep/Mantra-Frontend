@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import ProgressCard from "../progress-card";
 import TrackingHeader from "../header-card";
 import Step1 from "./step1/index";
@@ -99,9 +99,9 @@ function getStepName(step: string | undefined): string {
       return "Tahap 6 (Implementasi)";
     case "BAST":
       return "Tahap 7 (BAST)";
-    case "PEMBAYARAN":
-      return "Tahap 8 (Garansi)";
     case "GARANSI":
+      return "Tahap 8 (Garansi)";
+    case "PEMBAYARAN":
       return "Tahap 9 (Accounting)";
     default:
       return "Tahap 1 (Permintaan Masuk)";
@@ -123,6 +123,7 @@ const STEP_LABELS: Record<number, string> = {
 // ─── Main Component ─────────────────────────────────────────────────────────
 export default function PenawaranPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const trackingId = id ?? "";
   const userInfo = getUserInfo();
   const mode = detectMode(userInfo.divisi, userInfo.role);
@@ -217,6 +218,14 @@ export default function PenawaranPage() {
   const isRelatedSales =
     !!userInfo.pegawaiId && penawaran?.marketingId === userInfo.pegawaiId;
 
+  // BAST (step 7) & Garansi (step 8): hanya Admin Proyek (per-tracking),
+  // MASTER, dan MANAGER_OPERASIONAL yang boleh add/edit/action —
+  // target_hari_ini.md poin 2 (sinkron dengan backend canManageBastGaransi).
+  const canManageBastGaransi =
+    userInfo.role === "MASTER" ||
+    userInfo.divisi === "MANAGER_OPERASIONAL" ||
+    isAdminProyek;
+
   function hasStepPermission(step: number): boolean {
     return canViewPengadaanStepWithAdminProyek(
       step,
@@ -248,13 +257,38 @@ export default function PenawaranPage() {
   // (step 9) sengaja gak pernah dijadiin landing pertama — sensitif, gak
   // semua orang boleh lihat, jadi biar dibuka manual doang kalau memang
   // berwenang, bukan ke-loncat otomatis pas pertama buka detail.
+  //
+  // Exception: ?step= (dari notifikasi, target_hari_ini.md poin 5 & 6) —
+  // kalau user klik "Detail Pengadaan" dari notif termin/BAST, landing ke
+  // step tujuan (mis. PEMBAYARAN → 9, BAST → 7) asal tidak isStepBlocked.
   useEffect(() => {
     if (!hasSetInitialStep && penawaran?.stepSaatIni) {
+      const stepParam = searchParams.get("step");
+      // Step enum yang valid buat deep-link (getStepNumber mengembalikan 1
+      // untuk string tak dikenal, jadi validasi eksplisit dulu).
+      const validStepParams = [
+        "PENYUSUNAN_BOQ",
+        "REVIEW_INTERNAL",
+        "PERSETUJUAN_MANAJEMEN",
+        "FOLLOW_UP",
+        "IMPLEMENTASI",
+        "BAST",
+        "GARANSI",
+        "PEMBAYARAN",
+      ];
+      if (stepParam && validStepParams.includes(stepParam)) {
+        const targetStep = getStepNumber(stepParam);
+        if (!isStepBlocked(targetStep)) {
+          setActiveStep(targetStep);
+          setHasSetInitialStep(true);
+          return;
+        }
+      }
       const rawStep = getStepNumber(penawaran.stepSaatIni);
       setActiveStep(rawStep === 9 ? 8 : rawStep);
       setHasSetInitialStep(true);
     }
-  }, [hasSetInitialStep, penawaran?.stepSaatIni]);
+  }, [hasSetInitialStep, penawaran?.stepSaatIni, searchParams]);
 
   // ── Next Button ────────────────────────────────────────────────────────
   const isNextBlocked =
@@ -341,8 +375,12 @@ export default function PenawaranPage() {
               {activeStep === 6 && (
                 <Step6 trackingId={trackingId} onChatClick={handleOpenChat} />
               )}
-              {activeStep === 7 && <Step7 trackingId={trackingId} />}
-              {activeStep === 8 && <Step9 trackingId={trackingId} />}
+              {activeStep === 7 && (
+                <Step7 trackingId={trackingId} canManage={canManageBastGaransi} />
+              )}
+              {activeStep === 8 && (
+                <Step9 trackingId={trackingId} canManage={canManageBastGaransi} />
+              )}
               {activeStep === 9 && <Step8 trackingId={trackingId} />}
             </>
           )}

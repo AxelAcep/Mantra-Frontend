@@ -484,6 +484,7 @@ interface BarangSectionProps {
   trackingId?: string;
   activityPembelian?: any;
   onChatClick: (activityId: string, activityJudul: string) => void;
+  canManageBarang?: boolean;
   onAssignPGA?: () => void;
 }
 
@@ -491,6 +492,7 @@ export default function BarangSection({
   trackingId,
   activityPembelian,
   onChatClick,
+  canManageBarang = true,
   onAssignPGA,
 }: BarangSectionProps) {
   const navigate = useNavigate();
@@ -740,18 +742,20 @@ export default function BarangSection({
                 className="bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 w-56"
               />
             </div>
-            <button
-              onClick={onOpenAdd}
-              disabled={isMutating || formMode !== null}
-              className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <Plus size={14} /> Tambah Barang
-            </button>
+            {canManageBarang && (
+              <button
+                onClick={onOpenAdd}
+                disabled={isMutating || formMode !== null}
+                className="bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-600 transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Plus size={14} /> Tambah Barang
+              </button>
+            )}
           </div>
         </div>
 
         {/* Inline Form Card (Add or Edit) */}
-        {formMode !== null && (
+        {canManageBarang && formMode !== null && (
           <FormCard
             isEdit={formMode === "edit"}
             isSaving={isSavingForm}
@@ -863,31 +867,33 @@ export default function BarangSection({
                           )}
                         </td>
                         <td className="px-4 py-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => onOpenEdit(item)}
-                              disabled={isRowDisabled}
-                              className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${editingId === item.id
-                                  ? "text-cyan-500"
-                                  : "text-cyan-500 hover:text-cyan-600"
-                                }`}
-                              title="Edit"
-                            >
-                              <Pencil size={14} />
-                            </button>
-                            <button
-                              onClick={() => onDeleteClick(item)}
-                              disabled={isRowDisabled}
-                              className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Hapus"
-                            >
-                              {isRowDeleting ? (
-                                <Loader2 size={14} className="animate-spin" />
-                              ) : (
-                                <Trash2 size={14} />
-                              )}
-                            </button>
-                          </div>
+                          {canManageBarang && (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => onOpenEdit(item)}
+                                disabled={isRowDisabled}
+                                className={`transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${editingId === item.id
+                                    ? "text-cyan-500"
+                                    : "text-cyan-500 hover:text-cyan-600"
+                                  }`}
+                                title="Edit"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                onClick={() => onDeleteClick(item)}
+                                disabled={isRowDisabled}
+                                className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Hapus"
+                              >
+                                {isRowDeleting ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                  <Trash2 size={14} />
+                                )}
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );

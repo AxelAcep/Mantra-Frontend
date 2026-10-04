@@ -15,6 +15,7 @@ interface ImplementasiTabsProps {
   activityInstalasi?: any;
   onChatClick: (activityId: string, activityJudul: string) => void;
   canAssignPGA: boolean;
+  canManageBarang: boolean;
   onAssignPGA: (phase: "pembelian" | "pengantaran" | "instalasi") => void;
 }
 
@@ -29,6 +30,7 @@ export default function ImplementasiTabs({
   activityInstalasi,
   onChatClick,
   canAssignPGA,
+  canManageBarang,
   onAssignPGA,
 }: ImplementasiTabsProps) {
   return (
@@ -64,6 +66,7 @@ export default function ImplementasiTabs({
             trackingId={trackingId}
             activityPembelian={activityPembelian}
             onChatClick={onChatClick}
+            canManageBarang={canManageBarang}
             onAssignPGA={
               canAssignPGA && activityPembelian
                 ? () => onAssignPGA("pembelian")

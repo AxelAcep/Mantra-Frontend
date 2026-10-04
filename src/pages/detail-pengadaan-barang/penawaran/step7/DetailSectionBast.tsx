@@ -9,6 +9,7 @@ interface DetailSectionBastProps {
   tanggalTerbit?: string;
   tanggalSerahTerima?: string;
   isSaving: boolean;
+  canManage?: boolean;
   onSave: (payload: {
     noReferensi?: string;
     tanggalTerbit?: string;
@@ -41,6 +42,7 @@ export default function DetailSectionBast({
   tanggalTerbit,
   tanggalSerahTerima,
   isSaving,
+  canManage = true,
   onSave,
 }: DetailSectionBastProps) {
   const nomorBast = formatNomorBast(kategori, index);
@@ -86,14 +88,14 @@ export default function DetailSectionBast({
   return (
     <div className="mt-6">
       <div className="flex justify-end mb-3">
-        {!isEditing ? (
+        {canManage && !isEditing ? (
           <button
             onClick={handleEditClick}
             className="flex items-center gap-1.5 text-cyan-600 text-xs font-bold hover:underline"
           >
             <Pencil size={14} /> Edit
           </button>
-        ) : (
+        ) : isEditing ? (
           <div className="flex items-center gap-2">
             {saveError && (
               <p className="text-[11px] text-red-500 font-medium">
@@ -115,7 +117,7 @@ export default function DetailSectionBast({
               <Check size={14} /> {isSaving ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

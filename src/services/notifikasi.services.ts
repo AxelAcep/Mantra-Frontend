@@ -70,6 +70,7 @@ export interface NotifikasiItem {
     lokasiProyek?: string;
     trackingPenawaranId?: string;
     tahapan?: string;
+    stepCode?: string; // StepPenawaran enum ("PEMBAYARAN", "BAST", ...) — dipakai navigasi ke step detail pengadaan
 }
 
 export interface PaginatedNotifikasi {

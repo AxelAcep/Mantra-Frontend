@@ -76,6 +76,14 @@ export function AktivitasTab() {
         navigate(target);
     };
 
+    // Target halaman detail pengadaan — sertakan ?step= dari stepCode notif
+    // (mis. "PEMBAYARAN" → tab Accounting, "BAST" → tab BAST) supaya "Detail
+    // Pengadaan" membuka step yang benar, bukan stepSaatIni saat ini
+    // (target_hari_ini.md poin 5 & 6). Notif lama tanpa stepCode tetap jalan
+    // tanpa query (landing dari stepSaatIni seperti biasa).
+    const penawaranTarget = (item: { trackingPenawaranId?: string; stepCode?: string }) =>
+        `/penawaran/${item.trackingPenawaranId}${item.stepCode ? `?step=${item.stepCode}` : ""}`;
+
     const isToday = (dateStr: string) => {
         if (!dateStr) return false;
         const d = new Date(dateStr);
@@ -163,7 +171,7 @@ export function AktivitasTab() {
                                     onRead={() => handleRead(item.id, item.activityId)}
                                     onOpenPenawaran={
                                         item.trackingPenawaranId
-                                            ? () => handleOpen(item.id, `/penawaran/${item.trackingPenawaranId}`)
+                                            ? () => handleOpen(item.id, penawaranTarget(item))
                                             : undefined
                                     }
                                     onOpenDaily={
@@ -197,7 +205,7 @@ export function AktivitasTab() {
                                     onRead={() => handleRead(item.id, item.activityId)}
                                     onOpenPenawaran={
                                         item.trackingPenawaranId
-                                            ? () => handleOpen(item.id, `/penawaran/${item.trackingPenawaranId}`)
+                                            ? () => handleOpen(item.id, penawaranTarget(item))
                                             : undefined
                                     }
                                     onOpenDaily={

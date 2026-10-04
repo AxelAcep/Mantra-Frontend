@@ -41,10 +41,11 @@ function toDateInputValue(dateStr?: string) {
 interface MonthCardProps {
   month: GaransiMonthItem;
   isSaving: boolean;
+  canManage?: boolean;
   onSaveTanggal: (monthId: string, tanggal: string) => Promise<unknown>;
 }
 
-function MonthCard({ month, isSaving, onSaveTanggal }: MonthCardProps) {
+function MonthCard({ month, isSaving, canManage = true, onSaveTanggal }: MonthCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tanggal, setTanggal] = useState(
     toDateInputValue(month.tanggalKunjungan),
@@ -53,7 +54,7 @@ function MonthCard({ month, isSaving, onSaveTanggal }: MonthCardProps) {
 
   // Bisa diedit selama daily bulan ini masih berjalan (ON_PROGRESS) — begitu
   // daily disetujui selesai (status jadi DITERIMA), tanggal terkunci.
-  const canEditTanggal = month.status === "ON_PROGRESS";
+  const canEditTanggal = canManage && month.status === "ON_PROGRESS";
 
   const handleEditClick = () => {
     setTanggal(toDateInputValue(month.tanggalKunjungan));
@@ -173,6 +174,7 @@ interface TrackingGaransiSectionProps {
   months: GaransiMonthItem[];
   updatingTanggal: boolean;
   kategoriGaransi?: string;
+  canManage?: boolean;
   onSaveTanggal: (monthId: string, tanggal: string) => Promise<unknown>;
 }
 
@@ -192,6 +194,7 @@ export default function TrackingGaransiSection({
   months,
   updatingTanggal,
   kategoriGaransi,
+  canManage = true,
   onSaveTanggal,
 }: TrackingGaransiSectionProps) {
   const totalBulan = months.length;
@@ -274,6 +277,7 @@ export default function TrackingGaransiSection({
             key={month.id}
             month={month}
             isSaving={updatingTanggal}
+            canManage={canManage}
             onSaveTanggal={onSaveTanggal}
           />
         ))}

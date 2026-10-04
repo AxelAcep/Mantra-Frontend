@@ -72,6 +72,10 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
   const canEditPOAndWaktu = isMasterOrManager || isAdminProyek;
   const canEditWO = userInfo.role === "MASTER" || isAdminProyek;
   const canAssignPGA = isKepalaPGA;
+  // Hanya PROCUREMENT_GA (dan MASTER) yang boleh kelola barang —
+  // target_hari_ini.md poin 1 (sinkron dengan backend canEditImplementasiBarang).
+  const canManageBarang =
+    userInfo.role === "MASTER" || userInfo.divisi === "PROCUREMENT_GA";
 
   // ── States ──
   const [activeTab, setActiveTab] = useState<Tab>("pembelian");
@@ -338,6 +342,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           activityInstalasi={implData?.activityInstalasi}
           onChatClick={onChatClick}
           canAssignPGA={canAssignPGA}
+          canManageBarang={canManageBarang}
           onAssignPGA={onOpenAssignModal}
         />
 

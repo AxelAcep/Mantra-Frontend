@@ -34,6 +34,7 @@ function SubHeading({ title }: { title: string }) {
 
 interface Step7Props {
   trackingId: string;
+  canManage?: boolean;
 }
 
 // Isi satu tab BAST (dipakai baik ada 1 BAST doang maupun pas lagi nampilin
@@ -43,10 +44,12 @@ function BastTabContent({
   bast,
   updating,
   updateBast,
+  canManage,
 }: {
   bast: BastResponse;
   updating: boolean;
   updateBast: ReturnType<typeof useBast>["updateBast"];
+  canManage?: boolean;
 }) {
   const entries = bast.entries ?? [];
   const kategoriLabel = KATEGORI_BAST_LABEL[bast.kategori];
@@ -95,6 +98,7 @@ function BastTabContent({
                       tanggalTerbit={entry.tanggalTerbit}
                       tanggalSerahTerima={entry.tanggalSerahTerima}
                       isSaving={updating}
+                      canManage={canManage}
                       onSave={(payload) => updateBast(entry.id, payload)}
                     />
                     <DocumentSectionBast
@@ -115,7 +119,7 @@ function BastTabContent({
   );
 }
 
-export default function Step7({ trackingId }: Step7Props) {
+export default function Step7({ trackingId, canManage }: Step7Props) {
   const { basts, loading, error, refetch, updateBast, updating } =
     useBast(trackingId);
 
@@ -171,7 +175,7 @@ export default function Step7({ trackingId }: Step7Props) {
         </div>
       )}
 
-      <BastTabContent bast={current} updating={updating} updateBast={updateBast} />
+      <BastTabContent bast={current} updating={updating} updateBast={updateBast} canManage={canManage} />
     </div>
   );
 }
