@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
@@ -12,7 +12,6 @@ import { useKonfirmasiKolaborasi } from "@/hooks/use-activity"
 import { DialogKonfirmasi } from "./dialog-konfirmasi"
 
 
-type SortKey = "kategori" | "terkaitPO" | "targetSelesai" | "status" | "perusahaan" | null
 type SortDir = "asc" | "desc" | "" | undefined
 
 type Props = {
@@ -20,6 +19,9 @@ type Props = {
     isLoading: boolean
     isError: boolean
     page: number
+    sortBy?: string
+    sortDir?: SortDir
+    onSort: (column: string) => void
     onPageChange: (page: number) => void
 }
 
@@ -213,31 +215,10 @@ function AksiCell({ item, overdue }: { item: Activity; overdue: boolean }) {
     )
 }
 
-export function ActivityTable({ data, isLoading, isError, page, onPageChange }: Props) {
-    const [sortKey, setSortKey] = useState<SortKey>(null)
-    const [sortDir, setSortDir] = useState<SortDir>("asc")
-
-    function handleSort(key: SortKey) {
-        if (sortKey === key) {
-            setSortDir((d) => (d === "asc" ? "desc" : "asc"))
-        } else {
-            setSortKey(key)
-            setSortDir("asc")
-        }
-    }
-
-    const sorted = useMemo(() => {
-        if (!data?.data || !sortKey) return data?.data ?? []
-        return [...data.data].sort((a, b) => {
-            let aVal = ""
-            let bVal = ""
-            if (sortKey === "kategori") { aVal = a.kategori; bVal = b.kategori }
-            if (sortKey === "perusahaan") { aVal = a.perusahaan ?? ""; bVal = b.perusahaan ?? "" }
-            if (sortKey === "targetSelesai") { aVal = a.targetSelesai; bVal = b.targetSelesai }
-            if (sortKey === "status") { aVal = a.status; bVal = b.status }
-            return sortDir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-        })
-    }, [data, sortKey, sortDir])
+export function ActivityTable({ data, isLoading, isError, page, sortBy, sortDir, onSort, onPageChange }: Props) {
+    // Sorting dikerjakan server (lihat applyActivitySort di backend) supaya
+    // urutannya berlaku untuk seluruh data, bukan cuma halaman yang tampil.
+    const rows = data?.data ?? []
 
     const totalPages = data?.meta.totalPages ?? 1
 
@@ -260,12 +241,12 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
             <Table>
                 <TableHeader>
                     <TableRow className="bg-slate-50 border-b border-slate-100">
-                        <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL INPUT</TableHead>
-                        <TableHead className="text-[#000000] text-xs font-semibold">JUDUL</TableHead>
-                        <SortableHeader label="KATEGORI" active={sortKey === "kategori"} sortDir={sortDir} onClick={() => handleSort("kategori")} />
-                        <SortableHeader label="PERUSAHAAN" active={sortKey === "perusahaan"} sortDir={sortDir} onClick={() => handleSort("perusahaan")} />
-                        <SortableHeader label="DEADLINE" active={sortKey === "targetSelesai"} sortDir={sortDir} onClick={() => handleSort("targetSelesai")} />
-                        <SortableHeader label="STATUS" active={sortKey === "status"} sortDir={sortDir} onClick={() => handleSort("status")} />
+                        <SortableHeader label="TANGGAL INPUT" active={sortBy === "createdAt"} sortDir={sortDir} onClick={() => onSort("createdAt")} />
+                        <SortableHeader label="JUDUL" active={sortBy === "judul"} sortDir={sortDir} onClick={() => onSort("judul")} />
+                        <SortableHeader label="KATEGORI" active={sortBy === "kategori"} sortDir={sortDir} onClick={() => onSort("kategori")} />
+                        <SortableHeader label="PERUSAHAAN" active={sortBy === "perusahaan"} sortDir={sortDir} onClick={() => onSort("perusahaan")} />
+                        <SortableHeader label="DEADLINE" active={sortBy === "targetSelesai"} sortDir={sortDir} onClick={() => onSort("targetSelesai")} />
+                        <SortableHeader label="STATUS" active={sortBy === "status"} sortDir={sortDir} onClick={() => onSort("status")} />
                         <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -280,12 +261,12 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                             <TableCell colSpan={7} className="text-center py-10 text-red-500 text-sm">Gagal memuat data.</TableCell>
                         </TableRow>
                     )}
-                    {!isLoading && !isError && sorted.length === 0 && (
+                    {!isLoading && !isError && rows.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">Tidak ada data.</TableCell>
                         </TableRow>
                     )}
-                    {sorted.map((item) => {
+                    {rows.map((item) => {
                         const input = formatDate(item.createdAt)
                         const deadline = formatDate(item.targetSelesai)
                         const overdue = isOverdue(item)

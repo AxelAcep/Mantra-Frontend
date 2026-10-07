@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import {
@@ -8,6 +8,7 @@ import type { ActivityPegawai } from "../../../services/master-activity.services
 import { TablePagination } from "./table-pagination"
 import { StatusBadge } from "./status-badge"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useListParams } from "@/hooks/use-list-params"
 import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
@@ -127,37 +128,23 @@ export function CardRiwayatTable({
 }) {
     const navigate = useNavigate()
 
-    // ── Search & Filter State ─────────────────────────────────────────────────
-    const [searchInput, setSearchInput] = useState("")
-    const [filterKaryawan, setFilterKaryawan] = useState("")
-    const [filterKategori, setFilterKategori] = useState("")
-    const [filterStatus, setFilterStatus] = useState("")
-    const [sortBy, setSortBy] = useState("")
-    const [sortDir, setSortDir] = useState<SortDir>("")
+    const { sortBy, sortDir, search, filters, toggleSort, update } = useListParams({
+        filters: { kategori: "" },
+    })
+    const filterKategori = filters.kategori
 
-    const search = useDebounce(searchInput, 400)
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(search)
+    const debouncedSearch = useDebounce(searchInput, 400)
 
-    const prevDeps = useRef({ search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir })
-    // Reset page setiap filter/search berubah
     useEffect(() => {
-        const p = prevDeps.current
-        if (p.search === search && p.filterKaryawan === filterKaryawan && p.filterKategori === filterKategori && p.filterStatus === filterStatus && p.sortBy === sortBy && p.sortDir === sortDir) {
-            return
-        }
-        prevDeps.current = { search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir }
-        onPageChange(1)
-    }, [search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir])
+        if (debouncedSearch !== search) update({ search: debouncedSearch })
+    }, [debouncedSearch])
 
     const { data, isLoading } = useMasterRiwayat(
-        page, 10, search, sortBy, sortDir, filterKaryawan, filterKategori, filterStatus
+        page, 10, search, sortBy, sortBy ? sortDir : "", "", filterKategori, ""
     )
-
-    // ── Sort Handler ──────────────────────────────────────────────────────────
-    function handleSort(field: string) {
-        if (sortBy !== field) { setSortBy(field); setSortDir("asc") }
-        else if (sortDir === "asc") setSortDir("desc")
-        else { setSortBy(""); setSortDir("") }
-    }
 
 
     const items = data?.data ?? []
@@ -188,7 +175,7 @@ export function CardRiwayatTable({
                 {/* Filter Kategori */}
                 <select
                     value={filterKategori}
-                    onChange={(e) => setFilterKategori(e.target.value)}
+                    onChange={(e) => update({ kategori: e.target.value })}
                     className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
                 >
                     <option value="">Semua Kategori</option>
@@ -210,9 +197,9 @@ export function CardRiwayatTable({
                 </select> */}
 
                 {/* Reset */}
-                {(search || filterKategori || filterStatus) && (
+                {(search || filterKategori) && (
                     <button
-                        onClick={() => { setSearchInput(""); setFilterKaryawan(""); setFilterKategori(""); setFilterStatus("") }}
+                        onClick={() => { setSearchInput(""); update({ search: undefined, kategori: undefined }) }}
                         className="px-3 py-2 text-sm text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg transition-colors"
                     >
                         Reset
@@ -226,12 +213,12 @@ export function CardRiwayatTable({
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-100">
-                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                                 <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
                                 <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
                                 <TableHead className="text-[#000000] text-xs font-semibold">DEADLINE / SUBMIT</TableHead>
-                                <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                                <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                                 <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -243,7 +230,7 @@ export function CardRiwayatTable({
                             ) : items.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-medium">
-                                        {search || filterKategori || filterStatus
+                                        {search || filterKategori
                                             ? "Tidak ada hasil yang cocok dengan filter."
                                             : "Tidak ada aktivitas aktif."
                                         }

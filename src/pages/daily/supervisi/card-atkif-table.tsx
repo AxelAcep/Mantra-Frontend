@@ -4,7 +4,7 @@ import {
     TableHeader, TableRow,
 } from "@/components/ui/table"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TablePagination } from "./table-pagination"
 import { StatusBadge } from "./status-badge"
 import { useSupervisiActivityAktif, useMarkSupervised } from "@/hooks/use-supervisi"
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
+import { useListParams } from "@/hooks/use-list-params"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -167,19 +168,27 @@ export function CardAktifTable({
     onPageChange: (p: number) => void
 }) {
     const navigate = useNavigate()
-    const [sortBy, setSortBy] = useState("")
-    const [sortDir, setSortDir] = useState<SortDir>("")
-    const [search, setSearch] = useState("")
-    const [filterStatus, setFilterStatus] = useState("")
+    const { sortBy, sortDir, search: searchParam, filters, toggleSort, update } = useListParams({
+        filters: { status: "", deadline: "" },
+    })
+    const filterStatus = filters.status
     const [confirmTarget, setConfirmTarget] = useState<string | null>(null)
 
-    const debouncedSearch = useDebounce(search, 400)
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(searchParam)
+    const debouncedSearch = useDebounce(searchInput, 400)
+
+    useEffect(() => {
+        if (debouncedSearch !== searchParam) update({ search: debouncedSearch })
+    }, [debouncedSearch])
 
     const { data, isLoading } = useSupervisiActivityAktif({
         page,
-        search: debouncedSearch || undefined,
+        search: searchParam || undefined,
         sortBy: sortBy || undefined,
-        sortDir: sortDir || undefined,
+        sortDir: sortBy ? sortDir : undefined,
+        deadline: filters.deadline || undefined,
         status:
             filterStatus === "KONFIRMASI_SELESAI_UNSUPERVISED" ? "KONFIRMASI_SELESAI" :
                 filterStatus === "VERIFIED" ? undefined :
@@ -191,12 +200,6 @@ export function CardAktifTable({
     })
 
     const markSupervised = useMarkSupervised()
-
-    function handleSort(field: string) {
-        if (sortBy !== field) { setSortBy(field); setSortDir("asc") }
-        else if (sortDir === "asc") setSortDir("desc")
-        else { setSortBy(""); setSortDir("") }
-    }
 
     function handleConfirm() {
         if (!confirmTarget) return
@@ -219,7 +222,7 @@ export function CardAktifTable({
                     {/* Filter Status */}
                     <select
                         value={filterStatus}
-                        onChange={(e) => { setFilterStatus(e.target.value); onPageChange(1) }}
+                        onChange={(e) => update({ status: e.target.value })}
                         className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
                     >
                         <option value="">Semua Status</option>
@@ -234,8 +237,8 @@ export function CardAktifTable({
                         <input
                             type="text"
                             placeholder="Cari karyawan, judul, perusahaan..."
-                            value={search}
-                            onChange={(e) => { setSearch(e.target.value); onPageChange(1) }}
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
                             className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                         />
                     </div>
@@ -248,12 +251,12 @@ export function CardAktifTable({
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-100">
-                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                        <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                        <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                        <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                         <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
                         <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
-                        <SortableHeader label="DEADLINE / SUBMIT" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} center />
+                        <SortableHeader label="DEADLINE / SUBMIT" field="targetselesai" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                        <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} center />
                         <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -267,7 +270,7 @@ export function CardAktifTable({
                         ) : items.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
-                                    {search ? "Tidak ada hasil yang cocok." : "Tidak ada aktivitas."}
+                                    {searchParam ? "Tidak ada hasil yang cocok." : "Tidak ada aktivitas."}
                                 </TableCell>
                             </TableRow>
                         ) : items.map((item) => {

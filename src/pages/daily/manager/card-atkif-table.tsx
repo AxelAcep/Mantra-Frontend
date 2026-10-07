@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { CheckCircle, XCircle, Search, ChevronUp, ChevronDown, ChevronsUpDown, BadgeCheck } from "lucide-react"
 import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
 } from "@/components/ui/table"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import {
     useMasterAktif,
     useKonfirmasiReschedule,
@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
+import { useListParams } from "@/hooks/use-list-params"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -201,36 +202,23 @@ export function CardAktifTable({
     onPageChange: (p: number) => void
 }) {
     const navigate = useNavigate()
-    const [searchParams, setSearchParams] = useSearchParams()
-    const urlStatus = searchParams.get("status") || ""
+    const { sortBy, sortDir, search, filters, toggleSort, update } = useListParams({
+        filters: { status: "", kategori: "" },
+    })
+    const filterStatus = filters.status
+    const filterKategori = filters.kategori
 
-    // ── Search & Filter State ─────────────────────────────────────────────────
-    const [searchInput, setSearchInput] = useState("")
-    const [filterKaryawan, setFilterKaryawan] = useState("")
-    const [filterKategori, setFilterKategori] = useState("")
-    const [filterStatus, setFilterStatus] = useState(urlStatus)
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(search)
+    const debouncedSearch = useDebounce(searchInput, 400)
 
     useEffect(() => {
-        setFilterStatus(urlStatus)
-    }, [urlStatus])
-    const [sortBy, setSortBy] = useState("")
-    const [sortDir, setSortDir] = useState<SortDir>("")
-
-    const search = useDebounce(searchInput, 400)
-
-    const prevDeps = useRef({ search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir })
-    // Reset page setiap filter/search berubah
-    useEffect(() => {
-        const p = prevDeps.current
-        if (p.search === search && p.filterKaryawan === filterKaryawan && p.filterKategori === filterKategori && p.filterStatus === filterStatus && p.sortBy === sortBy && p.sortDir === sortDir) {
-            return
-        }
-        prevDeps.current = { search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir }
-        onPageChange(1)
-    }, [search, filterKaryawan, filterKategori, filterStatus, sortBy, sortDir])
+        if (debouncedSearch !== search) update({ search: debouncedSearch })
+    }, [debouncedSearch])
 
     const { data, isLoading, refetch } = useMasterAktif(
-        page, 10, search, sortBy, sortDir, filterKaryawan, filterKategori, filterStatus
+        page, 10, search, sortBy, sortBy ? sortDir : "", "", filterKategori, filterStatus
     )
 
     // ── Modal State ───────────────────────────────────────────────────────────
@@ -242,13 +230,6 @@ export function CardAktifTable({
     const konfirmasi = useKonfirmasiReschedule()
     const konfirmasiSelesaiMutation = useKonfirmasiSelesai(() => refetch())
     const isPendingSelesai = konfirmasiSelesaiMutation.isPending
-
-    // ── Sort Handler ──────────────────────────────────────────────────────────
-    function handleSort(field: string) {
-        if (sortBy !== field) { setSortBy(field); setSortDir("asc") }
-        else if (sortDir === "asc") setSortDir("desc")
-        else { setSortBy(""); setSortDir("") }
-    }
 
     // ── Handlers: Reschedule ──────────────────────────────────────────────────
     const handleTerima = () => {
@@ -316,7 +297,7 @@ export function CardAktifTable({
                 {/* Filter Kategori */}
                 <select
                     value={filterKategori}
-                    onChange={(e) => setFilterKategori(e.target.value)}
+                    onChange={(e) => update({ kategori: e.target.value })}
                     className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
                 >
                     <option value="">Semua Kategori</option>
@@ -328,17 +309,7 @@ export function CardAktifTable({
                 {/* Filter Status */}
                 <select
                     value={filterStatus}
-                    onChange={(e) => {
-                        const val = e.target.value
-                        setFilterStatus(val)
-                        const params = new URLSearchParams(searchParams)
-                        if (val) {
-                            params.set("status", val)
-                        } else {
-                            params.delete("status")
-                        }
-                        setSearchParams(params, { replace: true })
-                    }}
+                    onChange={(e) => update({ status: e.target.value })}
                     className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
                 >
                     <option value="">Semua Status</option>
@@ -352,12 +323,7 @@ export function CardAktifTable({
                     <button
                         onClick={() => {
                             setSearchInput("")
-                            setFilterKaryawan("")
-                            setFilterKategori("")
-                            setFilterStatus("")
-                            const params = new URLSearchParams(searchParams)
-                            params.delete("status")
-                            setSearchParams(params, { replace: true })
+                            update({ search: undefined, status: undefined, kategori: undefined })
                         }}
                         className="px-3 py-2 text-sm text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg transition-colors"
                     >
@@ -372,12 +338,12 @@ export function CardAktifTable({
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-100">
-                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                                 <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
                                 <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
-                                <SortableHeader label="DEADLINE / SUBMIT" field="targetSelesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} center />
+                                <SortableHeader label="DEADLINE / SUBMIT" field="targetSelesai" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} center />
                                 <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                             </TableRow>
                         </TableHeader>

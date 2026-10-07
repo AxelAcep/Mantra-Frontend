@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 interface TrackingHeaderProps {
   title: string
@@ -18,15 +18,25 @@ export default function TrackingHeader({
   status,
   onBack
 }: TrackingHeaderProps) {
+  const navigate = useNavigate()
+
+  // Kembali ke histori sebelumnya supaya tab, halaman, sorting, dan filter
+  // pada daftar pengadaan tetap utuh (semuanya tersimpan di URL).
+  const handleBack = () => {
+    if (onBack) onBack()
+    else navigate(-1)
+  }
+
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
       <div className="flex items-start gap-4">
-        <Link
-          to="/pengadaan-barang"
+        <button
+          type="button"
+          onClick={handleBack}
           className="mt-0.5 h-11 w-11 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 shadow-sm inline-flex items-center justify-center text-slate-500 transition-colors"
         >
           <ArrowLeft size={18} />
-        </Link>
+        </button>
 
         <div className="space-y-2">
           <h1 className="text-[24px] leading-none font-bold tracking-tight text-slate-900">

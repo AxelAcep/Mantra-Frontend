@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -14,6 +13,7 @@ import { useMasterStats } from "@/hooks/use-kpi";
 import { useMasterKaryawan } from "@/hooks/use-master-activity";
 import { Link, useNavigate } from "react-router-dom";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
+import { useListParams } from "@/hooks/use-list-params";
 
 export default function DailyActivityReport() {
   const navigate = useNavigate();
@@ -21,7 +21,8 @@ export default function DailyActivityReport() {
   const bulan = now.getMonth() + 1;
   const tahun = now.getFullYear();
 
-  const [page, setPage] = useState(1);
+  // Prefix "daily" supaya param tabel ini tidak bentrok dengan tabel lain di /dashboard.
+  const { page, setPage } = useListParams({ prefix: "daily" });
 
   const { data: stats } = useMasterStats();
   const { data: karyawanData, isLoading } = useMasterKaryawan(page, "", "tahun", bulan, tahun, "", "", 7);

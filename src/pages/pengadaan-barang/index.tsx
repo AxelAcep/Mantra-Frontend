@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   ArrowLeft,
   Plus,
@@ -9,7 +8,7 @@ import TabelPembayaran from "./TabelPembayaran";
 import TableKonfirmasiSelesai from "./TabelKonfirmasi";
 import TabelGaransi from "./TabelGaransi";
 import TableRiwayat from "./TabelRiwayat";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type TabName =
   | "Permintaan Penawaran"
@@ -56,10 +55,21 @@ export default function ListPengadaan() {
   const { role } = getAuthData();
   const isKaryawan = role === "KARYAWAN";
   const tabs: TabName[] = isKaryawan ? KARYAWAN_TABS : ALL_TABS;
-  const [activeTab, setActiveTab] = useState<TabName>(
-    isKaryawan ? "PO Aktif" : "Permintaan Penawaran",
-  );
   const navigate = useNavigate();
+
+  // Tab aktif disimpan di URL supaya posisi tab (beserta page/sort/filter tiap
+  // tabel) tetap utuh saat user kembali dari halaman detail.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const defaultTab: TabName = tabs[0];
+  const tabParam = searchParams.get("tab") as TabName | null;
+  const activeTab: TabName =
+    tabParam && tabs.includes(tabParam) ? tabParam : defaultTab;
+
+  const setActiveTab = (tab: TabName) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", tab);
+    setSearchParams(next, { replace: true });
+  };
 
   const { divisi } = getAuthData();
   const canCreatePenawaran =

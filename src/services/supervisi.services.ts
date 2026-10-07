@@ -84,6 +84,8 @@ export type SupervisiActivityParams = {
     kategori?: string
     status?: string
     isSupervised?: boolean | string
+    /** Shortcut dari card ringkasan: "today" (deadline hari ini) atau "overdue". */
+    deadline?: string
 }
 
 export interface DashboardStats {

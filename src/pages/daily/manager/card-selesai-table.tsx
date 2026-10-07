@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { CheckCircle, XCircle, Search, ChevronUp, ChevronDown, ChevronsUpDown, BadgeCheck } from "lucide-react"
 import { useMasterSelesai, useKonfirmasiSelesai } from "@/hooks/use-master-activity"
 import { TablePagination } from "./table-pagination"
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { type NilaiKPI } from "@/services/kpi.services"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useListParams } from "@/hooks/use-list-params"
 import { cn } from "@/lib/utils"
 import {
     Table, TableBody, TableCell, TableHead,
@@ -286,13 +287,19 @@ export function SelesaiTable({
     page: number
     onPageChange: (p: number) => void
 }) {
-    const [searchInput, setSearchInput] = useState("")
-    const search = useDebounce(searchInput, 400)
-    const [sortBy, setSortBy] = useState("")
-    const [sortDir, setSortDir] = useState<SortDir>("")
+    const { sortBy, sortDir, search, toggleSort, update } = useListParams()
+
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(search)
+    const debouncedSearch = useDebounce(searchInput, 400)
     const navigate = useNavigate()
 
-    const { data, isLoading, isError } = useMasterSelesai(page, 5, search, sortBy, sortDir)
+    useEffect(() => {
+        if (debouncedSearch !== search) update({ search: debouncedSearch })
+    }, [debouncedSearch])
+
+    const { data, isLoading, isError } = useMasterSelesai(page, 5, search, sortBy, sortBy ? sortDir : "")
 
     const [terimaTarget, setTerimaTarget] = useState<TerimaTarget | null>(null)
     const [tolakTarget, setTolakTarget] = useState<string | null>(null)
@@ -309,32 +316,6 @@ export function SelesaiTable({
     const items = data?.data ?? []
     const total = data?.total ?? 0
     const totalPages = data?.totalPages ?? 1
-
-    // ── Sort Handler ──────────────────────────────────────────────────────────
-
-    function handleSort(field: string) {
-        if (sortBy !== field) {
-            setSortBy(field)
-            setSortDir("asc")
-        } else if (sortDir === "asc") {
-            setSortDir("desc")
-        } else if (sortDir === "desc") {
-            // klik ketiga: reset sort
-            setSortBy("")
-            setSortDir("")
-        }
-        onPageChange(1)
-    }
-
-    // ── Search Handler ────────────────────────────────────────────────────────
-
-    function handleSearch() {
-        onPageChange(1)
-    }
-
-    function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        if (e.key === "Enter") handleSearch()
-    }
 
     // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -360,15 +341,6 @@ export function SelesaiTable({
         )
     }
 
-    const prevSearch = useRef(search)
-    useEffect(() => {
-        if (prevSearch.current === search) {
-            return
-        }
-        prevSearch.current = search
-        onPageChange(1)
-    }, [search])
-
     return (
         <div className="w-full bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden space-y-4">
             <div className="p-6 space-y-4">
@@ -388,7 +360,6 @@ export function SelesaiTable({
                             placeholder="Cari karyawan, judul, perusahaan..."
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            onKeyDown={handleSearchKeyDown}
                             className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                         />
                     </div>
@@ -400,12 +371,12 @@ export function SelesaiTable({
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 border-b border-slate-100">
-                                    <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                    <SortableHeader label="JUDUL AKTIVITAS" field="judul" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                    <SortableHeader label="PERUSAHAAN" field="perusahaan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                    <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                    <SortableHeader label="TARGET SELESAI" field="targetSelesai" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                                    <SortableHeader label="TANGGAL SUBMIT" field="waktuSubmit" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                                    <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                    <SortableHeader label="JUDUL AKTIVITAS" field="judul" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                    <SortableHeader label="PERUSAHAAN" field="perusahaan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                    <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                    <SortableHeader label="TARGET SELESAI" field="targetSelesai" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                    <SortableHeader label="TANGGAL SUBMIT" field="waktuSubmit" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                                     <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
                                     <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                                 </TableRow>

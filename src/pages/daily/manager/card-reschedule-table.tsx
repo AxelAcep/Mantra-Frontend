@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { CheckCircle, ChevronsUpDown, Search, XCircle, ChevronUp, ChevronDown, BadgeCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import {
     useTerimaSemuaReschedule,
 } from "@/hooks/use-master-activity"
 import { useDebounce } from "@/hooks/use-debounce";
+import { useListParams } from "@/hooks/use-list-params"
 import { TablePagination } from "./table-pagination"
 import { ConfirmTerimaModal, TolakModal } from "./card-confirm-modal"
 import { StatusBadge } from "./status-badge"    // ← NEW
@@ -112,16 +113,28 @@ export function RescheduleTable({
     page: number
     onPageChange: (p: number) => void
 }) {
-    const [search, setSearch] = useState("")
+    const { search, sortBy, sortDir, toggleSort, update } = useListParams()
+
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(search)
+    const debouncedSearch = useDebounce(searchInput, 400)
+
+    useEffect(() => {
+        if (debouncedSearch !== search) update({ search: debouncedSearch })
+    }, [debouncedSearch])
+
     const [groupByKaryawan, setGroupByKaryawan] = useState(false)
-    const [sortConfig, setSortConfig] = useState<{
-        key: string | null,
-        direction: SortDir
-    }>({ key: null, direction: "" })
 
-    const debouncedSearch = useDebounce(search, 400)
+    // Saat pengelompokan per karyawan aktif, urutannya dipaksa by karyawan —
+    // tetap dikerjakan server supaya pengelompokan tidak pecah antar halaman.
+    const efektifSortBy = groupByKaryawan ? "karyawan" : sortBy
+    const efektifSortDir = groupByKaryawan ? "asc" : sortDir
 
-    const { data, isLoading, isError } = useMasterReschedule(page, 10, debouncedSearch)
+    const { data, isLoading, isError } = useMasterReschedule(page, 10, search, true, {
+        sortBy: efektifSortBy,
+        sortDir: efektifSortDir,
+    })
     const konfirmasi = useKonfirmasiReschedule()
     const terimaSemuaMutation = useTerimaSemuaReschedule(data?.data ?? [])
 
@@ -134,44 +147,9 @@ export function RescheduleTable({
     const total = data?.total ?? 0
     const totalPages = data?.totalPages ?? 1
 
-    // ── Sorting & Grouping Logic ──
-    const sortedItems = useMemo(() => {
-        let sortable = [...items]
-
-        if (sortConfig.key && sortConfig.direction) {
-            sortable.sort((a, b) => {
-                let valA: any, valB: any
-                if (sortConfig.key === "judul") {
-                    valA = a.activity.judul.toLowerCase()
-                    valB = b.activity.judul.toLowerCase()
-                } else if (sortConfig.key === "awal") {
-                    valA = new Date(a.activity.targetSelesai).getTime()
-                    valB = new Date(b.activity.targetSelesai).getTime()
-                } else if (sortConfig.key === "baru") {
-                    valA = new Date(a.targetSelesaiBaru).getTime()
-                    valB = new Date(b.targetSelesaiBaru).getTime()
-                } else if (sortConfig.key === "karyawan") {
-                    valA = a.activity.pegawai.nama.toLowerCase()
-                    valB = b.activity.pegawai.nama.toLowerCase()
-                }
-
-                if (valA !== undefined && valB !== undefined) {
-                    if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1
-                    if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1
-                }
-                return 0
-            })
-        }
-
-        if (groupByKaryawan) {
-            // Jika grup aktif, sort utama by nama karyawan
-            return [...sortable].sort((a, b) =>
-                a.activity.pegawai.nama.localeCompare(b.activity.pegawai.nama)
-            )
-        }
-
-        return sortable
-    }, [items, groupByKaryawan, sortConfig])
+    // Urutan datang dari server (lihat rescheduleOrderClause di backend) supaya
+    // berlaku untuk seluruh pengajuan, bukan cuma halaman yang sedang tampil.
+    const sortedItems = items
 
     const handleTerima = () => {
         if (!terimaTarget) return
@@ -189,22 +167,9 @@ export function RescheduleTable({
         )
     }
 
-    // Reset ke page 1 setiap kali search berubah
-    const handleSearch = (val: string) => {
-        setSearch(val)
-        onPageChange(1)
-    }
-
     const handleSort = (key: string) => {
         if (key !== "karyawan") setGroupByKaryawan(false)
-
-        if (sortConfig.key !== key) {
-            setSortConfig({ key, direction: "asc" })
-        } else if (sortConfig.direction === "asc") {
-            setSortConfig({ key, direction: "desc" })
-        } else {
-            setSortConfig({ key: null, direction: "" })
-        }
+        toggleSort(key)
     }
 
     return (
@@ -236,8 +201,8 @@ export function RescheduleTable({
                     <input
                         type="text"
                         placeholder="Cari nama karyawan atau judul..."
-                        value={search}
-                        onChange={(e) => handleSearch(e.target.value)}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
                         className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     />
                 </div>
@@ -251,8 +216,8 @@ export function RescheduleTable({
                                     <SortableHeader
                                         label="KARYAWAN"
                                         field="karyawan"
-                                        sortBy={sortConfig.key}
-                                        sortDir={sortConfig.direction}
+                                        sortBy={efektifSortBy}
+                                        sortDir={efektifSortDir}
                                         onSort={(f) => {
                                             handleSort(f)
                                             setGroupByKaryawan(prev => !prev)
@@ -262,23 +227,23 @@ export function RescheduleTable({
                                     <SortableHeader
                                         label="JUDUL AKTIVITAS"
                                         field="judul"
-                                        sortBy={sortConfig.key}
-                                        sortDir={sortConfig.direction}
+                                        sortBy={efektifSortBy}
+                                        sortDir={efektifSortDir}
                                         onSort={handleSort}
                                     />
                                     <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
                                     <SortableHeader
                                         label="JADWAL AWAL"
-                                        field="awal"
-                                        sortBy={sortConfig.key}
-                                        sortDir={sortConfig.direction}
+                                        field="targetselesai"
+                                        sortBy={efektifSortBy}
+                                        sortDir={efektifSortDir}
                                         onSort={handleSort}
                                     />
                                     <SortableHeader
                                         label="JADWAL BARU"
-                                        field="baru"
-                                        sortBy={sortConfig.key}
-                                        sortDir={sortConfig.direction}
+                                        field="targetselesaibaru"
+                                        sortBy={efektifSortBy}
+                                        sortDir={efektifSortDir}
                                         onSort={handleSort}
                                     />
                                     <TableHead className="text-[#000000] text-xs font-semibold">ALASAN</TableHead>

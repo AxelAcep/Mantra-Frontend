@@ -103,8 +103,26 @@ export type CreateActivityPayload = {
     kolaborator: KolaboratorPayload[]
 }
 
-async function fetchActivity(endpoint: string, page = 1, limit = 10): Promise<PaginatedActivity> {
+export type ActivityListParams = {
+    page?: number
+    limit?: number
+    /** Kolom sorting; diterapkan server di level SQL supaya urutannya berlaku lintas halaman. */
+    sortBy?: string
+    sortDir?: "asc" | "desc"
+    /** Shortcut dari card ringkasan: "today" (deadline hari ini) atau "overdue". */
+    deadline?: string
+}
+
+async function fetchActivity(endpoint: string, options: ActivityListParams = {}): Promise<PaginatedActivity> {
+    const { page = 1, limit = 10, sortBy, sortDir, deadline } = options
+
     const params = new URLSearchParams({ page: String(page), limit: String(limit) })
+    if (sortBy) {
+        params.set("sortBy", sortBy)
+        params.set("sortDir", sortDir ?? "asc")
+    }
+    if (deadline) params.set("deadline", deadline)
+
     const res = await fetchClient(`/activity/${endpoint}?${params}`, { headers: authHeaders() })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error ?? "Gagal mengambil data.")
@@ -120,11 +138,11 @@ export async function readAllChat(): Promise<void> {
     if (!res.ok) throw new Error(data.error ?? "Gagal menandai semua chat.")
 }
 
-export const getAllActivityBerjalan = (page?: number, limit?: number) => fetchActivity("berjalan", page, limit)
-export const getAllActivityAktif = (page?: number, limit?: number) => fetchActivity("aktif", page, limit)
-export const getAllActivityPending = (page?: number, limit?: number) => fetchActivity("pending", page, limit)
-export const getAllActivityPerluTindakan = (page?: number, limit?: number) => fetchActivity("perlu-tindakan", page, limit)
-export const getAllActivityRiwayat = (page?: number, limit?: number) => fetchActivity("riwayat", page, limit)
+export const getAllActivityBerjalan = (params?: ActivityListParams) => fetchActivity("berjalan", params)
+export const getAllActivityAktif = (params?: ActivityListParams) => fetchActivity("aktif", params)
+export const getAllActivityPending = (params?: ActivityListParams) => fetchActivity("pending", params)
+export const getAllActivityPerluTindakan = (params?: ActivityListParams) => fetchActivity("perlu-tindakan", params)
+export const getAllActivityRiwayat = (params?: ActivityListParams) => fetchActivity("riwayat", params)
 
 export async function getActivityCount(): Promise<ActivityCount> {
     const res = await fetchClient(`/activity/count`, { headers: authHeaders() })

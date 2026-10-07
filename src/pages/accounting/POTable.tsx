@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { X } from "lucide-react";
 import { useAccountingPOList } from "@/hooks/use-accounting-dashboard";
-import type { StatusPembayaranPO } from "@/services/accounting-dashboard.service";
+import type {
+  AccountingPOFlag,
+  AccountingPOSortBy,
+  StatusPembayaranPO,
+} from "@/services/accounting-dashboard.service";
 import { formatNomorPenawaran } from "@/lib/utils";
+import { useListParams } from "@/hooks/use-list-params";
+import SortableHeader from "@/components/ui/sortable-header";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 function formatTanggal(iso: string | null | undefined) {
@@ -62,16 +69,55 @@ function ProgressBadge({ selesai, total }: { selesai: number; total: number }) {
 }
 
 export default function POTable() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusPembayaranPO | "">("");
+  const {
+    page,
+    sortBy,
+    sortDir,
+    search,
+    filters,
+    setPage,
+    toggleSort,
+    setFilter,
+    update,
+  } = useListParams({
+    defaultSortBy: "deadline",
+    defaultSortDir: "asc",
+    filters: { status: "", flag: "" },
+  });
+
+  const status = filters.status as StatusPembayaranPO | "";
+  const flag = filters.flag as AccountingPOFlag;
+
+  // Input pencarian ditahan sebentar sebelum ditulis ke URL supaya setiap
+  // ketikan tidak memicu entri history & refetch sendiri-sendiri.
+  const [searchDraft, setSearchDraft] = useState(search);
+
+  useEffect(() => {
+    setSearchDraft(search);
+  }, [search]);
+
+  useEffect(() => {
+    if (searchDraft === search) return;
+    const timer = setTimeout(() => update({ search: searchDraft }), 400);
+    return () => clearTimeout(timer);
+  }, [searchDraft, search, update]);
 
   const { data, isLoading, isError } = useAccountingPOList({
     page,
     limit: 10,
     search,
     status,
+    sortBy: sortBy as AccountingPOSortBy,
+    sortDir,
+    flag,
   });
+
+  const activeFilterLabel =
+    flag === "MENDEKATI"
+      ? "Mendekati Tenggat (≤2 Minggu)"
+      : flag === "LEWAT"
+        ? "Lewat Tenggat"
+        : "";
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
@@ -79,19 +125,13 @@ export default function POTable() {
         <input
           type="text"
           placeholder="Cari nomor PO, perusahaan..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
+          value={searchDraft}
+          onChange={(e) => setSearchDraft(e.target.value)}
           className="w-full max-w-sm px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 placeholder:text-gray-300"
         />
         <select
           value={status}
-          onChange={(e) => {
-            setStatus(e.target.value as StatusPembayaranPO | "");
-            setPage(1);
-          }}
+          onChange={(e) => setFilter("status", e.target.value)}
           className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 text-gray-600"
         >
           {STATUS_OPTIONS.map((opt) => (
@@ -100,6 +140,20 @@ export default function POTable() {
             </option>
           ))}
         </select>
+
+        {activeFilterLabel && (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-700 text-xs font-medium">
+            Filter: {activeFilterLabel}
+            <button
+              type="button"
+              onClick={() => setFilter("flag", "")}
+              aria-label="Hapus filter tenggat"
+              className="rounded-full p-0.5 hover:bg-cyan-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/40"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        )}
       </div>
 
       <div className="w-full overflow-x-auto px-6 pb-4 pt-2">
@@ -107,12 +161,12 @@ export default function POTable() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 border-b border-slate-100">
-                <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold text-right">DIBAYAR / NILAI PROYEK</TableHead>
+                <SortableHeader label="Nomor PO" column="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                <SortableHeader label="Perusahaan" column="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                <SortableHeader label="Dibayar / Nilai Proyek" column="persentaseDibayar" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} align="right" />
                 <TableHead className="text-[#000000] text-xs font-semibold text-center">PROGRESS TERMIN</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold">TERMIN TERDEKAT</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
+                <SortableHeader label="Termin Terdekat" column="deadline" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                <SortableHeader label="Status" column="status" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} align="center" />
                 <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
               </TableRow>
             </TableHeader>
@@ -209,10 +263,10 @@ export default function POTable() {
             Menampilkan <span className="font-semibold text-slate-700">{data.data.length}</span> dari <span className="font-semibold text-slate-700">{data.meta.total}</span> data
           </p>
           <div className="flex items-center gap-1">
-            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+            <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">‹</button>
             <span className="text-sm text-slate-500 px-2">{page} / {data.meta.totalPages}</span>
-            <button onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))} disabled={page === data.meta.totalPages}
+            <button onClick={() => setPage(Math.min(data.meta.totalPages, page + 1))} disabled={page === data.meta.totalPages}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors">›</button>
           </div>
         </div>

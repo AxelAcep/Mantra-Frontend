@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -21,6 +21,7 @@ import { usePenawaranList } from "@/hooks/use-create-penawaran";
 import { formatNomorPenawaran } from "@/lib/utils";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useListParams } from "@/hooks/use-list-params";
 
 type SortDir = "asc" | "desc" | "";
 
@@ -60,20 +61,15 @@ function SortableHeader({
 }
 
 export default function DaftarPenawaranApprovalPengadaanBarang() {
-  const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [sortBy, setSortBy] = useState("");
-  const [sortDir, setSortDir] = useState<SortDir>("");
+  const { page, sortBy, sortDir, search, setPage, toggleSort, update } = useListParams();
+  const [searchInput, setSearchInput] = useState(search);
 
-  const search = useDebounce(searchInput, 400);
+  const debouncedSearch = useDebounce(searchInput, 400);
 
-  const prevDeps = useRef({ search, sortBy, sortDir });
+  // Ketikan baru disimpan ke URL setelah debounce supaya param tidak ditulis tiap huruf.
   useEffect(() => {
-    const p = prevDeps.current;
-    if (p.search === search && p.sortBy === sortBy && p.sortDir === sortDir) return;
-    prevDeps.current = { search, sortBy, sortDir };
-    setPage(1);
-  }, [search, sortBy, sortDir]);
+    if (debouncedSearch !== search) update({ search: debouncedSearch });
+  }, [debouncedSearch, search, update]);
 
   const { data, isLoading } = usePenawaranList({
     step: "REVIEW_INTERNAL,PERSETUJUAN_MANAJEMEN",
@@ -81,17 +77,12 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
     limit: 10,
     search,
     sortBy,
-    sortDir: sortDir || undefined,
+    // Arah sort hanya dikirim saat ada kolom aktif, sama seperti perilaku sebelumnya.
+    sortDir: sortBy ? sortDir : undefined,
   });
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
-
-  function handleSort(field: string) {
-    if (sortBy !== field) { setSortBy(field); setSortDir("asc"); }
-    else if (sortDir === "asc") setSortDir("desc");
-    else { setSortBy(""); setSortDir(""); }
-  }
 
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
@@ -116,16 +107,16 @@ export default function DaftarPenawaranApprovalPengadaanBarang() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
-                  <SortableHeader label="TANGGAL PERMINTAAN" field="tanggalMasuk" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[12%] pl-4" />
-                  <SortableHeader label="NO. PENAWARAN" field="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[12%]" />
+                  <SortableHeader label="TANGGAL PERMINTAAN" field="tanggalMasuk" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[12%] pl-4" />
+                  <SortableHeader label="NO. PENAWARAN" field="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[12%]" />
                   <TableHead className="h-11 w-[12%]">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">PIC REQ</div>
                   </TableHead>
                   <TableHead className="h-11 w-[14%]">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">PEMBUAT PENAWARAN</div>
                   </TableHead>
-                  <SortableHeader label="PERUSAHAAN" field="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[14%]" />
-                  <SortableHeader label="LOKASI PROYEK" field="lokasiProyek" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[12%]" />
+                  <SortableHeader label="PERUSAHAAN" field="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[14%]" />
+                  <SortableHeader label="LOKASI PROYEK" field="lokasiProyek" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[12%]" />
                   <TableHead className="h-11 w-[14%]">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">JENIS PENGADAAN</div>
                   </TableHead>

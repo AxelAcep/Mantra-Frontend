@@ -1,6 +1,6 @@
 import { ChevronUp, ChevronDown, ChevronsUpDown, Search } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
@@ -8,6 +8,8 @@ import {
 import { TablePagination } from "./table-pagination"
 import { useSupervisiActivityRiwayat } from "@/hooks/use-supervisi"
 import type { SupervisiActivityItem } from "@/services/supervisi.services"
+import { useDebounce } from "@/hooks/use-debounce"
+import { useListParams } from "@/hooks/use-list-params"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -93,22 +95,23 @@ export function CardRiwayatTable({
     onPageChange: (p: number) => void
 }) {
     const navigate = useNavigate()
-    const [search, setSearch] = useState("")
-    const [sortBy, setSortBy] = useState("")
-    const [sortDir, setSortDir] = useState<SortDir>("")
+    const { sortBy, sortDir, search, toggleSort, update } = useListParams()
+
+    // Input pencarian ditahan di state lokal dulu supaya URL tidak berubah tiap
+    // ketukan huruf; hasil debounce-nya yang ditulis ke URL.
+    const [searchInput, setSearchInput] = useState(search)
+    const debouncedSearch = useDebounce(searchInput, 400)
+
+    useEffect(() => {
+        if (debouncedSearch !== search) update({ search: debouncedSearch })
+    }, [debouncedSearch])
 
     const { data, isLoading } = useSupervisiActivityRiwayat({
         page,
         search: search || undefined,
         sortBy: sortBy || undefined,
-        sortDir: sortDir || undefined,
+        sortDir: sortBy ? sortDir : undefined,
     })
-
-    function handleSort(field: string) {
-        if (sortBy !== field) { setSortBy(field); setSortDir("asc") }
-        else if (sortDir === "asc") setSortDir("desc")
-        else { setSortBy(""); setSortDir("") }
-    }
 
     const items: SupervisiActivityItem[] = data?.data ?? []
 
@@ -127,8 +130,8 @@ export function CardRiwayatTable({
                     <input
                         type="text"
                         placeholder="Cari informasi..."
-                        value={search}
-                        onChange={(e) => { setSearch(e.target.value); onPageChange(1) }}
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
                         className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                     />
                 </div>
@@ -140,11 +143,11 @@ export function CardRiwayatTable({
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-100">
-                            <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
-                            <SortableHeader label="TANGGAL" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                            <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                            <SortableHeader label="TANGGAL" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                             <TableHead className="text-[#000000] text-xs font-semibold">AKTIVITAS</TableHead>
                             <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
-                            <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                            <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                             <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                         </TableRow>
                     </TableHeader>
