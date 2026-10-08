@@ -7,6 +7,7 @@ import {
   usePegawaiByDivisi,
 } from "@/hooks/use-penawaran";
 import type { Mode } from "./index";
+import { labelDivisi } from "@/utils/divisi"
 
 function getInitials(nama: string) {
   return nama
@@ -143,7 +144,7 @@ function AssignCard({
               {currentPegawai.nama}
             </p>
             <p className="text-[0.65rem] text-gray-400 font-medium mt-1 tracking-tight">
-              {toTitleCase(currentPegawai.divisi ?? divisi)}
+              {labelDivisi(currentPegawai.divisi ?? divisi)}
             </p>
           </div>
         </div>

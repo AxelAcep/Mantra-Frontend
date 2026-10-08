@@ -329,7 +329,7 @@ export default function DocumentSectionFollowUp({
   // Daily Activity, urut kronologis flow:
   // Admin Sekertaris -> Sales PIC -> Pengecekan PO (Admin Proyek & Finance) -> Upload PO (Admin Proyek)
   const activities = [
-    ...(activityAdmin ? [{ ...activityAdmin, role: "Admin Sekertaris" }] : []),
+    ...(activityAdmin ? [{ ...activityAdmin, role: "Sekertaris" }] : []),
 
     ...(activitySales ? [{ ...activitySales, role: "Sales PIC" }] : []),
 
@@ -342,7 +342,7 @@ export default function DocumentSectionFollowUp({
       : []),
 
     ...(activityMintaTTDDirektur
-      ? [{ ...activityMintaTTDDirektur, role: "Admin Sekertaris (Minta TTD Direktur)" }]
+      ? [{ ...activityMintaTTDDirektur, role: "Sekertaris (Minta TTD Direktur)" }]
       : []),
 
     ...(activityAdminProyek

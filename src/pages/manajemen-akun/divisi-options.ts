@@ -1,9 +1,10 @@
 export const DIVISI_OPTIONS = [
     { value: "KOMISARIS", label: "Komisaris" },
     { value: "DIREKTUR", label: "Direktur" },
-    { value: "SEKERTARIS", label: "Sekertaris" },
     { value: "ADMIN_SEKERTARIAT", label: "Admin Sekertariat" },
-    { value: "ADMIN_SEKERTARIS", label: "Admin Sekertaris" },
+    // Alur pengadaan barang mengecek ADMIN_SEKERTARIS, jadi hanya nilai ini
+    // yang boleh dipilih — labelnya saja yang disebut "Sekertaris".
+    { value: "ADMIN_SEKERTARIS", label: "Sekertaris" },
     { value: "MANAGER_OPERASIONAL", label: "Manager Operasional" },
     { value: "MONITORING_CONTROL_ADVISOR", label: "Monitoring Control Advisor" },
     { value: "PROCUREMENT_GA", label: "Procurement & GA" },

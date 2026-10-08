@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { labelDivisi } from "@/utils/divisi"
 
 type Pegawai = {
   id: string
@@ -60,7 +61,7 @@ export function PegawaiSelect({
           {selectedPegawai ? (
             <>
               {selectedPegawai.nama}
-              <span className="ml-2 text-xs text-gray-500">({toTitleCase(selectedPegawai.divisi)})</span>
+              <span className="ml-2 text-xs text-gray-500">({labelDivisi(selectedPegawai.divisi)})</span>
             </>
           ) : (
             "Pilih pegawai..."
@@ -92,7 +93,7 @@ export function PegawaiSelect({
                   />
                   <div className="flex flex-col items-start">
                     <span className="font-medium">{item.nama}</span>
-                    <span className="text-xs text-gray-500">{toTitleCase(item.divisi)}</span>
+                    <span className="text-xs text-gray-500">{labelDivisi(item.divisi)}</span>
                   </div>
                 </CommandItem>
               ))}

@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, ArrowRight, MessageCircle } from "lucide-react";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -64,7 +65,7 @@ export default function LogbookCard({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
+                    {labelDivisi(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                           "id-ID",
@@ -112,7 +113,7 @@ export default function LogbookCard({
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
                           {child.pegawai?.nama ?? "—"} ·{" "}
-                          {toTitleCase(child.pegawai?.divisi ?? "—")} ·{" "}
+                          {labelDivisi(child.pegawai?.divisi ?? "—")} ·{" "}
                           {child.targetSelesai
                             ? new Date(child.targetSelesai).toLocaleDateString(
                                 "id-ID",

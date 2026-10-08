@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -104,7 +105,7 @@ export default function AssignPGAModal({
                         {staff.nama}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Divisi {toTitleCase(staff.divisi)}
+                        Divisi {labelDivisi(staff.divisi)}
                       </p>
                     </div>
                   </label>

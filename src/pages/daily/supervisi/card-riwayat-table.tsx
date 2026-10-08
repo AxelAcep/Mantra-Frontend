@@ -10,6 +10,7 @@ import { useSupervisiActivityRiwayat } from "@/hooks/use-supervisi"
 import type { SupervisiActivityItem } from "@/services/supervisi.services"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useListParams } from "@/hooks/use-list-params"
+import { labelDivisi } from "@/utils/divisi"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -176,7 +177,7 @@ export function CardRiwayatTable({
                                             </div>
                                             <div title={item.pegawai.nama} className="max-w-[150px]">
                                                 <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama}</p>
-                                                <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.pegawai.divisi)}</p>
                                             </div>
                                         </div>
                                     </TableCell>

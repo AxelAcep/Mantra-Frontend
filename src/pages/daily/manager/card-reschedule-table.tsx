@@ -16,6 +16,7 @@ import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
 } from "@/components/ui/table"
+import { labelDivisi } from "@/utils/divisi"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -281,7 +282,7 @@ export function RescheduleTable({
                                                         </div>
                                                         <div title={item.activity.pegawai.nama} className="max-w-[150px]">
                                                             <p className="font-semibold text-gray-900 truncate">{item.activity.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
-                                                            <p className="text-[0.75rem] text-muted-foreground truncate">{item.activity.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                            <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.activity.pegawai.divisi)}</p>
                                                         </div>
                                                     </div>
                                                 ) : (

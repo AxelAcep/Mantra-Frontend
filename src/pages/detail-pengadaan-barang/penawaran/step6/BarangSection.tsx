@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useUnreadChatCount } from "@/hooks/use-activity";
+import { labelDivisi } from "@/utils/divisi"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -942,7 +943,7 @@ export default function BarangSection({
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
                       {activityPembelian.pegawai?.nama ?? "—"} ·{" "}
-                      {toTitleCase(activityPembelian.pegawai?.divisi ?? "—")}{" "}
+                      {labelDivisi(activityPembelian.pegawai?.divisi ?? "—")}{" "}
                       ·{" "}
                       {activityPembelian.targetSelesai
                         ? new Date(
@@ -995,7 +996,7 @@ export default function BarangSection({
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
                               {child.pegawai?.nama ?? "—"} ·{" "}
-                              {toTitleCase(child.pegawai?.divisi ?? "—")}
+                              {labelDivisi(child.pegawai?.divisi ?? "—")}
                               ·{" "}
                               {child.targetSelesai
                                 ? new Date(

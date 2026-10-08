@@ -14,6 +14,7 @@ import { useMasterKaryawan } from "@/hooks/use-master-activity";
 import { Link, useNavigate } from "react-router-dom";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
 import { useListParams } from "@/hooks/use-list-params";
+import { labelDivisi } from "@/utils/divisi"
 
 export default function DailyActivityReport() {
   const navigate = useNavigate();
@@ -108,7 +109,7 @@ export default function DailyActivityReport() {
 
                 <TableCell>
                   <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
-                    {row.divisi?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                    {labelDivisi(row.divisi)}
                   </span>
                 </TableCell>
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Download, ArrowRight, CheckCircle2 } from "lucide-react";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -71,7 +72,7 @@ export default function DocumentSectionBast({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activityAdminProyek.pegawai?.nama ?? "—"} ·{" "}
-                    {toTitleCase(activityAdminProyek.pegawai?.divisi ?? "—")} ·{" "}
+                    {labelDivisi(activityAdminProyek.pegawai?.divisi ?? "—")} ·{" "}
                     {activityAdminProyek.targetSelesai
                       ? new Date(
                           activityAdminProyek.targetSelesai,

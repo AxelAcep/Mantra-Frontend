@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 import { DialogEditKaryawan } from "./dialog-edit-karyawan"
 import type { User } from "../../services/user.services"
+import { labelDivisi } from "@/utils/divisi"
 
 function getInitials(nama: string) {
     return nama.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
@@ -95,7 +96,7 @@ export function UserTable({ users, sortBy, sortDir, onSort }: UserTableProps) {
                                 </TableCell>
                                 <TableCell>
                                     <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
-                                        {user.pegawai.divisi?.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                                        {labelDivisi(user.pegawai.divisi)}
                                     </span>
                                 </TableCell>
                                 <TableCell className="text-gray-800 truncate" title={user.email}>{user.email}</TableCell>

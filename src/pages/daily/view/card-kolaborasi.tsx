@@ -16,6 +16,7 @@ import { useTambahKolaborator } from "@/hooks/use-activity"
 import { DialogKonfirmasi } from "./dialog-konfirmasi"
 import { usePegawai } from "@/hooks/use-user"
 import { PegawaiSelect } from "./card-select"
+import { labelDivisi } from "@/utils/divisi"
 
 const KATEGORI_OPTIONS = [
     { label: "Quotation", value: "QUOTATION" },
@@ -128,7 +129,7 @@ export function KolaborasiCard({ activityId, kolaborator, activityStatus, onLiha
                                 {/* Divisi */}
                                 <div className="bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 min-w-0">
                                     <p className="text-xs text-gray-400 mb-1">Divisi</p>
-                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.divisi}>{toTitleCase(kol.pegawai.divisi)}</p>
+                                    <p className="text-sm font-semibold text-gray-800 truncate" title={kol.pegawai.divisi}>{labelDivisi(kol.pegawai.divisi)}</p>
                                 </div>
 
                                 {/* Judul */}
