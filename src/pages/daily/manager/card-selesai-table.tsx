@@ -86,7 +86,7 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal"
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
@@ -397,7 +397,17 @@ export function SelesaiTable({
 
                 <div className="w-full overflow-x-auto pb-4">
                     <div className="w-full rounded-md border bg-white min-w-[800px]">
-                        <Table>
+                        <Table className="table-fixed">
+                            <colgroup>
+                                <col className="w-[15%]" />
+                                <col className="w-[17%]" />
+                                <col className="w-[12%]" />
+                                <col className="w-[11%]" />
+                                <col className="w-[12%]" />
+                                <col className="w-[12%]" />
+                                <col className="w-[9%]" />
+                                <col className="w-[12%]" />
+                            </colgroup>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 border-b border-slate-100">
                                     <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
@@ -442,25 +452,25 @@ export function SelesaiTable({
                                             key={item.id}
                                             className="hover:bg-slate-50/50 transition-colors"
                                         >
-                                            <TableCell>
+                                            <TableCell className="overflow-hidden">
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                         {getInitials(item.pegawai.nama)}
                                                     </div>
-                                                    <div title={item.pegawai.nama} className="max-w-[150px]">
+                                                    <div title={item.pegawai.nama} className="min-w-0 w-full">
                                                         <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                         <p className="text-[0.75rem] text-muted-foreground truncate">{item.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-gray-800 max-w-[200px] truncate" title={item.judul}>
-                                                {item.judul}
+                                            <TableCell className="text-gray-800 overflow-hidden" title={item.judul}>
+                                                <p className="truncate">{item.judul}</p>
                                             </TableCell>
-                                            <TableCell className="text-gray-800 max-w-[150px] truncate" title={item.perusahaan}>
-                                                {item.perusahaan}
+                                            <TableCell className="text-gray-800 overflow-hidden" title={item.perusahaan}>
+                                                <p className="truncate">{item.perusahaan}</p>
                                             </TableCell>
-                                            <TableCell>
-                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                                            <TableCell className="overflow-hidden">
+                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold whitespace-nowrap">
                                                     {toTitleCase(item.kategori ?? "")}
                                                 </span>
                                             </TableCell>

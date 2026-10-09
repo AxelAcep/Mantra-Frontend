@@ -93,7 +93,7 @@ function SortableHeader({ label, active, sortDir, onClick }: {
 }) {
     return (
         <TableHead
-            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal"
             onClick={onClick}
         >
             <div className="flex items-center gap-1">
@@ -247,7 +247,16 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
 
     return (
         <div className="rounded-md border bg-white">
-            <Table>
+            <Table className="table-fixed">
+                <colgroup>
+                    <col className="w-[12%]" />
+                    <col className="w-[22%]" />
+                    <col className="w-[13%]" />
+                    <col className="w-[15%]" />
+                    <col className="w-[13%]" />
+                    <col className="w-[15%]" />
+                    <col className="w-[10%]" />
+                </colgroup>
                 <TableHeader>
                     <TableRow className="bg-slate-50 border-b border-slate-100">
                         <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL INPUT</TableHead>
@@ -285,13 +294,13 @@ export function ActivityTable({ data, isLoading, isError, page, onPageChange }: 
                                     <p className="text-medium text-gray-800 leading-tight">{input.tanggal}</p>
                                     <p className="text-xs text-gray-800 leading-tight">{input.waktu}</p>
                                 </TableCell>
-                                <TableCell className="text-gray-800 max-w-[200px] truncate">{item.judul}</TableCell>
-                                <TableCell>
-                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                                <TableCell className="text-gray-800 overflow-hidden" title={item.judul}><p className="truncate">{item.judul}</p></TableCell>
+                                <TableCell className="overflow-hidden">
+                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold whitespace-nowrap">
                                         {KATEGORI_LABEL[item.kategori] ?? item.kategori}
                                     </span>
                                 </TableCell>
-                                <TableCell className="text-gray-800">{item.perusahaan ?? "-"}</TableCell>
+                                <TableCell className="text-gray-800 overflow-hidden" title={item.perusahaan ?? "-"}><p className="truncate">{item.perusahaan ?? "-"}</p></TableCell>
                                 <TableCell>
                                     <p className={`text-medium leading-tight ${overdue ? "text-red-500 font-medium" : "text-gray-800"}`}>{deadline.tanggal}</p>
                                     <p className={`text-xs leading-tight ${overdue ? "text-red-400" : "text-gray-800"}`}>{deadline.waktu}</p>

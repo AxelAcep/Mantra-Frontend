@@ -89,7 +89,7 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold"
+            className="cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal"
             onClick={() => onSort(field)}
             title={title}
         >
@@ -245,7 +245,17 @@ export function RescheduleTable({
                 {/* Table */}
                 <div className="w-full overflow-x-auto">
                     <div className="w-full rounded-md border bg-white min-w-[800px]">
-                        <Table>
+                        <Table className="table-fixed">
+                            <colgroup>
+                                <col className="w-[15%]" />
+                                <col className="w-[17%]" />
+                                <col className="w-[12%]" />
+                                <col className="w-[11%]" />
+                                <col className="w-[11%]" />
+                                <col className="w-[16%]" />
+                                <col className="w-[8%]" />
+                                <col className="w-[10%]" />
+                            </colgroup>
                             <TableHeader>
                                 <TableRow className="bg-slate-50 border-b border-slate-100">
                                     <SortableHeader
@@ -266,7 +276,7 @@ export function RescheduleTable({
                                         sortDir={sortConfig.direction}
                                         onSort={handleSort}
                                     />
-                                    <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
+                                    <TableHead className="text-[#000000] text-xs font-semibold whitespace-normal">PERUSAHAAN</TableHead>
                                     <SortableHeader
                                         label="JADWAL AWAL"
                                         field="awal"
@@ -281,7 +291,7 @@ export function RescheduleTable({
                                         sortDir={sortConfig.direction}
                                         onSort={handleSort}
                                     />
-                                    <TableHead className="text-[#000000] text-xs font-semibold">ALASAN</TableHead>
+                                    <TableHead className="text-[#000000] text-xs font-semibold whitespace-normal">ALASAN</TableHead>
                                     <TableHead className="text-[#000000] text-xs font-semibold text-center">STATUS</TableHead>
                                     <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                                 </TableRow>
@@ -308,13 +318,13 @@ export function RescheduleTable({
                                     return (
                                         <TableRow key={item.id} className={`hover:bg-slate-50/50 transition-colors ${groupByKaryawan && !isSameKaryawan && idx !== 0 ? "border-t-2 border-t-cyan-100" : ""
                                             }`}>
-                                            <TableCell>
+                                            <TableCell className="overflow-hidden">
                                                 {!isSameKaryawan ? (
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                             {getInitials(item.activity.pegawai.nama)}
                                                         </div>
-                                                        <div title={item.activity.pegawai.nama} className="max-w-[150px]">
+                                                        <div title={item.activity.pegawai.nama} className="min-w-0 w-full">
                                                             <p className="font-semibold text-gray-900 truncate">{item.activity.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                             <p className="text-[0.75rem] text-muted-foreground truncate">{item.activity.pegawai.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                         </div>
@@ -324,8 +334,8 @@ export function RescheduleTable({
                                                     <div className="pl-12 text-xs text-muted-foreground italic">↳ sama</div>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-gray-800 max-w-[200px] truncate" title={item.activity.judul}>{item.activity.judul}</TableCell>
-                                            <TableCell className="text-gray-800 max-w-[150px] truncate" title={item.activity.perusahaan}>{item.activity.perusahaan}</TableCell>
+                                            <TableCell className="text-gray-800 overflow-hidden" title={item.activity.judul}><p className="truncate">{item.activity.judul}</p></TableCell>
+                                            <TableCell className="text-gray-800 overflow-hidden" title={item.activity.perusahaan}><p className="truncate">{item.activity.perusahaan}</p></TableCell>
                                             <TableCell className="text-gray-800 text-medium">
                                                 <p>{formatDate(item.activity.targetSelesai)}</p>
                                                 <p>{formatTime(item.activity.targetSelesai)}</p>
@@ -334,7 +344,7 @@ export function RescheduleTable({
                                                 <p>{formatDate(item.targetSelesaiBaru)}</p>
                                                 <p>{formatTime(item.targetSelesaiBaru)}</p>
                                             </TableCell>
-                                            <TableCell className="text-gray-800 text-medium max-w-[200px]" title={item.alasan}>
+                                            <TableCell className="text-gray-800 text-medium overflow-hidden" title={item.alasan}>
                                                 <p className="truncate">{item.alasan}</p>
                                             </TableCell>
                                             <TableCell>
