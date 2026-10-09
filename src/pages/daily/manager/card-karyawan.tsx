@@ -62,7 +62,7 @@ function SortableHeader({
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal ${className}`}
             onClick={() => onSort(field)}
         >
             <div className={`flex items-center gap-1 ${className.includes("text-center") ? "justify-center" : "justify-start"}`}>
@@ -224,7 +224,14 @@ export function KaryawanTable({
             {/* ── Table ── */}
             <div className="w-full overflow-x-auto">
                 <div className="w-full rounded-md border bg-white min-w-[800px]">
-                    <Table>
+                    <Table className="table-fixed">
+                        <colgroup>
+                            <col className="w-[28%]" />
+                            <col className="w-[24%]" />
+                            <col className="w-[14%]" />
+                            <col className="w-[18%]" />
+                            <col className="w-[16%]" />
+                        </colgroup>
                         <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-100">
                                 <SortableHeader label="KARYAWAN" field="nama" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
@@ -269,12 +276,12 @@ export function KaryawanTable({
                                         className="hover:bg-slate-50/50 transition-colors"
                                     >
                                         {/* Karyawan */}
-                                        <TableCell>
+                                        <TableCell className="overflow-hidden">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                     {getInitials(item.nama)}
                                                 </div>
-                                                <div>
+                                                <div title={item.nama} className="min-w-0 w-full">
                                                     <p className="font-semibold text-gray-900 truncate">{item.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                     <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.divisi)}</p>
                                                 </div>
@@ -282,7 +289,7 @@ export function KaryawanTable({
                                         </TableCell>
 
                                         {/* KPI Bar */}
-                                        <TableCell>
+                                        <TableCell className="overflow-hidden">
                                             <KPIBar
                                                 baik={item.baik}
                                                 cukup={item.cukup}

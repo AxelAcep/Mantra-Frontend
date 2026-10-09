@@ -73,7 +73,7 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort, className = "" 
     const isActive = sortBy === field
     return (
         <TableHead
-            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold ${className}`}
+            className={`cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal ${className}`}
             onClick={() => onSort(field)}
         >
             <div className="flex items-center gap-1">
@@ -141,13 +141,21 @@ export function CardRiwayatTable({
             {/* Table */}
             <div className="w-full overflow-x-auto px-6">
                 <div className="w-full rounded-md border bg-white min-w-[800px]">
-                <Table>
+                <Table className="table-fixed">
+                    <colgroup>
+                        <col className="w-[18%]" />
+                        <col className="w-[13%]" />
+                        <col className="w-[30%]" />
+                        <col className="w-[15%]" />
+                        <col className="w-[12%]" />
+                        <col className="w-[12%]" />
+                    </colgroup>
                     <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-100">
                             <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                             <SortableHeader label="TANGGAL" field="tanggal" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
-                            <TableHead className="text-[#000000] text-xs font-semibold">AKTIVITAS</TableHead>
-                            <TableHead className="text-[#000000] text-xs font-semibold">PERUSAHAAN</TableHead>
+                            <TableHead className="text-[#000000] text-xs font-semibold whitespace-normal">AKTIVITAS</TableHead>
+                            <TableHead className="text-[#000000] text-xs font-semibold whitespace-normal">PERUSAHAAN</TableHead>
                             <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                             <TableHead className="text-right text-[#000000] text-xs font-semibold">AKSI</TableHead>
                         </TableRow>
@@ -170,12 +178,12 @@ export function CardRiwayatTable({
                             return (
                                 <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                                     {/* Karyawan */}
-                                    <TableCell>
+                                    <TableCell className="overflow-hidden">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                 {getInitials(item.pegawai.nama)}
                                             </div>
-                                            <div title={item.pegawai.nama} className="max-w-[150px]">
+                                            <div title={item.pegawai.nama} className="min-w-0 w-full">
                                                 <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama}</p>
                                                 <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.pegawai.divisi)}</p>
                                             </div>
@@ -191,19 +199,19 @@ export function CardRiwayatTable({
                                     </TableCell>
 
                                     {/* Aktivitas */}
-                                    <TableCell className="max-w-[320px]">
-                                        <p className="text-medium font-semibold text-gray-900">{item.judul}</p>
+                                    <TableCell className="overflow-hidden" title={item.judul}>
+                                        <p className="text-medium font-semibold text-gray-900 truncate">{item.judul}</p>
                                         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.deskripsi}</p>
                                     </TableCell>
 
                                     {/* Perusahaan */}
-                                    <TableCell className="text-medium text-gray-800">
-                                        {item.perusahaan || "-"}
+                                    <TableCell className="text-medium text-gray-800 overflow-hidden" title={item.perusahaan || "-"}>
+                                        <p className="truncate">{item.perusahaan || "-"}</p>
                                     </TableCell>
 
                                     {/* Kategori */}
-                                    <TableCell>
-                                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-xs font-semibold">
+                                    <TableCell className="overflow-hidden">
+                                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-xs font-semibold whitespace-nowrap">
                                             {toTitleCase(item.kategori)}
                                         </span>
                                     </TableCell>

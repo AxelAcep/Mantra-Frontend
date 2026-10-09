@@ -120,7 +120,7 @@ function SortableHeader({
     return (
         <TableHead
             className={cn(
-                "cursor-pointer select-none group text-[#000000] text-xs font-semibold",
+                "cursor-pointer select-none group text-[#000000] text-xs font-semibold whitespace-normal",
                 center && "text-center",
                 className
             )}
@@ -336,12 +336,21 @@ export function CardAktifTable({
             {/* Table */}
             <div className="w-full overflow-x-auto px-6">
                 <div className="w-full rounded-md border bg-white min-w-[800px]">
-                    <Table>
+                    <Table className="table-fixed">
+                        <colgroup>
+                            <col className="w-[16%]" />
+                            <col className="w-[10%]" />
+                            <col className="w-[22%]" />
+                            <col className="w-[10%]" />
+                            <col className="w-[16%]" />
+                            <col className="w-[12%]" />
+                            <col className="w-[14%]" />
+                        </colgroup>
                         <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-100">
-                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                                <SortableHeader label="KARYAWAN" field="karyawan" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="whitespace-normal" />
                                 <SortableHeader label="KATEGORI" field="kategori" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
-                                <TableHead className="text-[#000000] text-xs font-semibold">JUDUL / PERUSAHAAN</TableHead>
+                                <TableHead className="text-[#000000] text-xs font-semibold whitespace-normal">JUDUL / PERUSAHAAN</TableHead>
                                 <TableHead className="text-[#000000] text-xs font-semibold">NO. REFERENSI</TableHead>
                                 <SortableHeader label="DEADLINE / SUBMIT" field="targetSelesai" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                                 <SortableHeader label="STATUS" field="status" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} center />
@@ -370,12 +379,12 @@ export function CardAktifTable({
                                 return (
                                     <TableRow key={item.id} className="hover:bg-slate-50/50 transition-colors">
                                         {/* Karyawan */}
-                                        <TableCell>
+                                        <TableCell className="overflow-hidden">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatar.bg} ${avatar.text}`}>
                                                     {getInitials(item.pegawai.nama)}
                                                 </div>
-                                                <div title={item.pegawai.nama} className="max-w-[150px]">
+                                                <div title={item.pegawai.nama} className="min-w-0 w-full">
                                                         <p className="font-semibold text-gray-900 truncate">{item.pegawai.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
                                                         <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.pegawai.divisi)}</p>
                                                 </div>
@@ -383,16 +392,16 @@ export function CardAktifTable({
                                         </TableCell>
 
                                         {/* Kategori */}
-                                        <TableCell>
-                                            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold">
+                                        <TableCell className="overflow-hidden">
+                                            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full text-xs font-semibold whitespace-nowrap">
                                                 {toTitleCase(item.kategori)}
                                             </span>
                                         </TableCell>
 
                                         {/* Judul / Perusahaan */}
-                                        <TableCell title={`${item.judul} - ${item.perusahaan}`}>
+                                        <TableCell className="overflow-hidden" title={`${item.judul} - ${item.perusahaan}`}>
                                             <div className="flex items-center gap-3">
-                                                <div className="max-w-[150px]">
+                                                <div className="min-w-0 w-full">
                                                     <p className="text-gray-900 truncate">{item.judul}</p>
                                                     <p className="text-[0.75rem] text-muted-foreground truncate">{item.perusahaan}</p>
                                                 </div>
@@ -400,7 +409,7 @@ export function CardAktifTable({
                                         </TableCell>
 
                                         {/* No. Referensi */}
-                                        <TableCell className="font-mono text-medium max-w-[120px] truncate" title={item.terkaitPO || "-"}>
+                                        <TableCell className="font-mono text-medium truncate" title={item.terkaitPO || "-"}>
                                             {item.terkaitPO?.toUpperCase().includes("PENDING") ? "-" : (item.terkaitPO || "-")}
                                         </TableCell>
 
