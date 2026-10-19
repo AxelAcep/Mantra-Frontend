@@ -85,7 +85,7 @@ export default function ApprovalSectionFollowUp({
   const followUpStages: FollowUpStage[] = [
     {
       title: "Penawaran Terkirim ke Customer",
-      description: `Menunggu pengiriman dokumen penawaran lengkap via email ke ${customerName} oleh Admin Sekertaris`,
+      description: `Menunggu pengiriman dokumen penawaran lengkap via email ke ${customerName} oleh Sekertaris`,
       date: "",
       status: timelineStatus1,
     },
@@ -96,9 +96,9 @@ export default function ApprovalSectionFollowUp({
       status: timelineStatus2,
     },
     {
-      title: "Pengecekan Dokumen PO (Admin Proyek → Finance → Admin Sekertaris)",
+      title: "Pengecekan Dokumen PO (Admin Proyek → Finance → Sekertaris)",
       description:
-        "Berurutan: Admin Proyek cek kelengkapan PO, lanjut Finance, lanjut Admin Sekertaris minta TTD Direktur",
+        "Berurutan: Admin Proyek cek kelengkapan PO, lanjut Finance, lanjut Sekertaris minta TTD Direktur",
       date: "",
       status: timelineStatus3,
     },
@@ -295,7 +295,7 @@ export default function ApprovalSectionFollowUp({
                     return `Admin Proyek selesai. Menunggu Finance${financeNama ? ` (${financeNama})` : ""} menyelesaikan pengecekan.`;
                   }
                   if (!isDiterima(mintaTTDStatus)) {
-                    return `Finance selesai. Menunggu Admin Sekertaris${adminSekertarisNama ? ` (${adminSekertarisNama})` : ""} minta TTD Direktur.`;
+                    return `Finance selesai. Menunggu Sekertaris${adminSekertarisNama ? ` (${adminSekertarisNama})` : ""} minta TTD Direktur.`;
                   }
                   return "Semua daily pengecekan selesai, lanjut ke konfirmasi Direktur.";
                 })()}

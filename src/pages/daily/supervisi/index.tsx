@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom"
+import { useListParams } from "@/hooks/use-list-params"
 import { Icons } from "@/assets"
 import { StatCard } from "./card-stat"
 import { CardAktifTable } from "./card-atkif-table"
@@ -22,24 +23,30 @@ function TabContent({ activeTab, page, onPageChange }: {
 }
 
 export default function ActivityPageSupervisi() {
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const activeTab = searchParams.get("tab") || "aktifitas"
-    const page = parseInt(searchParams.get("page") || "1", 10)
+
+    const { page, filters, setPage, update } = useListParams({ filters: { deadline: "" } })
+    const deadlineFilter = filters.deadline
 
     const { data: stats, isLoading: statsLoading } = useSupervisiDashboardStats()
 
-    const setActiveTab = (tab: string) => {
-        const params = new URLSearchParams(searchParams)
-        params.set("tab", tab)
-        params.set("page", "1")
-        setSearchParams(params, { replace: true })
+    const setActiveTab = (tab: string) => update({ tab, deadline: undefined })
+
+    /**
+     * Card ringkasan jadi shortcut filter. Filter deadline hanya berlaku di tab
+     * Aktivitas, karena angka di card memang dihitung dari aktivitas berjalan.
+     */
+    const applyShortcut = (deadline?: string) => {
+        if ((deadline ?? "") === deadlineFilter && activeTab === "aktifitas") {
+            update({ tab: "aktifitas", deadline: undefined })
+            return
+        }
+        update({ tab: "aktifitas", deadline })
     }
 
-    const setPage = (p: number) => {
-        const params = new URLSearchParams(searchParams)
-        params.set("page", p.toString())
-        setSearchParams(params, { replace: true })
-    }
+    const isShortcutAktif = (deadline?: string) =>
+        activeTab === "aktifitas" && (deadline ?? "") === deadlineFilter
 
     return (
         <div className="p-6 bg-slate-50 min-h-screen space-y-8">
@@ -59,6 +66,8 @@ export default function ActivityPageSupervisi() {
                         icon={Icons.Aktifitas}
                         borderColor="border-blue-500"
                         iconAlt=""
+                        active={isShortcutAktif()}
+                        onClick={() => applyShortcut()}
                     />
                     <StatCard
                         label="Deadline Hari Ini"
@@ -67,6 +76,8 @@ export default function ActivityPageSupervisi() {
                         icon={Icons.AktifitasApproval}
                         borderColor="border-amber-500"
                         iconAlt=""
+                        active={isShortcutAktif("today")}
+                        onClick={() => applyShortcut("today")}
                     />
                     <StatCard
                         label="Overdue"
@@ -75,6 +86,8 @@ export default function ActivityPageSupervisi() {
                         icon={Icons.AKtifitasOverdue}
                         borderColor="border-red-500"
                         iconAlt=""
+                        active={isShortcutAktif("overdue")}
+                        onClick={() => applyShortcut("overdue")}
                     />
                 </div>
             </div>

@@ -21,6 +21,7 @@ import {
   useDeletePenawaranDokumen,
 } from "@/hooks/use-penawaran";
 import { useUnreadChatCount } from "@/hooks/use-activity";
+import { labelDivisi } from "@/utils/divisi"
 
 interface DocumentSectionProps {
   trackingId: string;
@@ -152,7 +153,7 @@ export default function DocumentSection({
                   </p>
                   <p className="text-xs text-gray-400">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
+                    {labelDivisi(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                         "id-ID",

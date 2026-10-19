@@ -24,6 +24,7 @@ import {
     readAllChat,
     getActivityKonfirmasiKolaborasi,
     konfirmasiKolaborasi,
+    type ActivityListParams,
     type CreateActivityPayload,
     type UpdateActivityPayload,
     type KolaboratorPayload,
@@ -40,24 +41,24 @@ import { updateActivityKPI } from "../services/master-activity.services"
 import { uploadDokumen, deleteDokumen } from "../services/dokumen.services"
 import { toast } from "sonner"
 
-export function useActivityBerjalan(page = 1, limit = 10) {
-    return useQuery({ queryKey: ["activity", "berjalan", page], queryFn: () => getAllActivityBerjalan(page, limit) })
+export function useActivityBerjalan(params: ActivityListParams = {}) {
+    return useQuery({ queryKey: ["activity", "berjalan", params], queryFn: () => getAllActivityBerjalan(params) })
 }
 
-export function useActivityAktif(page = 1, limit = 10) {
-    return useQuery({ queryKey: ["activity", "aktif", page], queryFn: () => getAllActivityAktif(page, limit) })
+export function useActivityAktif(params: ActivityListParams = {}) {
+    return useQuery({ queryKey: ["activity", "aktif", params], queryFn: () => getAllActivityAktif(params) })
 }
 
-export function useActivityPending(page = 1, limit = 10) {
-    return useQuery({ queryKey: ["activity", "pending", page], queryFn: () => getAllActivityPending(page, limit) })
+export function useActivityPending(params: ActivityListParams = {}) {
+    return useQuery({ queryKey: ["activity", "pending", params], queryFn: () => getAllActivityPending(params) })
 }
 
-export function useActivityPerluTindakan(page = 1, limit = 10) {
-    return useQuery({ queryKey: ["activity", "perlu-tindakan", page], queryFn: () => getAllActivityPerluTindakan(page, limit) })
+export function useActivityPerluTindakan(params: ActivityListParams = {}) {
+    return useQuery({ queryKey: ["activity", "perlu-tindakan", params], queryFn: () => getAllActivityPerluTindakan(params) })
 }
 
-export function useActivityRiwayat(page = 1, limit = 10) {
-    return useQuery({ queryKey: ["activity", "riwayat", page], queryFn: () => getAllActivityRiwayat(page, limit) })
+export function useActivityRiwayat(params: ActivityListParams = {}) {
+    return useQuery({ queryKey: ["activity", "riwayat", params], queryFn: () => getAllActivityRiwayat(params) })
 }
 
 export function useActivityCount() {

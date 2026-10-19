@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, X } from "lucide-react"
+import { useListParams } from "@/hooks/use-list-params"
+import type { ActivityListParams } from "@/services/activity.services"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/assets"
 import { StatCard } from "./card-stat"
@@ -26,19 +28,21 @@ const tabs = [
 
 function TabContent({
     activeTab,
-    page,
+    params,
     onPageChange,
+    onSort,
 }: {
     activeTab: string
-    page: number
+    params: ActivityListParams
     onPageChange: (p: number) => void
+    onSort: (column: string) => void
 }) {
 
-    const berjalan = useActivityBerjalan(page)
-    const aktif = useActivityAktif(page)
-    const pending = useActivityPending(page)
-    const perluTindakan = useActivityPerluTindakan(page)
-    const riwayat = useActivityRiwayat(page)
+    const berjalan = useActivityBerjalan(params)
+    const aktif = useActivityAktif(params)
+    const pending = useActivityPending(params)
+    const perluTindakan = useActivityPerluTindakan(params)
+    const riwayat = useActivityRiwayat(params)
 
     const map: Record<string, typeof berjalan> = {
         semua: berjalan,
@@ -69,7 +73,10 @@ function TabContent({
                 data={current.data}
                 isLoading={current.isLoading}
                 isError={current.isError}
-                page={page}
+                page={params.page ?? 1}
+                sortBy={params.sortBy}
+                sortDir={params.sortDir}
+                onSort={onSort}
                 onPageChange={onPageChange}
             />
         </div>
@@ -77,26 +84,44 @@ function TabContent({
 }
 
 export default function ActivityPagePegawai() {
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const activeTab = searchParams.get("tab") || "semua"
-    const page = parseInt(searchParams.get("page") || "1", 10)
 
-    const setActiveTab = (tab: string) => {
-        const params = new URLSearchParams(searchParams)
-        params.set("tab", tab)
-        params.set("page", "1")
-        setSearchParams(params, { replace: true })
+    const { page, sortBy, sortDir, filters, setPage, toggleSort, update } = useListParams({
+        filters: { deadline: "" },
+    })
+    const deadlineFilter = filters.deadline
+
+    const listParams: ActivityListParams = {
+        page,
+        sortBy: sortBy || undefined,
+        sortDir,
+        deadline: deadlineFilter || undefined,
     }
 
-    const setPage = (p: number) => {
-        const params = new URLSearchParams(searchParams)
-        params.set("page", p.toString())
-        setSearchParams(params, { replace: true })
+    const setActiveTab = (tab: string) => update({ tab, deadline: undefined })
+
+    /**
+     * Card ringkasan berfungsi sebagai shortcut filter: tiap card membuka tab
+     * yang memuat data tersebut lalu menerapkan filter deadline yang definisinya
+     * sama persis dengan angka di card. Klik ulang card yang sedang aktif akan
+     * melepas filternya.
+     */
+    const applyShortcut = (tab: string, deadline?: string) => {
+        const sudahAktif = activeTab === tab && (deadline ?? "") === deadlineFilter
+        if (sudahAktif) {
+            update({ tab: "semua", deadline: undefined })
+            return
+        }
+        update({ tab, deadline })
     }
+
+    const isShortcutAktif = (tab: string, deadline?: string) =>
+        activeTab === tab && (deadline ?? "") === deadlineFilter
 
     const [modalOpen, setModalOpen] = useState(false)
     const { data: count } = useActivityCount()
-    const { data: perluTindakanData } = useActivityPerluTindakan(1, 1)
+    const { data: perluTindakanData } = useActivityPerluTindakan({ page: 1, limit: 1 })
 
     const perluTindakanCount = perluTindakanData?.meta.total ?? 0
     const hasOverdue = (count?.overdue ?? 0) > 0
@@ -129,10 +154,42 @@ export default function ActivityPagePegawai() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border border-gray-200 p-6 rounded-xl shadow-sm bg-slate-50">
-                    <StatCard label="Aktivitas Aktif" value={count?.aktif ?? 0} icon={Icons.Aktifitas} borderColor="border-blue-500" iconAlt="" />
-                    <StatCard label="Deadline Hari Ini" value={count?.deadlineHariIni ?? 0} icon={Icons.AktifitasApproval} borderColor="border-amber-500" iconAlt="" />
-                    <StatCard label="Menunggu Approval" value={count?.approval ?? 0} icon={Icons.AKtifitasDeadline} borderColor="border-indigo-500" iconAlt="" />
-                    <StatCard label="Overdue" value={count?.overdue ?? 0} icon={Icons.AKtifitasOverdue} borderColor="border-red-500" iconAlt="" />
+                    <StatCard
+                        label="Aktivitas Aktif"
+                        value={count?.aktif ?? 0}
+                        icon={Icons.Aktifitas}
+                        borderColor="border-blue-500"
+                        iconAlt=""
+                        active={isShortcutAktif("progress")}
+                        onClick={() => applyShortcut("progress")}
+                    />
+                    <StatCard
+                        label="Deadline Hari Ini"
+                        value={count?.deadlineHariIni ?? 0}
+                        icon={Icons.AktifitasApproval}
+                        borderColor="border-amber-500"
+                        iconAlt=""
+                        active={isShortcutAktif("semua", "today")}
+                        onClick={() => applyShortcut("semua", "today")}
+                    />
+                    <StatCard
+                        label="Menunggu Approval"
+                        value={count?.approval ?? 0}
+                        icon={Icons.AKtifitasDeadline}
+                        borderColor="border-indigo-500"
+                        iconAlt=""
+                        active={isShortcutAktif("waiting")}
+                        onClick={() => applyShortcut("waiting")}
+                    />
+                    <StatCard
+                        label="Overdue"
+                        value={count?.overdue ?? 0}
+                        icon={Icons.AKtifitasOverdue}
+                        borderColor="border-red-500"
+                        iconAlt=""
+                        active={isShortcutAktif("semua", "overdue")}
+                        onClick={() => applyShortcut("semua", "overdue")}
+                    />
                 </div>
             </div>
 
@@ -161,7 +218,25 @@ export default function ActivityPagePegawai() {
                     ))}
                 </div>
 
-                <TabContent activeTab={activeTab} page={page} onPageChange={setPage} />
+                {deadlineFilter ? (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-slate-500">Filter aktif:</span>
+                        <button
+                            onClick={() => update({ deadline: undefined })}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-medium text-cyan-700 hover:bg-cyan-100 transition-colors"
+                        >
+                            {deadlineFilter === "today" ? "Deadline Hari Ini" : "Overdue"}
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                ) : null}
+
+                <TabContent
+                    activeTab={activeTab}
+                    params={listParams}
+                    onPageChange={setPage}
+                    onSort={toggleSort}
+                />
             </div>
         </div>
     )

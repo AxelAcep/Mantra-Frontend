@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { FileText, Upload, Download, Trash2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -84,7 +85,7 @@ export default function DocumentSectionPersetujuan({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activityAdmin.pegawai?.nama ?? "—"} ·{" "}
-                    {toTitleCase(activityAdmin.pegawai?.divisi ?? "—")} ·{" "}
+                    {labelDivisi(activityAdmin.pegawai?.divisi ?? "—")} ·{" "}
                     {activityAdmin.targetSelesai
                       ? new Date(
                         activityAdmin.targetSelesai,

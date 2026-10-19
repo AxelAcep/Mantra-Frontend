@@ -1,6 +1,7 @@
-﻿import { useState } from "react";
-import { Link } from "react-router";
+﻿import { Link } from "react-router";
 import { usePenawaranList } from "@/hooks/use-create-penawaran";
+import { useListParams } from "@/hooks/use-list-params";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { formatNomorPenawaran } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -50,8 +51,8 @@ function formatRupiah(nilai: number | null | undefined) {
 }
 
 export default function TablePermintaanPenawaran() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const { page, search, sortBy, sortDir, setPage, toggleSort, update } =
+    useListParams({ prefix: "permintaan", defaultSortBy: "tanggalMasuk", defaultSortDir: "desc" });
   const { role } = getAuthData();
   const isMaster = role === "MASTER";
 
@@ -59,6 +60,8 @@ export default function TablePermintaanPenawaran() {
     page,
     limit: 10,
     search,
+    sortBy,
+    sortDir,
   });
 
   return (
@@ -69,10 +72,7 @@ export default function TablePermintaanPenawaran() {
           type="text"
           placeholder="Cari no. penawaran, customer, lokasi..."
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => update({ search: e.target.value })}
           className="w-full max-w-sm px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 placeholder:text-gray-300"
         />
       </div>
@@ -82,13 +82,13 @@ export default function TablePermintaanPenawaran() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 border-b border-slate-100">
-                <TableHead className="text-[#000000] text-xs font-semibold">TANGGAL PERMINTAAN</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold">NO. PENAWARAN</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold">NAMA PERUSAHAAN / LOKASI</TableHead>
+                <SortableHeader label="Tanggal Permintaan" column="tanggalMasuk" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                <SortableHeader label="No. Penawaran" column="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
+                <SortableHeader label="Nama Perusahaan / Lokasi" column="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                 <TableHead className="text-[#000000] text-xs font-semibold">PEMBUAT PENAWARAN</TableHead>
                 {isMaster && <TableHead className="text-[#000000] text-xs font-semibold">HARGA</TableHead>}
                 <TableHead className="text-[#000000] text-xs font-semibold">JENIS PENGADAAN</TableHead>
-                <TableHead className="text-[#000000] text-xs font-semibold text-center">TAHAPAN</TableHead>
+                <SortableHeader label="Tahapan" column="stepSaatIni" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} align="center" className="text-center" />
                 <TableHead className="text-[#000000] text-xs font-semibold text-right">AKSI</TableHead>
               </TableRow>
             </TableHeader>
@@ -174,7 +174,7 @@ export default function TablePermintaanPenawaran() {
           </p>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
@@ -184,7 +184,7 @@ export default function TablePermintaanPenawaran() {
               {page} / {data.meta.totalPages}
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
+              onClick={() => setPage(Math.min(data.meta.totalPages, page + 1))}
               disabled={page === data.meta.totalPages}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >

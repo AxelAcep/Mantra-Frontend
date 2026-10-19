@@ -3,6 +3,7 @@ import { BadgeCheck, ExternalLink, MessageSquare } from "lucide-react"
 import { Icons } from "@/assets"
 import { Link } from "react-router-dom"
 import { usePenawaranIdByNomor } from "@/hooks/use-penawaran"
+import { labelDivisi } from "@/utils/divisi"
 
 const KATEGORI_LABEL: Record<string, string> = {
     QUOTATION: "Quotation",
@@ -218,7 +219,7 @@ export function OverviewCard({
                 {isAdmin && divisi && (
                     <InfoBox
                         label="Divisi"
-                        value={toTitleCase(divisi)}
+                        value={labelDivisi(divisi)}
                     />
                 )}
                 {parent && (

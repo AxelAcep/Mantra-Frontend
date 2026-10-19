@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import { useUnreadChatCount } from "@/hooks/use-activity";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -150,7 +151,7 @@ export default function DocumentSectionBoQ({
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     {activity.pegawai?.nama ?? "—"} ·{" "}
-                    {toTitleCase(activity.pegawai?.divisi ?? "—")} ·{" "}
+                    {labelDivisi(activity.pegawai?.divisi ?? "—")} ·{" "}
                     {activity.targetSelesai
                       ? new Date(activity.targetSelesai).toLocaleDateString(
                           "id-ID",

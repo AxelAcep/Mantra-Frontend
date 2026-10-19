@@ -1,7 +1,8 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
+import { useListParams } from "@/hooks/use-list-params";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import ProgressBadge from "./ProgressBadge";
 import { formatNomorPenawaran } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -30,12 +31,17 @@ function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
 }
 
 export default function TabelGaransi() {
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   // 3 filter kategori garansi: PAC Montair (termasuk Chiller & AC Split/
   // Standing), Generator FirePro (termasuk Conventional/Addressable/
   // StandAlone-BTA), dan Battery (Battery & UPS).
-  const [filterJenis, setFilterJenis] = useState<string>("PAC Montair");
+  const { page, search, sortBy, sortDir, filters, setPage, toggleSort, setFilter, update } =
+    useListParams({
+      prefix: "garansi",
+      defaultSortBy: "tanggalMasuk",
+      defaultSortDir: "desc",
+      filters: { jenis: "PAC Montair" },
+    });
+  const filterJenis = filters.jenis;
 
   const { data, isLoading, isError } = usePenawaranListAktif({
     page,
@@ -43,6 +49,8 @@ export default function TabelGaransi() {
     search,
     step: "GARANSI",
     jenisPenawaran: filterJenis,
+    sortBy,
+    sortDir,
   });
 
   return (
@@ -56,10 +64,7 @@ export default function TabelGaransi() {
             type="text"
             placeholder="Cari nomor PO, nomor WO, nomor penawaran, perusahaan, lokasi..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => update({ search: e.target.value })}
             className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent placeholder:text-gray-300"
           />
         </div>
@@ -67,10 +72,7 @@ export default function TabelGaransi() {
         {/* Filter Jenis Pengadaan */}
         <select
           value={filterJenis}
-          onChange={(e) => {
-            setFilterJenis(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => setFilter("jenis", e.target.value)}
           className="px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-white"
         >
           <option value="PAC Montair">PAC Montair</option>
@@ -86,8 +88,9 @@ export default function TabelGaransi() {
               <TableRow className="bg-slate-50 border-b border-slate-100">
               <TableHead className="text-[#000000] text-xs font-semibold">NOMOR PO</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">NOMOR WO</TableHead>
-              <TableHead className="text-[#000000] text-xs font-semibold">NAMA PERUSAHAAN</TableHead>
+              <SortableHeader label="Nama Perusahaan" column="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
               <TableHead className="text-[#000000] text-xs font-semibold">JENIS PENGADAAN</TableHead>
+              <SortableHeader label="Tanggal Masuk" column="tanggalMasuk" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
               <TableHead className="text-[#000000] text-xs font-semibold">GARANSI MULAI</TableHead>
               <TableHead className="text-[#000000] text-xs font-semibold">GARANSI SELESAI</TableHead>
               <TableHead className="text-center text-[#000000] text-xs font-semibold">PROGRESS BULAN</TableHead>
@@ -98,21 +101,21 @@ export default function TabelGaransi() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={10} className="text-center py-10 text-muted-foreground text-sm">
                   Memuat data...
                 </TableCell>
               </TableRow>
             )}
             {isError && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-10 text-red-500 text-sm">
+                <TableCell colSpan={10} className="text-center py-10 text-red-500 text-sm">
                   Gagal memuat data.
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && !isError && data?.data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground text-sm">
+                <TableCell colSpan={10} className="text-center py-10 text-muted-foreground text-sm">
                   Tidak ada data garansi.
                 </TableCell>
               </TableRow>
@@ -139,6 +142,9 @@ export default function TabelGaransi() {
                       </span>
                     )) || "—"}
                   </div>
+                </TableCell>
+                <TableCell className="text-gray-800">
+                  {formatTanggal(item.tanggalTerbit || item.tanggalMasuk)}
                 </TableCell>
                 <TableCell className="text-gray-800">
                   {item.garansiTuntas && !item.garansiMulai && !item.garansiSelesai ? (
@@ -190,7 +196,7 @@ export default function TabelGaransi() {
           </p>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
@@ -200,7 +206,7 @@ export default function TabelGaransi() {
               <span className="font-semibold text-slate-700">{page}</span> / <span className="font-semibold text-slate-700">{data.meta.totalPages}</span>
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(data.meta.totalPages, p + 1))}
+              onClick={() => setPage(Math.min(data.meta.totalPages, page + 1))}
               disabled={page === data.meta.totalPages}
               className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >

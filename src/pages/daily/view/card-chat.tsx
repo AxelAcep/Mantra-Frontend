@@ -17,6 +17,7 @@ import {
   useUpdateChat,
 } from "@/hooks/use-activity";
 import type { Chat } from "../../../services/activity.services";
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -405,7 +406,7 @@ export function ChatPanel({
                                   {chat.pegawai.nama}
                                 </span>
                                 <span className="text-[10px] text-slate-400 font-normal">
-                                  {toTitleCase(chat.pegawai.divisi)}
+                                  {labelDivisi(chat.pegawai.divisi)}
                                 </span>
                               </div>
                             )}

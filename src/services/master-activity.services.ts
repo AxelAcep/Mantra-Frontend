@@ -107,9 +107,19 @@ export type KonfirmasiPayload = {
 
 // ─── Services ─────────────────────────────────────────────────────────────────
 
-export async function getMasterReschedule(page = 1, limit = 10, search = ""): Promise<PaginatedMasterReschedule> {
+export async function getMasterReschedule(
+    page = 1,
+    limit = 10,
+    search = "",
+    sortBy = "",
+    sortDir = "",
+): Promise<PaginatedMasterReschedule> {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) })
     if (search) params.set("search", search)
+    if (sortBy) {
+        params.set("sortBy", sortBy)
+        params.set("sortDir", sortDir || "asc")
+    }
 
     const res = await fetchClient(`/activity/master/reschedule?${params}`, { headers: authHeaders() })
     const json = await res.json()

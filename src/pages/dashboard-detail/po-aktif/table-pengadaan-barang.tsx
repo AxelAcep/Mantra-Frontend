@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -22,6 +22,7 @@ import { formatNomorPenawaran } from "@/lib/utils";
 import { usePenawaranListAktif } from "@/hooks/use-create-penawaran";
 import { TablePagination } from "@/pages/daily/manager/table-pagination";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useListParams } from "@/hooks/use-list-params";
 
 type SortDir = "asc" | "desc" | "";
 
@@ -73,20 +74,15 @@ function SortableHeader({
 }
 
 export default function DaftarPOAktifPengadaanBarang() {
-  const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [sortBy, setSortBy] = useState("");
-  const [sortDir, setSortDir] = useState<SortDir>("");
+  const { page, sortBy, sortDir, search, setPage, toggleSort, update } = useListParams();
+  const [searchInput, setSearchInput] = useState(search);
 
-  const search = useDebounce(searchInput, 400);
+  const debouncedSearch = useDebounce(searchInput, 400);
 
-  const prevDeps = useRef({ search, sortBy, sortDir });
+  // Ketikan baru disimpan ke URL setelah debounce supaya param tidak ditulis tiap huruf.
   useEffect(() => {
-    const p = prevDeps.current;
-    if (p.search === search && p.sortBy === sortBy && p.sortDir === sortDir) return;
-    prevDeps.current = { search, sortBy, sortDir };
-    setPage(1);
-  }, [search, sortBy, sortDir]);
+    if (debouncedSearch !== search) update({ search: debouncedSearch });
+  }, [debouncedSearch, search, update]);
 
   const { data, isLoading } = usePenawaranListAktif({
     step: "IMPLEMENTASI,BAST",
@@ -94,17 +90,12 @@ export default function DaftarPOAktifPengadaanBarang() {
     limit: 10,
     search,
     sortBy,
-    sortDir: sortDir || undefined,
+    // Arah sort hanya dikirim saat ada kolom aktif, sama seperti perilaku sebelumnya.
+    sortDir: sortBy ? sortDir : undefined,
   });
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
-
-  function handleSort(field: string) {
-    if (sortBy !== field) { setSortBy(field); setSortDir("asc"); }
-    else if (sortDir === "asc") setSortDir("desc");
-    else { setSortBy(""); setSortDir(""); }
-  }
 
   return (
     <Card className="rounded-xl border-slate-200 shadow-sm overflow-hidden py-0! gap-0!">
@@ -129,10 +120,10 @@ export default function DaftarPOAktifPengadaanBarang() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
-                  <SortableHeader label="NOMOR PO" field="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[15%] pl-4" />
-                  <SortableHeader label="TANGGAL TERBIT" field="tanggalTerbit" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[15%]" />
-                  <SortableHeader label="NAMA PERUSAHAAN" field="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[20%]" />
-                  <SortableHeader label="LOKASI PROYEK" field="lokasiProyek" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} className="w-[15%]" />
+                  <SortableHeader label="NOMOR PO" field="nomorPenawaran" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[15%] pl-4" />
+                  <SortableHeader label="TANGGAL TERBIT" field="tanggalTerbit" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[15%]" />
+                  <SortableHeader label="NAMA PERUSAHAAN" field="perusahaanName" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[20%]" />
+                  <SortableHeader label="LOKASI PROYEK" field="lokasiProyek" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} className="w-[15%]" />
                   <TableHead className="h-11 w-[15%]">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">JENIS PENGADAAN</div>
                   </TableHead>

@@ -7,6 +7,7 @@ import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow,
 } from "@/components/ui/table"
+import { labelDivisi } from "@/utils/divisi"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -282,7 +283,7 @@ export function KaryawanTable({
                                                 </div>
                                                 <div title={item.nama} className="min-w-0 w-full">
                                                     <p className="font-semibold text-gray-900 truncate">{item.nama?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</p>
-                                                    <p className="text-[0.75rem] text-muted-foreground truncate">{item.divisi?.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</p>
+                                                    <p className="text-[0.75rem] text-muted-foreground truncate">{labelDivisi(item.divisi)}</p>
                                                 </div>
                                             </div>
                                         </TableCell>

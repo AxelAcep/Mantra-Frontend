@@ -18,10 +18,17 @@ import {
     type PaginatedActivity
 } from "../services/master-activity.services"
 
-export function useMasterReschedule(page = 1, limit = 10, search = "", enabled = true) {
+export function useMasterReschedule(
+    page = 1,
+    limit = 10,
+    search = "",
+    enabled = true,
+    sort: { sortBy?: string; sortDir?: string } = {},
+) {
+    const { sortBy = "", sortDir = "" } = sort
     return useQuery({
-        queryKey: ["master", "reschedule", page, limit, search],
-        queryFn: () => getMasterReschedule(page, limit, search),
+        queryKey: ["master", "reschedule", page, limit, search, sortBy, sortDir],
+        queryFn: () => getMasterReschedule(page, limit, search, sortBy, sortDir),
         enabled,
     })
 }

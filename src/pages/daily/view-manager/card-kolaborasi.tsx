@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { labelDivisi } from "@/utils/divisi"
 
 function toTitleCase(str: string) {
     return str
@@ -114,7 +115,7 @@ export function KolaborasiCardAdmin({ kolaborator = [], onLihatDetail }: Props) 
                                 <FieldBox label="Nama Karyawan" value={kol.pegawai.nama} />
 
                                 {/* Divisi */}
-                                <FieldBox label="Divisi" value={toTitleCase(kol.pegawai.divisi)} />
+                                <FieldBox label="Divisi" value={labelDivisi(kol.pegawai.divisi)} />
 
                                 {/* Judul */}
                                 <FieldBox label="Judul" value={kol.judul} />

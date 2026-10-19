@@ -104,11 +104,24 @@ export async function getAccountingSummary(): Promise<AccountingSummaryResponse>
   return res.json();
 }
 
+export type AccountingPOSortBy =
+  | "deadline"
+  | "nomorPenawaran"
+  | "perusahaanName"
+  | "persentaseDibayar"
+  | "status";
+
+export type AccountingPOFlag = "MENDEKATI" | "LEWAT" | "";
+
 export interface GetAccountingPOListParams {
   page?: number;
   limit?: number;
   search?: string;
   status?: StatusPembayaranPO | "";
+  sortBy?: AccountingPOSortBy | "";
+  sortDir?: "asc" | "desc";
+  /** Filter cepat dari card ringkasan: termin terdekat mendekati / lewat tenggat. */
+  flag?: AccountingPOFlag;
 }
 
 export async function getAccountingPOList(
@@ -119,6 +132,9 @@ export async function getAccountingPOList(
   if (params.limit) query.set("limit", String(params.limit));
   if (params.search) query.set("search", params.search);
   if (params.status) query.set("status", params.status);
+  if (params.sortBy) query.set("sortBy", params.sortBy);
+  if (params.sortDir) query.set("sortDir", params.sortDir);
+  if (params.flag) query.set("flag", params.flag);
 
   const res = await fetchClient(`/accounting/po?${query.toString()}`, {
     method: "GET",
