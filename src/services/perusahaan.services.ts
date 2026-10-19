@@ -40,6 +40,9 @@ export type Perusahaan = {
     nomor_telepon?: string
     createdAt?: string
     updatedAt?: string
+    // Hanya diisi oleh GET /perusahaan (list): jumlah proyek pengadaan
+    // barang per perusahaan yang tidak dibatalkan.
+    totalProyekPengadaan?: number
 }
 
 export async function getPerusahaanList(): Promise<Perusahaan[]> {

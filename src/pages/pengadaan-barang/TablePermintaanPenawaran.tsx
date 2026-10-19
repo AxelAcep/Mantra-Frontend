@@ -50,7 +50,11 @@ function formatRupiah(nilai: number | null | undefined) {
   }).format(nilai);
 }
 
-export default function TablePermintaanPenawaran() {
+type Props = {
+  perusahaanId?: string;
+};
+
+export default function TablePermintaanPenawaran({ perusahaanId }: Props) {
   const { page, search, sortBy, sortDir, setPage, toggleSort, update } =
     useListParams({ prefix: "permintaan", defaultSortBy: "tanggalMasuk", defaultSortDir: "desc" });
   const { role } = getAuthData();
@@ -60,6 +64,7 @@ export default function TablePermintaanPenawaran() {
     page,
     limit: 10,
     search,
+    perusahaanId,
     sortBy,
     sortDir,
   });

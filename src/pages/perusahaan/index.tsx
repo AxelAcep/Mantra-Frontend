@@ -85,8 +85,7 @@ export default function PerusahaanPage() {
           phone: item.nomor_telepon || "-",
           activity: getTimeAgo(item.updatedAt || item.createdAt || ""),
           rawDate: item.updatedAt || item.createdAt || "",
-          pengadaan: 0,
-          total: 0
+          totalProyek: item.totalProyekPengadaan ?? 0
         }));
         setCompanyList(mapped);
       } catch (err: any) {
@@ -184,8 +183,7 @@ export default function PerusahaanPage() {
           phone: created.nomor_telepon || "-",
           activity: getTimeAgo(created.updatedAt || created.createdAt || ""),
           rawDate: created.updatedAt || created.createdAt || "",
-          pengadaan: 0,
-          total: 0
+          totalProyek: 0
         }
       ]);
     } catch (err: any) {
@@ -226,15 +224,14 @@ export default function PerusahaanPage() {
                 <SortableHeader label="ALAMAT" field="address" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[20%]" />
                 <SortableHeader label="NOMOR TELEPON" field="phone" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[15%]" />
                 <SortableHeader label="AKTIVITAS TERAKHIR" field="activity" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} className="w-[15%]" />
-                <SortableHeader label="PENGADAAN BARANG" field="pengadaan" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[12%]" />
-                <SortableHeader label="TOTAL PROYEK" field="total" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[10%]" />
+                <SortableHeader label="TOTAL PROYEK PENGADAAN BARANG" field="totalProyek" sortField={sortField} sortOrder={sortOrder} onSort={handleSort} center className="w-[18%]" />
                 <TableHead className="text-right text-[#000000] text-xs font-semibold w-[6%]">AKSI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedCompanies.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-muted-foreground text-sm">
+                  <TableCell colSpan={6} className="text-center py-10 text-muted-foreground text-sm">
                     Tidak ada perusahaan yang ditemukan.
                   </TableCell>
                 </TableRow>
@@ -260,17 +257,8 @@ export default function PerusahaanPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      {item.pengadaan > 0 ? (
-                        <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[11px] font-semibold border border-blue-100">
-                          {item.pengadaan} Aktif
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 text-sm">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {item.total > 0 ? (
-                        <span className="font-bold text-slate-800 text-sm">{item.total}</span>
+                      {item.totalProyek > 0 ? (
+                        <span className="font-bold text-slate-800 text-sm">{item.totalProyek}</span>
                       ) : (
                         <span className="text-slate-400 text-sm">-</span>
                       )}

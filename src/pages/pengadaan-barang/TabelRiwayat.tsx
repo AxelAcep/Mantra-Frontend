@@ -74,7 +74,11 @@ function OverallStatusBadge({ status }: { status?: string }) {
 // Riwayat = SEMUA TrackingPenawaran, status/step apapun (termasuk yang
 // dibatalkan) — gak dibatasin ke satu step tertentu, cuma bisa difilter
 // manual lewat dropdown di bawah.
-export default function TableRiwayat() {
+type Props = {
+  perusahaanId?: string;
+};
+
+export default function TableRiwayat({ perusahaanId }: Props) {
   const { page, search, sortBy, sortDir, filters, setPage, toggleSort, setFilter, update } =
     useListParams({
       prefix: "riwayat",
@@ -93,6 +97,7 @@ export default function TableRiwayat() {
     page,
     limit: 10,
     search,
+    perusahaanId,
     step: step || undefined,
     overallStatus: overallStatus || undefined,
     sortBy,
