@@ -18,10 +18,11 @@ interface Props {
   canKonfirmasiUlang: boolean;
   isUpdating: boolean;
   adminDailySelesai: boolean;
+  supervisiSalesDailySelesai: boolean;
   onAcc: () => void;
   onPerluTindakan: (alasan: string) => void;
   onOnProgress: () => void;
-  onLihatDaily: () => void;
+  onLihatDaily: (activityId: string) => void;
 }
 
 function RevisionInlineModal({
@@ -92,16 +93,11 @@ function renderBadge(state: "DISETUJUI" | "MENUNGGU" | "DITOLAK") {
 
 export default function ApprovalSectionReviewInternal({
   data,
-  canSupervisiSalesAcc,
-  isUpdating,
-  onAcc,
   onPerluTindakan,
   onLihatDaily,
 }: Props) {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(false);
   const [showRevisionModal, setShowRevisionModal] = useState(false);
-  const [showTolakSalesInput, setShowTolakSalesInput] = useState(false);
-  const [alasanTolakSales, setAlasanTolakSales] = useState("");
 
   const adminDailyStatus = data.activityAdmin?.status;
 
@@ -118,10 +114,17 @@ export default function ApprovalSectionReviewInternal({
     return "MENUNGGU";
   })();
 
-  // Beda dari 2 badge di atas (yang ngikut status daily) -- Supervisi Sales
-  // gak punya daily, gate-nya murni field accSupervisiSales dari backend
-  // (harus dipencet manual, mirip accDirekturKomisaris di Persetujuan Manajemen).
-  const salesBadgeState = data.accSupervisiSales ? "DISETUJUI" : "MENUNGGU";
+  // Sama mekanisme kayak 2 badge di atas: ikut status daily Supervisi Sales
+  // (activitySupervisiSales). Fallback ke accSupervisiSales buat data lama
+  // yang udah selesai sebelum daily ini ada.
+  const supervisiSalesDailyStatus = data.activitySupervisiSales?.status;
+  const salesBadgeState = (() => {
+    const s = supervisiSalesDailyStatus?.toUpperCase();
+    if (s === "DITERIMA" || s === "SELESAI") return "DISETUJUI";
+    if (s === "DITOLAK") return "DITOLAK";
+    if (data.accSupervisiSales) return "DISETUJUI";
+    return "MENUNGGU";
+  })();
 
   const AccAdminDirektur = adBadgeState === "DISETUJUI";
   const AccManagerOperasinal = moBadgeState === "DISETUJUI";
@@ -132,13 +135,6 @@ export default function ApprovalSectionReviewInternal({
     (AccManagerOperasinal ? 1 : 0) +
     (AccSupervisiSales ? 1 : 0);
   const boq = data.trackingPenawaran;
-
-  function handleTolakSalesSubmit() {
-    if (!alasanTolakSales.trim()) return;
-    onPerluTindakan(alasanTolakSales.trim());
-    setAlasanTolakSales("");
-    setShowTolakSalesInput(false);
-  }
 
   return (
     <>
@@ -231,7 +227,7 @@ export default function ApprovalSectionReviewInternal({
                       Daily: {data.activityAdmin.judul}
                     </span>
                     <button
-                      onClick={onLihatDaily}
+                      onClick={() => onLihatDaily(data.activityAdmin!.id)}
                       className="flex items-center gap-1 text-xs text-cyan-500 hover:text-cyan-600 font-medium"
                     >
                       <ExternalLink size={12} /> Lihat Detail
@@ -320,8 +316,9 @@ export default function ApprovalSectionReviewInternal({
             )} */}
           </div>
 
-          {/* Supervisi Sales — gak ada daily, harus dipencet manual (mirip
-              Direktur/Komisaris di Persetujuan Manajemen) */}
+          {/* Supervisi Sales — sekarang gate-nya ikut daily sendiri
+              (ActivitySupervisiSales), sama mekanisme kayak Admin Direktur
+              di atas. Tombol manual dimatikan, mirror block Admin/Manajer. */}
           <div className="bg-slate-50/70 rounded-2xl border border-gray-100 p-5">
             <div className="flex gap-4">
               <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-base shrink-0">
@@ -334,15 +331,32 @@ export default function ApprovalSectionReviewInternal({
                       Supervisi Sales
                     </p>
                     <p className="text-xs text-gray-400 font-medium mt-0.5">
-                      Menunggu persetujuan Supervisi Sales
+                      {data.activitySupervisiSales?.pegawai?.nama ||
+                        "Supervisi Sales"}
                     </p>
                   </div>
                   {renderBadge(salesBadgeState)}
                 </div>
+
+                {data.activitySupervisiSales && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">
+                      Daily: {data.activitySupervisiSales.judul}
+                    </span>
+                    <button
+                      onClick={() =>
+                        onLihatDaily(data.activitySupervisiSales!.id)
+                      }
+                      className="flex items-center gap-1 text-xs text-cyan-500 hover:text-cyan-600 font-medium"
+                    >
+                      <ExternalLink size={12} /> Lihat Detail
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {canSupervisiSalesAcc && !showTolakSalesInput && (
+            {/* {canSupervisiSalesAcc && !showTolakSalesInput && (
               <div className="mt-5 ml-14 flex gap-3">
                 <button
                   onClick={onAcc}
@@ -390,7 +404,7 @@ export default function ApprovalSectionReviewInternal({
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

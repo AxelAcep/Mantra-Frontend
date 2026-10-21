@@ -79,6 +79,13 @@ export default function Step3({ trackingId }: Props) {
     adminDailyStatus === "SELESAI" ||
     adminDailyStatus === "DITERIMA";
 
+  // Status daily Supervisi Sales (sama mekanisme kayak daily Admin di atas)
+  const supervisiSalesDailyStatus = data.activitySupervisiSales?.status;
+  const supervisiSalesDailySelesai =
+    supervisiSalesDailyStatus === "KONFIRMASI_SELESAI" ||
+    supervisiSalesDailyStatus === "SELESAI" ||
+    supervisiSalesDailyStatus === "DITERIMA";
+
   // Admin Sekertaris: bisa ACC/Tolak hanya kalau ON_PROGRESS & daily selesai & belum acc
   const canAdminAcc =
     isAdminSekertaris &&
@@ -157,6 +164,7 @@ export default function Step3({ trackingId }: Props) {
           canKonfirmasiUlang={canKonfirmasiUlang}
           isUpdating={isUpdating}
           adminDailySelesai={adminDailySelesai}
+          supervisiSalesDailySelesai={supervisiSalesDailySelesai}
           onAcc={() => updateStatusMut.mutate({ status: "ACC" })}
           onPerluTindakan={(alasan) =>
             updateStatusMut.mutate({
@@ -165,10 +173,8 @@ export default function Step3({ trackingId }: Props) {
             })
           }
           onOnProgress={() => updateStatusMut.mutate({ status: "ON_PROGRESS" })}
-          onLihatDaily={() => {
-            if (data.activityAdmin?.id) {
-              navigate(`/dailyactivity/${data.activityAdmin.id}`);
-            }
+          onLihatDaily={(activityId: string) => {
+            navigate(`/dailyactivity/${activityId}`);
           }}
         />
 

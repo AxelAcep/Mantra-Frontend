@@ -24,7 +24,7 @@ export function useFollowUpAdmin(followUpId: string) {
 
     getPegawaiAdminProyek()
       .then((data) => {
-        if (active) setPegawaiList(data);
+        if (active) setPegawaiList(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
         if (active)

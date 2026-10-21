@@ -22,7 +22,6 @@ const ALL_TABS: TabName[] = [
   "Permintaan Penawaran",
   "PO Aktif",
   "BAST",
-  "Konfirmasi Selesai",
   "Garansi",
   "Riwayat",
 ];
