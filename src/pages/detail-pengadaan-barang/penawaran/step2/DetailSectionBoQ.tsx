@@ -104,7 +104,7 @@ export default function DetailSectionBoQ({
     setHarga1(financial?.harga1 ?? 0);
     setHarga2(financial?.harga2 ?? 0);
     setHarga3(financial?.harga3 ?? 0);
-  }, [financial]);
+  }, [financial?.harga1, financial?.harga2, financial?.harga3]);
 
   useEffect(() => {
     setNomorPenawaran(nomorPenawaran初始 ?? "");

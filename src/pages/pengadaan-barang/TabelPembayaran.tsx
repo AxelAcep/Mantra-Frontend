@@ -19,7 +19,11 @@ function formatTanggal(iso: string | null | undefined) {
 // Tab "BAST" = tracking yang lagi di tahap BAST tapi BELUM semua entry
 // selesai (masih berjalan). Pasangannya: tab "Konfirmasi Selesai" (BAST udah
 // lengkap semua entry-nya).
-export default function TablePembayaran() {
+type Props = {
+  perusahaanId?: string;
+};
+
+export default function TablePembayaran({ perusahaanId }: Props) {
   const { page, search, sortBy, sortDir, setPage, toggleSort, update } =
     useListParams({ prefix: "bast", defaultSortBy: "tanggalMasuk", defaultSortDir: "desc" });
 
@@ -27,6 +31,7 @@ export default function TablePembayaran() {
     page,
     limit: 10,
     search,
+    perusahaanId,
     step: "BAST",
     bastLengkap: "false",
     sortBy,

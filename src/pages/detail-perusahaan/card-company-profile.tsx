@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import { DialogEditPerusahaan } from "./dialog-edit-perusahaan";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPerusahaanDetail, updatePerusahaan, deletePerusahaan } from "@/services/perusahaan.services";
+import { usePengadaanSummaryPerusahaan } from "@/hooks/use-create-penawaran";
 import { getTimeAgo } from "@/lib/utils";
 import {
   AlertDialog,
@@ -22,6 +23,7 @@ export default function CardCompanyProfileDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { data: pengadaanSummary } = usePengadaanSummaryPerusahaan(id);
   const [companyInfo, setCompanyInfo] = useState({
     name: "PT. ABC Maju Jaya",
     address: "Jl. Sudirman No. 45, Jakarta Selatan",
@@ -140,16 +142,16 @@ export default function CardCompanyProfileDetail() {
             {/* Sub-grid untuk 3 Status */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-                <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
-                <p className="text-lg font-bold text-emerald-500">0</p>
+                <p className="text-[10px] text-slate-500 mb-1">Total</p>
+                <p className="text-lg font-bold text-cyan-600">{pengadaanSummary?.total ?? 0}</p>
               </div>
               <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
-                <p className="text-[10px] text-slate-500 mb-1">Menunggu Persetujuan</p>
-                <p className="text-lg font-bold text-slate-800">0</p>
+                <p className="text-[10px] text-slate-500 mb-1">Aktif</p>
+                <p className="text-lg font-bold text-emerald-500">{pengadaanSummary?.aktif ?? 0}</p>
               </div>
               <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-100 text-center flex flex-col justify-center">
                 <p className="text-[10px] text-slate-500 mb-1">Selesai</p>
-                <p className="text-lg font-bold text-slate-800">0</p>
+                <p className="text-lg font-bold text-slate-800">{pengadaanSummary?.selesai ?? 0}</p>
               </div>
             </div>
           </div>

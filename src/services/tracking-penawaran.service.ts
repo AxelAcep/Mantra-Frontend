@@ -119,6 +119,9 @@ export type GetPenawaranListParams = {
   bastLengkap?: "true" | "false";
   // Cuma dipakai tab Riwayat.
   overallStatus?: "ON_PROGRESS" | "SELESAI" | "DIBATALKAN";
+  // Scoping per perusahaan (halaman detail perusahaan) — kalau diisi, hanya
+  // pengadaan milik perusahaan tersebut yang dikembalikan.
+  perusahaanId?: string;
   // Sorting
   sortBy?: string;
   sortDir?: "asc" | "desc";
@@ -134,6 +137,7 @@ export async function getPenawaranList(
   if (params.step) query.set("step", params.step);
   if (params.sortBy) query.set("sortBy", params.sortBy);
   if (params.sortDir) query.set("sortDir", params.sortDir);
+  if (params.perusahaanId) query.set("perusahaanId", params.perusahaanId);
 
   const res = await fetchClient(`/tracking-penawaran?${query.toString()}`, {
     headers: authHeaders(),
@@ -156,6 +160,7 @@ export async function getPenawaranListAktif(
   if (params.jenisPenawaran) query.set("jenisPenawaran", params.jenisPenawaran);
   if (params.sortBy) query.set("sortBy", params.sortBy);
   if (params.sortDir) query.set("sortDir", params.sortDir);
+  if (params.perusahaanId) query.set("perusahaanId", params.perusahaanId);
 
   const res = await fetchClient(`/tracking-penawaran/aktif?${query.toString()}`, {
     headers: authHeaders(),
@@ -194,6 +199,7 @@ export async function getPenawaranListRiwayat(
   if (params.search) query.set("search", params.search);
   if (params.step) query.set("step", params.step);
   if (params.overallStatus) query.set("overallStatus", params.overallStatus);
+  if (params.perusahaanId) query.set("perusahaanId", params.perusahaanId);
 
   const res = await fetchClient(`/tracking-penawaran/riwayat?${query.toString()}`, {
     headers: authHeaders(),
@@ -201,6 +207,27 @@ export async function getPenawaranListRiwayat(
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message ?? "Gagal mengambil data riwayat penawaran.");
+  return data;
+}
+
+export type PengadaanSummaryPerusahaan = {
+  total: number;
+  aktif: number;
+  selesai: number;
+};
+
+export async function getPengadaanSummaryPerusahaan(
+  perusahaanId: string,
+): Promise<PengadaanSummaryPerusahaan> {
+  const res = await fetchClient(
+    `/tracking-penawaran/summary?perusahaanId=${encodeURIComponent(perusahaanId)}`,
+    { headers: authHeaders() },
+  );
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(
+      data.message ?? "Gagal mengambil ringkasan pengadaan perusahaan.",
+    );
   return data;
 }
 

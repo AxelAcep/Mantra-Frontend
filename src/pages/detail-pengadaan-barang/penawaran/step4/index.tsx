@@ -84,7 +84,8 @@ export default function Step4({ trackingId, onStatusChange }: Props) {
 
   useEffect(() => {
     if (data) onStatusChange?.(handlers);
-  }, [data, handlers, onStatusChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.status, canAcc, canKonfirmasiUlang, isUpdating]);
 
   if (loading) {
     return (

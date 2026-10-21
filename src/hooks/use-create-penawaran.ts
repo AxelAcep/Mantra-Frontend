@@ -8,6 +8,7 @@ import {
   getPenawaranListAktif,
   getPenawaranListRiwayat,
   getPengadaanSummary,
+  getPengadaanSummaryPerusahaan,
 } from "@/services/tracking-penawaran.service";
 
 type State = {
@@ -65,6 +66,16 @@ export function usePengadaanSummary() {
   return useQuery({
     queryKey: ["pengadaanSummary"],
     queryFn: getPengadaanSummary,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function usePengadaanSummaryPerusahaan(perusahaanId?: string) {
+  return useQuery({
+    queryKey: ["pengadaan-summary-perusahaan", perusahaanId],
+    queryFn: () => getPengadaanSummaryPerusahaan(perusahaanId!),
+    enabled: !!perusahaanId,
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
   });

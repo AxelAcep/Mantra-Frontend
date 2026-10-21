@@ -30,7 +30,11 @@ function GaransiTuntasBadge({ tuntas }: { tuntas?: boolean }) {
   );
 }
 
-export default function TabelGaransi() {
+type Props = {
+  perusahaanId?: string;
+};
+
+export default function TabelGaransi({ perusahaanId }: Props) {
   // 3 filter kategori garansi: PAC Montair (termasuk Chiller & AC Split/
   // Standing), Generator FirePro (termasuk Conventional/Addressable/
   // StandAlone-BTA), dan Battery (Battery & UPS).
@@ -47,6 +51,7 @@ export default function TabelGaransi() {
     page,
     limit: 10,
     search,
+    perusahaanId,
     step: "GARANSI",
     jenisPenawaran: filterJenis,
     sortBy,

@@ -40,7 +40,11 @@ function TahapBadge({ tahap }: { tahap?: TahapImplementasi }) {
   );
 }
 
-export default function TabelPengadaanAktif() {
+type Props = {
+  perusahaanId?: string;
+};
+
+export default function TabelPengadaanAktif({ perusahaanId }: Props) {
   const { page, search, sortBy, sortDir, setPage, toggleSort, update } =
     useListParams({ prefix: "aktif", defaultSortBy: "tanggalMasuk", defaultSortDir: "desc" });
 
@@ -48,6 +52,7 @@ export default function TabelPengadaanAktif() {
     page,
     limit: 10,
     search,
+    perusahaanId,
     step: "IMPLEMENTASI",
     sortBy,
     sortDir,
