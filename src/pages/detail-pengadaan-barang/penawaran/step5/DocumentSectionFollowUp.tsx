@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import type { FollowUpDokumen } from "@/services/follow-up.services";
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen";
 import { useUnreadChatCount, useDetailActivity } from "@/hooks/use-activity";
 
 interface ActivityRowProps {
@@ -306,7 +307,7 @@ export default function DocumentSectionFollowUp({
       }
     });
 
-    return result;
+    return sortDokumenByCreatedAtAsc(result);
   }, [
     dokumen,
     adminActivityDetail,

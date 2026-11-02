@@ -6,6 +6,7 @@ import DokumenPendukungSection from "./DokumenPendukung";
 import ActivityLogSectionGaransi from "./ActivityLog";
 import KonfigurasiGaransiCard from "./KonfigurasiGaransiCard";
 import type { GaransiResponse } from "@/services/garansi.service";
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen";
 
 const NAMA_BULAN_PANJANG = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -74,7 +75,7 @@ function GaransiTabContent({
     }));
 
   const dokumenPendukung = months.flatMap((m) =>
-    (m.activity?.dokumen ?? []).map((doc) => ({
+    sortDokumenByCreatedAtAsc(m.activity?.dokumen ?? []).map((doc) => ({
       id: doc.id,
       namaFile: doc.namaFile,
       path: doc.path,

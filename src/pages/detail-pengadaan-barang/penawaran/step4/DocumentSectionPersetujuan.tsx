@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { FileText, Upload, Download, Trash2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { labelDivisi } from "@/utils/divisi"
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen"
 
 function toTitleCase(str: string) {
     return str
@@ -140,7 +141,7 @@ export default function DocumentSectionPersetujuan({
               Belum ada dokumen diunggah.
             </p>
           ) : (
-            dokumen.map((doc) => (
+            sortDokumenByCreatedAtAsc(dokumen).map((doc) => (
               <div
                 key={doc.id}
                 className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"

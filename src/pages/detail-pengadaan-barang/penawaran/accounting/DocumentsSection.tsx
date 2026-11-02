@@ -1,5 +1,6 @@
 import React from "react";
 import { FileText, Upload, Download, Trash2 } from "lucide-react";
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen";
 
 interface Dokumen {
   id: string;
@@ -57,7 +58,7 @@ export default function DocumentSection({
           </p>
         )}
 
-        {dokumen.map((doc) => (
+        {sortDokumenByCreatedAtAsc(dokumen).map((doc) => (
           <div
             key={doc.id}
             className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group transition-colors"

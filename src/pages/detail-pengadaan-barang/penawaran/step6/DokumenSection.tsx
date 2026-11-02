@@ -9,6 +9,7 @@ export interface DokumenItem {
   uploader: string;
   path: string;
   divisi?: string;
+  createdAt: string;
 }
 
 interface DokumenSectionProps {

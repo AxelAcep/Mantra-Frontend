@@ -18,6 +18,7 @@ import {
 import { useDetailFollowUp } from "@/hooks/use-follow-up";
 import { useUnreadChatCount, useDetailActivity, useUploadDokumen } from "@/hooks/use-activity";
 import { usePegawaiByDivisi } from "@/hooks/use-penawaran";
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
@@ -231,6 +232,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPembelian?.judul || "Pembelian Barang"}`,
         path: doc.path,
         divisi: doc.pegawai?.divisi || "",
+        createdAt: doc.createdAt,
       });
     });
 
@@ -240,6 +242,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityPengantaran?.judul || "Pengantaran"}`,
         path: doc.path,
         divisi: doc.pegawai?.divisi || "",
+        createdAt: doc.createdAt,
       });
     });
 
@@ -249,6 +252,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
         uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Karyawan"} pada ${formatDateTime(doc.createdAt)} - ${implData?.activityInstalasi?.judul || "Instalasi"}`,
         path: doc.path,
         divisi: doc.pegawai?.divisi || "",
+        createdAt: doc.createdAt,
       });
     });
 
@@ -259,6 +263,7 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
           uploader: `${doc.pegawai?.nama || doc.uploadedBy || "Admin PGA"} pada ${formatDateTime(doc.createdAt)} - Follow Up`,
           path: doc.path,
           divisi: doc.pegawai?.divisi || "",
+          createdAt: doc.createdAt,
         });
       }
     });
@@ -275,12 +280,14 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
 
     // Admin Proyek: sembunyikan dokumen dari divisi tertentu
     if (isAdminProyek) {
-      return result.filter(
-        (d) => !HIDDEN_DIVISI_FOR_ADMIN_PROYEK.includes(d.divisi ?? ""),
+      return sortDokumenByCreatedAtAsc(
+        result.filter(
+          (d) => !HIDDEN_DIVISI_FOR_ADMIN_PROYEK.includes(d.divisi ?? ""),
+        ),
       );
     }
 
-    return result;
+    return sortDokumenByCreatedAtAsc(result);
   }, [
     pembelianDetail,
     pengantaranDetail,

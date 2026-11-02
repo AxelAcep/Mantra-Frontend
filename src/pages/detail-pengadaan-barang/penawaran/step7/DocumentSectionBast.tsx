@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Download, ArrowRight, CheckCircle2 } from "lucide-react";
 import { labelDivisi } from "@/utils/divisi"
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen"
 
 function toTitleCase(str: string) {
     return str
@@ -36,7 +37,7 @@ export default function DocumentSectionBast({
   activityAdminProyek,
 }: DocumentSectionBastProps) {
   const navigate = useNavigate();
-  const dokumen = activityAdminProyek?.dokumen ?? [];
+  const dokumen = sortDokumenByCreatedAtAsc(activityAdminProyek?.dokumen ?? []);
 
   return (
     <div className="space-y-6 mt-6">

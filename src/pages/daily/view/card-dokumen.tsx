@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, FileText, Trash2, Download, Loader2 } from "luc
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { type StatusActivity } from "../../../services/master-activity.services"
+import { sortDokumenByCreatedAtAsc } from "../../../utils/sort-dokumen"
 
 type Dokumen = {
     id: string
@@ -131,7 +132,7 @@ export function DokumenCard({
                             <p className="text-sm text-slate-400">Belum ada dokumen.</p>
                         )}
 
-                        {dokumen.map((doc) => {
+                        {sortDokumenByCreatedAtAsc(dokumen).map((doc) => {
                             const isDeleting = deletingId === doc.id
                             const fileUrl = doc.path.startsWith("http")
                                 ? doc.path

@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { DocumentItem } from "../components";
 import { useUnreadChatCount } from "@/hooks/use-activity";
 import { labelDivisi } from "@/utils/divisi"
+import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen"
 
 function toTitleCase(str: string) {
     return str
@@ -222,7 +223,7 @@ export default function DocumentSectionBoQ({
               Belum ada dokumen.
             </p>
           ) : (
-            dokumen.map((item) => (
+            sortDokumenByCreatedAtAsc(dokumen).map((item) => (
               <DocumentItem
                 key={item.id}
                 name={item.namaFile}
