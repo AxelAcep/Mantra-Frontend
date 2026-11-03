@@ -334,7 +334,7 @@ export default function DetailSection({
         <AssignCard
           icon={<User size={16} />}
           title="PIC Request"
-          divisi="SALES"
+          divisi="SALES,ADMIN_SEKERTARIS"
           currentPegawai={marketing}
           onAssign={(id, onSuccess) => {
             assignMarketing(id, { onSuccess }); // ← hit API sekarang

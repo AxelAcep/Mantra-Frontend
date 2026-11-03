@@ -72,7 +72,8 @@ export default function ListPengadaan() {
 
   const { divisi } = getAuthData();
   const canCreatePenawaran =
-    divisi?.toUpperCase() === "SALES";
+    divisi?.toUpperCase() === "SALES" ||
+    divisi?.toUpperCase() === "ADMIN_SEKERTARIS";
 
   const renderTable = () => {
     switch (activeTab) {
