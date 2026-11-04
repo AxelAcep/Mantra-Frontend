@@ -80,23 +80,6 @@ export interface ReviewInternalResponse {
   } | null;
   accAdminDirektur: boolean;
   accManajerOps: boolean;
-  activitySupervisiSalesId: string | null;
-  activitySupervisiSales: {
-    id: string;
-    pegawaiId: string;
-    pegawai?: {
-      id: string;
-      nama: string;
-      divisi: string;
-    };
-    judul: string;
-    status: string;
-    targetSelesai: string;
-    createdAt: string;
-  } | null;
-  // Sama mekanisme kayak activityAdmin di atas: auto-ACC begitu daily
-  // Supervisi Sales DITERIMA.
-  accSupervisiSales: boolean;
   status: string;
   logAktivitas: LogReviewInternal[];
   dokumen: ReviewInternalDokumen[] | null;
