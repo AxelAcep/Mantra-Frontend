@@ -22,7 +22,7 @@ import {
 } from "@/hooks/use-penawaran";
 import { useUnreadChatCount } from "@/hooks/use-activity";
 import { labelDivisi } from "@/utils/divisi"
-import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen"
+import { sortDokumenByCreatedAtDesc } from "@/utils/sort-dokumen"
 
 interface DocumentSectionProps {
   trackingId: string;
@@ -226,7 +226,7 @@ export default function DocumentSection({
               Belum ada dokumen.
             </p>
           ) : (
-            sortDokumenByCreatedAtAsc(dokumen).map((item) => (
+            sortDokumenByCreatedAtDesc(dokumen).map((item) => (
               <DocumentItem
                 key={item.id}
                 name={item.namaFile}

@@ -18,7 +18,7 @@ import {
 import { useDetailFollowUp } from "@/hooks/use-follow-up";
 import { useUnreadChatCount, useDetailActivity, useUploadDokumen } from "@/hooks/use-activity";
 import { usePegawaiByDivisi } from "@/hooks/use-penawaran";
-import { sortDokumenByCreatedAtAsc } from "@/utils/sort-dokumen";
+import { sortDokumenByCreatedAtDesc } from "@/utils/sort-dokumen";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 
@@ -280,14 +280,14 @@ export default function Step6({ trackingId, onChatClick }: Step6Props) {
 
     // Admin Proyek: sembunyikan dokumen dari divisi tertentu
     if (isAdminProyek) {
-      return sortDokumenByCreatedAtAsc(
+      return sortDokumenByCreatedAtDesc(
         result.filter(
           (d) => !HIDDEN_DIVISI_FOR_ADMIN_PROYEK.includes(d.divisi ?? ""),
         ),
       );
     }
 
-    return sortDokumenByCreatedAtAsc(result);
+    return sortDokumenByCreatedAtDesc(result);
   }, [
     pembelianDetail,
     pengantaranDetail,
